@@ -25,7 +25,7 @@ Machine = Setting_Paramiter[0]["MachineName"]
 
 if Quantity_Cam == 1:
     frame0 = cv.VideoCapture(0, cv.CAP_DSHOW)
-    frame0.set(cv.CAP_PROP_FRAME_WIDTH, 1000)
+    frame0.set(cv.CAP_PROP_FRAME_WIDTH, 1024)
     frame0.set(cv.CAP_PROP_FRAME_HEIGHT, 768)
     frame0.set(cv.CAP_PROP_AUTO_EXPOSURE,0)
     frame0.set(cv.CAP_PROP_AUTOFOCUS, 0)
@@ -338,6 +338,8 @@ class Frame1(ttk.Frame, App):
 
         self.OK_Data = 0
         self.NG_Data = 0
+        self.Comfrim_Data = 0
+        self.Comfrim_SaveScore = 0
         self.OK = tk.LabelFrame(self, text="OK", borderwidth=3, relief="ridge", padx=5, pady=10)
         self.OK.configure(font=("Arial", 25))
         self.OK.configure(fg='Green')
@@ -625,7 +627,6 @@ class Frame1(ttk.Frame, App):
                     self.ShowScore()
                     self.ShowResult()
                     self.Save_Image()
-                    self.Save_Score()
                     self.ProcessP.place_forget()
                     self.ProcessP = tk.Label(self.Process, text="Ready")
                     self.ProcessP.configure(font=("Arial", 18))
@@ -869,6 +870,8 @@ class Frame1(ttk.Frame, App):
                         self.Couter_Printer()
                         self.PrintText()
                         self.OK_Data = self.OK_Data + 1
+                        self.Comfrim_Data = 0
+                        self.Save_Score()
                         self.Result_Ok = tk.Label(self.OK, text=self.OK_Data, borderwidth=3, relief="ridge", padx=5, pady=10)
                         self.Result_Ok.configure(font=("Arial", 25))
                         self.Result_Ok.configure(fg='Green')
@@ -880,14 +883,17 @@ class Frame1(ttk.Frame, App):
                         self.Alarm(False)
                         self.Speaker = False
                         Save_Result(0)
-                    self.NG_Data = self.NG_Data + 1
-                    self.Result_NG = tk.Label(self.NG, text=self.NG_Data, borderwidth=3, relief="ridge", padx=5, pady=10)
-                    self.Result_NG.configure(font=("Arial", 25))
-                    self.Result_NG.configure(fg='Red')
-                    self.Result_NG.place(x=15, y=0, height=70, width=200)
-                    # ClassBoard = Borad()
-                    # ClassBoard.inst.write("@1 R20")
-                    break
+                    self.Comfrim_Data += 1
+                    if self.Comfrim_Data >= 4:
+                        self.NG_Data = self.NG_Data + 1
+                        self.Save_Score()
+                        self.Result_NG = tk.Label(self.NG, text=self.NG_Data, borderwidth=3, relief="ridge", padx=5, pady=10)
+                        self.Result_NG.configure(font=("Arial", 25))
+                        self.Result_NG.configure(fg='Red')
+                        self.Result_NG.place(x=15, y=0, height=70, width=200)
+                        # ClassBoard = Borad()
+                        # ClassBoard.inst.write("@1 R20")
+                        break
 
     def ShowScore(self):
         if self.count != 0:
@@ -929,7 +935,6 @@ class Frame1(ttk.Frame, App):
 
     def Save_Score(self):
         named_tuple = time.localtime()
-
         #Time = time.strftime("%Y-%m-%d_%H%M%S", named_tuple)
         Time = time.strftime("%Y%m%d%H%M%S", named_tuple)
         Transition = [dict(PartNumber=self.Part_API, BatchNumber=self.Batch_API, MachineName=self.Machine_API, Details=[])]
