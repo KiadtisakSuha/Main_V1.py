@@ -25,7 +25,7 @@ Machine = Setting_Paramiter[0]["MachineName"]
 
 if Quantity_Cam == 1:
     frame0 = cv.VideoCapture(0, cv.CAP_DSHOW)
-    frame0.set(cv.CAP_PROP_FRAME_WIDTH, 1700)
+    frame0.set(cv.CAP_PROP_FRAME_WIDTH, 1024)
     frame0.set(cv.CAP_PROP_FRAME_HEIGHT, 768)
     frame0.set(cv.CAP_PROP_AUTO_EXPOSURE,0)
     frame0.set(cv.CAP_PROP_AUTOFOCUS, 0)
