@@ -787,6 +787,8 @@ class Frame1(ttk.Frame, App):
     def Process_Area(self, Data1, Data2):
             Score_Ture = []
             Chack = []
+            swapped = False
+            Result_Score = 0
             for i in range(len(Data1)):
                 total = (((Data1[i] + Data2[i]) / 2) / Data2[i])
                 if total < 1.99:
@@ -800,21 +802,17 @@ class Frame1(ttk.Frame, App):
                 else:
                     Score_Ture.append(0)
                     Chack.append(0)
-            return [Score_Ture, sum(Chack)]
 
-    def bubblesort(self, elements):
-        swapped = False
-        Result_Score = 0
-        for n in range(len(elements) - 1, 0, -1):
-            for i in range(n):
-                if elements[i] > elements[i + 1]:
-                    swapped = True
-                    elements[i], elements[i + 1] = elements[i + 1], elements[i]
-        for i in range(len(elements)):
-            if i <= 4:
-                Result_Score += elements[i]
-        Result_Score = int(Result_Score/5)
-        return Result_Score
+            for n in range(len(Score_Ture) - 1, 0, -1):
+                for i in range(n):
+                    if Score_Ture[i] > Score_Ture[i + 1]:
+                        swapped = True
+                        Score_Ture[i], Score_Ture[i + 1] = Score_Ture[i + 1], Score_Ture[i]
+            for i in range(len(Score_Ture)):
+                if i <= 4:
+                    Result_Score += Score_Ture[i]
+            Result_Score = int(Result_Score/5)
+            return [Result_Score, sum(Chack)]
 
     def Main(self):
         if self.count != 0:
@@ -839,7 +837,7 @@ class Frame1(ttk.Frame, App):
                #ret1, Template_View = cv.threshold(Template_View, 100, 255, cv.THRESH_BINARY)
                 Master_Image = self.Crop_image_Area(image, self.Point_Left[x], self.Point_Top[x], self.Point_Right[x], self.Point_Bottom[x])
                 (Score_Area_Data, Chack) = self.Process_Area(self.Rule_Of_Thirds(Master_Image), self.Rule_Of_Thirds(Template_View))
-                Score_Area_Data = self.bubblesort(Score_Area_Data)
+                #Score_Area_Data = self.bubblesort(Score_Area_Data)
                 self.Score_Outline_Data.append(int(round(val * 1000, 0)))
                 self.Score_Area_Data.append(Score_Area_Data)
                 if scale == 1 and (val * 1000) >= self.Point_Score_Outline[x] and Score_Area_Data >= self.Point_Score_Area[x]:
