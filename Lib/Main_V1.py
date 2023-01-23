@@ -14,6 +14,7 @@ from PIL import Image
 from PIL import ImageTk
 from pygame import mixer
 from tkinter import messagebox
+import sys
 
 with open('Setting Paramiter.json', 'r') as json_file:
     Setting_Paramiter = json.loads(json_file.read())
@@ -167,11 +168,6 @@ class InfiniteTimer():
         else:
             print("Timer never started or failed to initialize.")
 
-    def is_alive(self):
-        self.thread.is_alive()
-        print(self.thread.is_alive())
-
-
 class App(tk.Tk, Getpart):
     def __init__(self):
         super().__init__()
@@ -191,7 +187,7 @@ class App(tk.Tk, Getpart):
         ttk.Style().configure('TNotebook.Tab', font=('Arial', 20),
                               background='black', foreground='#006400', borderwidth=0)
 
-        self.title('Machine Vision Inspection 1.0.0')
+        self.title('Machine Vision Inspection 1.4.0')
         self.geometry("1920x1020+0+0")
         #self.state('zoomed')
         self.attributes('-fullscreen', True)
@@ -274,6 +270,11 @@ class Frame1(ttk.Frame, App):
         self.Machine_Vision.configure(font=("Arial", 30))
         self.Machine_Vision.configure(fg=('Green'))
         self.Machine_Vision.place(x=15, y=5)
+
+        self.Machine_Version = tk.Label(self, text='v1.0.4')
+        self.Machine_Version.configure(font=("Arial", 10))
+        self.Machine_Version.configure(fg=('Green'))
+        self.Machine_Version.place(x=15, y=45)
 
         self.Machine = tk.LabelFrame(self, text="MACHINE")
         self.Machine.configure(font=("Arial", 13))
@@ -606,6 +607,7 @@ class Frame1(ttk.Frame, App):
                 frame0.release()
                 frame1.release()
             cv.destroyAllWindows()
+            self.Run_Alarm.cancel()
             app.destroy()
 
     def Board_run(self):
