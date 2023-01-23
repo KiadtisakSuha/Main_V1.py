@@ -837,7 +837,6 @@ class Frame1(ttk.Frame, App):
                #ret1, Template_View = cv.threshold(Template_View, 100, 255, cv.THRESH_BINARY)
                 Master_Image = self.Crop_image_Area(image, self.Point_Left[x], self.Point_Top[x], self.Point_Right[x], self.Point_Bottom[x])
                 (Score_Area_Data, Chack) = self.Process_Area(self.Rule_Of_Thirds(Master_Image), self.Rule_Of_Thirds(Template_View))
-                #Score_Area_Data = self.bubblesort(Score_Area_Data)
                 self.Score_Outline_Data.append(int(round(val * 1000, 0)))
                 self.Score_Area_Data.append(Score_Area_Data)
                 if scale == 1 and (val * 1000) >= self.Point_Score_Outline[x] and Score_Area_Data >= self.Point_Score_Area[x]:
