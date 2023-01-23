@@ -9,7 +9,7 @@ from threading import Timer
 from tkinter import ttk
 from tkinter.ttk import Notebook, Style
 import cv2 as cv
-# import pyvisa
+import pyvisa
 from PIL import Image
 from PIL import ImageTk
 from pygame import mixer
@@ -29,6 +29,17 @@ if Quantity_Cam == 1:
     frame0.set(cv.CAP_PROP_FRAME_HEIGHT, 768)
     frame0.set(cv.CAP_PROP_AUTO_EXPOSURE,0)
     frame0.set(cv.CAP_PROP_AUTOFOCUS, 0)
+elif Quantity_Cam == 2:
+    frame0 = cv.VideoCapture(0, cv.CAP_DSHOW)
+    frame0.set(cv.CAP_PROP_FRAME_WIDTH, 1024)
+    frame0.set(cv.CAP_PROP_FRAME_HEIGHT, 768)
+    frame0.set(cv.CAP_PROP_AUTO_EXPOSURE, 0)
+    frame0.set(cv.CAP_PROP_AUTOFOCUS, 0)
+    frame1 = cv.VideoCapture(1, cv.CAP_DSHOW)
+    frame1.set(cv.CAP_PROP_FRAME_WIDTH, 1024)
+    frame1.set(cv.CAP_PROP_FRAME_HEIGHT, 768)
+    frame1.set(cv.CAP_PROP_AUTO_EXPOSURE, 0)
+    frame1.set(cv.CAP_PROP_AUTOFOCUS, 0)
 font = cv.FONT_HERSHEY_SIMPLEX
 
 def Save_Result(Data):
@@ -721,7 +732,7 @@ class Frame1(ttk.Frame, App):
         img = cv.imread(imgframe, 0)
         template = cv.imread(imgTemplate, 0)
         w, h = template.shape[::-1]
-        TemplateThreshold = 0.1
+        TemplateThreshold = 0.8
         curMaxVal = 0
         c = 0
         for meth in ['cv.TM_CCOEFF_NORMED']:
@@ -771,12 +782,10 @@ class Frame1(ttk.Frame, App):
         if mod != 0:
             point.append(total[9])
         return point
-
     def Process_Area(self, Data1, Data2):
-        Score_Ture = []
-        Chack = []
-        try:
-            for i in range(10):
+            Score_Ture = []
+            Chack = []
+            for i in range(len(Data1)):
                 total = (((Data1[i] + Data2[i]) / 2) / Data2[i])
                 if total < 1.99:
                     score_out = int(total * 1000)
@@ -789,21 +798,7 @@ class Frame1(ttk.Frame, App):
                 else:
                     Score_Ture.append(0)
                     Chack.append(0)
-        except:
-            for i in range(9):
-                total = (((Data1[i] + Data2[i]) / 2) / Data2[i])
-                if total < 1.99:
-                    score_out = int(total * 1000)
-                    if score_out > 1000:
-                        score_out = 1000 - (score_out - 1000)
-                        Chack.append(1)
-                    else:
-                        Chack.append(0)
-                    Score_Ture.append(score_out)
-                else:
-                    Score_Ture.append(0)
-                    Chack.append(0)
-        return [Score_Ture, sum(Chack)]
+            return [Score_Ture, sum(Chack)]
 
     def bubblesort(self, elements):
         swapped = False
@@ -813,8 +808,6 @@ class Frame1(ttk.Frame, App):
                 if elements[i] > elements[i + 1]:
                     swapped = True
                     elements[i], elements[i + 1] = elements[i + 1], elements[i]
-            if not swapped:
-                return
         for i in range(len(elements)):
             if i <= 4:
                 Result_Score += elements[i]
@@ -859,6 +852,18 @@ class Frame1(ttk.Frame, App):
                     self.padx.append(35)
                 self.place.append(x * 70)
 
+    def ResultComfrim(self):
+        if self.Comfrim_Data >= 4:
+            self.NG_Data = self.NG_Data + 1
+            self.Save_Score()
+            self.Result_NG = tk.Label(self.NG, text=self.NG_Data, borderwidth=3, relief="ridge", padx=5, pady=10)
+            self.Result_NG.configure(font=("Arial", 25))
+            self.Result_NG.configure(fg='Red')
+            self.Result_NG.place(x=15, y=0, height=70, width=200)
+
+
+
+
     def ShowResult(self):
         with open('Result.json', 'r') as json_file:
             json_object = json.loads(json_file.read())
@@ -888,17 +893,10 @@ class Frame1(ttk.Frame, App):
                         self.Alarm(False)
                         self.Speaker = False
                         Save_Result(0)
-                    self.Comfrim_Data += 1
-                    if self.Comfrim_Data >= 4:
-                        self.NG_Data = self.NG_Data + 1
-                        self.Save_Score()
-                        self.Result_NG = tk.Label(self.NG, text=self.NG_Data, borderwidth=3, relief="ridge", padx=5, pady=10)
-                        self.Result_NG.configure(font=("Arial", 25))
-                        self.Result_NG.configure(fg='Red')
-                        self.Result_NG.place(x=15, y=0, height=70, width=200)
-                        # ClassBoard = Borad()
-                        # ClassBoard.inst.write("@1 R20")
-                        break
+                    self.Comfrim_Data = self.Comfrim_Data + 1
+                    self.ResultComfrim()
+                    break
+
 
     def ShowScore(self):
         if self.count != 0:
@@ -942,14 +940,14 @@ class Frame1(ttk.Frame, App):
         named_tuple = time.localtime()
         #Time = time.strftime("%Y-%m-%d_%H%M%S", named_tuple)
         Time = time.strftime("%Y%m%d%H%M%S", named_tuple)
+        parent_dir = 'Transaction/'
+        path = os.path.join(parent_dir)
+        try:
+            os.makedirs(path, exist_ok=True)
+        except OSError as error:
+            pass
         Transition = [dict(PartNumber=self.Part_API, BatchNumber=self.Batch_API, MachineName=self.Machine_API, Details=[])]
         for s in range(self.count):
-            parent_dir = 'Transaction/'
-            path = os.path.join(parent_dir)
-            try:
-                os.makedirs(path, exist_ok=True)
-            except OSError as error:
-                pass
             Transition[0]["Details"].append([dict(Score=int(self.Score_Area_Data[s]),
                                                   Result=self.Result[s], Point=s + 1)])
         with open('Transaction/' + Time + '.json', 'w') as json_file:
