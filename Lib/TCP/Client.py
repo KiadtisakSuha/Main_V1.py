@@ -1,25 +1,17 @@
 import socket
 
+HOST = '192.168.125.9'
+PORT = 8000
 
-def client_program():
-    host = socket.gethostname()  # as both code is running on same pc
-    port = 5000  # socket server port number
+# จากข้อ 1 : สร้าง socket object
+s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-    client_socket = socket.socket()  # instantiate
-    client_socket.connect((host, port))  # connect to the server
+# จากข้อ 4 : client ทำการเชื่อมต่อไปยัง server
+s.connect((HOST, PORT))
 
-    message = input(" -> ")  # take input
+# ส่งข้อมูลไปหา server
+s.sendall(b'Hello World')
 
-    while message.lower().strip() != 'bye':
-        client_socket.send(message.encode())  # send message
-        data = client_socket.recv(1024).decode()  # receive response
-
-        print('Received from server: ' + data)  # show in terminal
-
-        message = input(" -> ")  # again take input
-
-    client_socket.close()  # close the connection
-
-
-if __name__ == '__main__':
-    client_program()
+# รับข้อมูลที่ส่งมาจาก server
+data = s.recv(1024)
+print('received:', repr(data))
