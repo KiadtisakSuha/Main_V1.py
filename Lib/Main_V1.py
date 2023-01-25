@@ -601,13 +601,16 @@ class Frame1(ttk.Frame, App):
         self.Speaker = True
         response = messagebox.askquestion("Close Programe", "Are you sure?", icon='warning')
         if response == "yes":
+            try:
+                self.Run_Alarm.cancel()
+            except:
+                pass
             if Quantity_Cam == 1:
                 frame0.release()
             elif Quantity_Cam == 2:
                 frame0.release()
                 frame1.release()
             cv.destroyAllWindows()
-            #self.Run_Alarm.cancel()
             app.destroy()
 
     def Board_run(self):
