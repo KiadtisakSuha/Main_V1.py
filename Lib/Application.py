@@ -262,7 +262,7 @@ class Frame1(ttk.Frame, App):
         # NG OR OK Show
         self.Batch_API = self.API_json.Get()[1]
         self.Batch_API_Get = self.Batch_API
-        self.Machine_Vision = tk.Label(self, text='Machine Vision Inspection')
+        self.Machine_Vision = tk.Label(self, text='Machine Vision Inspection Demo')
         self.Machine_Vision.configure(font=("Arial", 30))
         self.Machine_Vision.configure(fg=('Green'))
         self.Machine_Vision.place(x=15, y=5)
@@ -398,7 +398,7 @@ class Frame1(ttk.Frame, App):
         self.btn_repart.place(x=1750, y=2)
 
         self.Board_show()
-        self.Board = InfiniteTimer(0.5, self.Board_show)
+        self.Board = InfiniteTimer(0.1, self.Board_show)
         self.Board.start()
         # self.ShowPoint()
 
