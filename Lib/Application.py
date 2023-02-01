@@ -183,10 +183,11 @@ class App(tk.Tk, Getpart):
         ttk.Style().configure('TNotebook.Tab', font=('Arial', 20),
                               background='black', foreground='#006400', borderwidth=0)
 
-        self.title('Machine Vision Inspection 1.4.0')
-        self.geometry("1920x1020+0+0")
+        self.title('Machine Vision Inspection 1.0.4')
+        self.overrideredirect(True)
+        self.geometry("1980x1020+0+0")
         #self.state('zoomed')
-        self.attributes('-fullscreen', True)
+        #self.attributes('-fullscreen', True)
 
         self.notebook = ttk.Notebook(self)
 
@@ -227,6 +228,7 @@ class Frame1(ttk.Frame, App):
 
         self.Batch_API_Get = self.Batch_API
         super().__init__()
+        self.zoom = 0
         self.Run_Alarm = None
         self.count = 0
         self.update_image = None
@@ -248,6 +250,11 @@ class Frame1(ttk.Frame, App):
         self.btn_Close.configure(justify="center", foreground="red")
         self.btn_Close.place(x=1850, y=2)
 
+        #self.btn_Titalbar = tk.Button(self, text="Resize", command=self.Titlebar)
+        #self.btn_Titalbar.configure(font=("Arial", 13))
+        #self.btn_Titalbar.configure(justify="center", foreground="green")
+        #self.btn_Titalbar.place(x=350, y=10)
+
         # self.thread = VideoThread()
         # self.thread.start()
         # self.thread.run()
@@ -262,8 +269,8 @@ class Frame1(ttk.Frame, App):
         # NG OR OK Show
         self.Batch_API = self.API_json.Get()[1]
         self.Batch_API_Get = self.Batch_API
-        self.Machine_Vision = tk.Label(self, text='Machine Vision Inspection Demo')
-        self.Machine_Vision.configure(font=("Arial", 30))
+        self.Machine_Vision = tk.Label(self, text='Machine Vision Inspection')
+        self.Machine_Vision.configure(font=("Arial", 20))
         self.Machine_Vision.configure(fg=('Green'))
         self.Machine_Vision.place(x=15, y=5)
 
@@ -398,8 +405,8 @@ class Frame1(ttk.Frame, App):
         self.btn_repart.place(x=1750, y=2)
 
         self.Board_show()
-        self.Board = InfiniteTimer(0.1, self.Board_show)
-        self.Board.start()
+        self.BoardLoop = InfiniteTimer(0.1, self.Board_show)
+        self.BoardLoop.start()
         # self.ShowPoint()
 
         # self.thread = threading.Timer(0.1,self.RunCam())
@@ -588,6 +595,13 @@ class Frame1(ttk.Frame, App):
             cv.destroyAllWindows()
             app.destroy()
 
+    def Titlebar(self):
+        if self.zoom == 0:
+            app.geometry("1980x1020+0+0")
+            self.zoom = 1
+        elif self.zoom == 1:
+            app.geometry("900x1020+0+0")
+            self.zoom = 0
 
     """""""""
     def CallKeyBorad(self):

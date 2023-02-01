@@ -15,6 +15,8 @@ from PIL import ImageTk
 from pygame import mixer
 from tkinter import messagebox
 import sys
+#import subprocess
+
 
 with open('Setting Paramiter.json', 'r') as json_file:
     Setting_Paramiter = json.loads(json_file.read())
@@ -612,6 +614,7 @@ class Frame1(ttk.Frame, App):
                 frame1.release()
             cv.destroyAllWindows()
             app.destroy()
+            #subprocess.call([r'test.bat'])
 
     def Board_run(self):
         ClassBoard = Borad()
@@ -737,13 +740,13 @@ class Frame1(ttk.Frame, App):
         img = cv.imread(imgframe, 0)
         template = cv.imread(imgTemplate, 0)
         w, h = template.shape[::-1]
-        TemplateThreshold = 0.8
+        TemplateThreshold = 0.45
         curMaxVal = 0
         c = 0
         for meth in ['cv.TM_CCOEFF_NORMED']:
             method = eval(meth)
             try:
-                crop_image_ = img[(Top - 30):(Bottom + 30), (Left - 30):(Right + 30)]
+                crop_image_ = img[(Top - 45):(Bottom + 45), (Left - 45):(Right + 45)]
                 res = cv.matchTemplate(crop_image_, template, method)
             except:
                 crop_image = img[Top:Bottom, Left:Right]
