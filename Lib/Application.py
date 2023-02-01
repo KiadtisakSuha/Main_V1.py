@@ -15,7 +15,7 @@ from PIL import ImageTk
 from pygame import mixer
 from tkinter import messagebox
 import sys
-
+import subprocess
 with open('Setting Paramiter.json', 'r') as json_file:
     Setting_Paramiter = json.loads(json_file.read())
 Quantity_Cam = Setting_Paramiter[0]["Quantity_Cam"]
@@ -594,6 +594,7 @@ class Frame1(ttk.Frame, App):
                 frame1.release()
             cv.destroyAllWindows()
             app.destroy()
+            subprocess.call([r'TerminatedProcess.bat'])
 
     def Titlebar(self):
         if self.zoom == 0:
