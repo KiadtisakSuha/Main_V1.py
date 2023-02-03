@@ -43,6 +43,25 @@ elif Quantity_Cam == 2:
     frame1.set(cv.CAP_PROP_FRAME_HEIGHT, 768)
     frame1.set(cv.CAP_PROP_AUTO_EXPOSURE, 0)
     frame1.set(cv.CAP_PROP_AUTOFOCUS, 0)
+
+elif Quantity_Cam == 3:
+    frame0 = cv.VideoCapture(0, cv.CAP_DSHOW)
+    frame0.set(cv.CAP_PROP_FRAME_WIDTH, 1024)
+    frame0.set(cv.CAP_PROP_FRAME_HEIGHT, 768)
+    frame0.set(cv.CAP_PROP_AUTO_EXPOSURE, 0)
+    frame0.set(cv.CAP_PROP_AUTOFOCUS, 0)
+
+    frame1 = cv.VideoCapture(1, cv.CAP_DSHOW)
+    frame1.set(cv.CAP_PROP_FRAME_WIDTH, 1024)
+    frame1.set(cv.CAP_PROP_FRAME_HEIGHT, 768)
+    frame1.set(cv.CAP_PROP_AUTO_EXPOSURE, 0)
+    frame1.set(cv.CAP_PROP_AUTOFOCUS, 0)
+
+    frame3 = cv.VideoCapture(2, cv.CAP_DSHOW)
+    frame3.set(cv.CAP_PROP_FRAME_WIDTH, 1024)
+    frame3.set(cv.CAP_PROP_FRAME_HEIGHT, 768)
+    frame3.set(cv.CAP_PROP_AUTO_EXPOSURE, 0)
+    frame3.set(cv.CAP_PROP_AUTOFOCUS, 0)
 font = cv.FONT_HERSHEY_SIMPLEX
 
 def Save_Result(Data):
