@@ -57,11 +57,12 @@ elif Quantity_Cam == 3:
     frame1.set(cv.CAP_PROP_AUTO_EXPOSURE, 0)
     frame1.set(cv.CAP_PROP_AUTOFOCUS, 0)
 
-    frame3 = cv.VideoCapture(2, cv.CAP_DSHOW)
-    frame3.set(cv.CAP_PROP_FRAME_WIDTH, 1024)
-    frame3.set(cv.CAP_PROP_FRAME_HEIGHT, 768)
-    frame3.set(cv.CAP_PROP_AUTO_EXPOSURE, 0)
-    frame3.set(cv.CAP_PROP_AUTOFOCUS, 0)
+    frame2 = cv.VideoCapture(2, cv.CAP_DSHOW)
+    frame2.set(cv.CAP_PROP_FRAME_WIDTH, 1024)
+    frame2.set(cv.CAP_PROP_FRAME_HEIGHT, 768)
+    frame2.set(cv.CAP_PROP_AUTO_EXPOSURE, 0)
+    frame2.set(cv.CAP_PROP_AUTOFOCUS, 0)
+
 font = cv.FONT_HERSHEY_SIMPLEX
 
 def Save_Result(Data):
@@ -194,10 +195,10 @@ class App(tk.Tk):
         super().__init__()
         ttk.Style().configure('TNotebook.Tab', font=('Arial', 20),
                               background='black', foreground='#006400', borderwidth=0)
-        self.title('Machine Vision Inspection 1.0.5')
+        self.title('Machine Vision Inspection 1.1.0')
         self.geometry("1920x1020+0+0")
         #self.state('zoomed')
-        #self.attributes('-fullscreen', True)
+        self.attributes('-fullscreen', True)
         self.API_json = Getpart()
         self.API_json.__int__()
         self.Part_API = self.API_json.Get()[0]
@@ -210,36 +211,13 @@ class App(tk.Tk):
         self.Packing_API = self.API_json.Get()[7]
 
         self.Batch_API_Get = self.Batch_API
-        super().__init__()
-        self.Run_Alarm = None
-        self.count = 0
-        self.update_image = None
-        self.Printer = 0
 
-        self.combobox_cam()
-        self.btn_cam = tk.Button(self, text="Choose Camera", command=self.callback_cam)
-        self.btn_cam.configure(font=("Arial", 13))
-        self.btn_cam.configure(justify="center", foreground="green")
-        self.btn_cam.place(x=650, y=20)
-
-        self.btn_reset = tk.Button(self, text="Initiated", command=self.ShowCount)
-        self.btn_reset.configure(font=("Arial", 13))
-        self.btn_reset.configure(justify="center", foreground="green")
-        self.btn_reset.place(x=800, y=20)
-
-        self.btn_Close = tk.Button(self, text="Close", command=self.Destroy)
-        self.btn_Close.configure(font=("Arial", 15))
-        self.btn_Close.configure(justify="center", foreground="red")
-        self.btn_Close.place(x=1850, y=2)
-
-        self.Batch_API = self.API_json.Get()[1]
-        self.Batch_API_Get = self.Batch_API
         self.Machine_Vision = tk.Label(self, text='Machine Vision Inspection')
         self.Machine_Vision.configure(font=("Arial", 30))
         self.Machine_Vision.configure(fg=('Green'))
         self.Machine_Vision.place(x=15, y=5)
 
-        self.Machine_Version = tk.Label(self, text='v1.0.5')
+        self.Machine_Version = tk.Label(self, text='v1.1.0')
         self.Machine_Version.configure(font=("Arial", 10))
         self.Machine_Version.configure(fg=('Green'))
         self.Machine_Version.place(x=15, y=45)
@@ -282,12 +260,6 @@ class App(tk.Tk):
         else:
             self.SeverP.configure(fg='Red')
         self.SeverP.place(x=10, y=15, anchor=tk.W)
-
-        # self.Board = tk.Label(self)
-        # self.Board.grid(padx=200, pady=500)
-        # self.Board.configure(font=("Courier", 44))
-        # self.filemenu.add_command(label="New...", command=self.Img_part())
-        self.Img_part()
 
         self.CUSTOMER_NUMBER = tk.LabelFrame(self, text="CUSTOMER NUMBER")
         self.CUSTOMER_NUMBER.configure(font=("Arial", 13))
@@ -358,6 +330,585 @@ class App(tk.Tk):
         self.ProcessP.place(x=10, y=15, anchor=tk.W)
 
 
+        self.Img_part()
+        self.combobox_cam()
+        self.Camera()
+        self.PrintText()
+
+        self.btn_cam = tk.Button(self, text="Choose Camera", command=self.callback_cam)
+        self.btn_cam.configure(font=("Arial", 13))
+        self.btn_cam.configure(justify="center", foreground="green")
+        self.btn_cam.place(x=650, y=20)
+
+        self.btn_add = tk.Button(self, text="Add Master", command=self.AddMaster)
+        self.btn_add.configure(font=("Arial", 13))
+        self.btn_add.configure(justify="center", foreground="green")
+        self.btn_add.place(x=890, y=20)
+
+        self.btn_reset = tk.Button(self, text="Initiated", command=self.ShowCount)
+        self.btn_reset.configure(font=("Arial", 13))
+        self.btn_reset.configure(justify="center", foreground="green")
+        self.btn_reset.place(x=800, y=20)
+
+        self.btn_Close = tk.Button(self, text="Close", command=self.Destroy)
+        self.btn_Close.configure(font=("Arial", 15))
+        self.btn_Close.configure(justify="center", foreground="red")
+        self.btn_Close.place(x=1850, y=2)
+
+        self.ShowCount()
+        self.CallKeyBorad()
+
+        self.btn_repart = tk.Button(self, text="Re-order", command=self.CallPart)
+        self.btn_repart.configure(font=("Arial", 15))
+        self.btn_repart.configure(justify="center", foreground="green")
+        self.btn_repart.place(x=1750, y=2)
+
+        self.view1 = tk.Label(self)
+        self.view1.place(x=1280, y=205)
+        self.view2 = tk.Label(self)
+        self.view2.place(x=1280, y=605)
+        self.view3 = tk.Label(self)
+        self.view3.place(x=1280, y=1005)
+
+    def CallPart(self):
+        self.API_json = Getpart()
+        self.API_json.__int__()
+        self.Part_API = self.API_json.Get()[0]
+        self.Batch_API = self.API_json.Get()[1]
+        self.part_name_API = self.API_json.Get()[2]
+        self.Customer_API = self.API_json.Get()[3]
+        self.Machine_API = self.API_json.Get()[4]
+        self.Mode_API = self.API_json.Get()[5]
+        self.Sever_API = self.API_json.Get()[6]
+        self.Packing_API = self.API_json.Get()[7]
+        if self.Batch_API_Get == self.Batch_API:
+            pass
+        elif self.Batch_API_Get != self.Batch_API:
+            self.Batch_API_Get = self.Batch_API
+            self.MachineP.configure(text=self.Machine_API)
+            self.PARTP.configure(text=self.Part_API)
+            self.PART_NAMEP.configure(text=self.part_name_API)
+            self.CUSTOMER_NUMBERP.configure(text=self.Customer_API)
+            self.BATCH_NUMBERP.configure(text=self.Batch_API)
+            self.MOLD_NUMBERP.configure(text=self.Mode_API)
+            self.Img_part()
+            self.ShowCount()
+            self.PrintText()
+
+    def PrintText(self):
+        with open('Couter_Printer.json', 'r') as json_file:
+            Data = json.loads(json_file.read())
+        Packing_Couter = Data["Couter"]
+        PackPart = Data["Partnumber"]
+        self.PACKING_NUMBER = tk.LabelFrame(self, text="PACKING")
+        self.PACKING_NUMBER.configure(font=("Arial", 13))
+        self.PACKING_NUMBER.configure(fg='Green')
+        self.PACKING_NUMBER.place(x=615, y=150, height=60, width=120)
+        self.PACKING_NUMBERP = tk.Label(self.PACKING_NUMBER, text=str(Packing_Couter) + "/" + str(self.Packing_API))
+        self.PACKING_NUMBERP.configure(font=("Arial", 13))
+        self.PACKING_NUMBERP.configure(fg='Green')
+        self.PACKING_NUMBERP.place(x=10, y=15, anchor=tk.W)
+
+    def Couter_Printer(self):
+        with open('Couter_Printer.json', 'r') as json_file:
+            Data = json.loads(json_file.read())
+        Packing_Couter = Data["Couter"]
+        PackPart = Data["Partnumber"]
+
+        if PackPart != self.Part_API:
+            Printer = {"Partnumber": self.Part_API, "Couter": 1, "Packing": self.Packing_API}
+            with open('Couter_Printer.json', 'w') as json_file:
+                json.dump(Printer, json_file, indent=6)
+        else:
+            Printer = {"Partnumber": self.Part_API, "Couter": Packing_Couter + 1, "Packing": self.Packing_API}
+            with open('Couter_Printer.json', 'w') as json_file:
+                json.dump(Printer, json_file, indent=6)
+
+            if self.Packing_API == Packing_Couter:
+                Printer = {"Partnumber": self.Part_API, "Couter": 1, "Packing": self.Packing_API}
+                with open('Couter_Printer.json', 'w') as json_file:
+                    json.dump(Printer, json_file, indent=6)
+                with open('Printer.txt', 'w') as f:
+                    f.write('Printer')
+
+    def AddMaster(self):
+        self.Login = tk.Toplevel(self)
+        self.Login .title("Login")
+        self.Login .geometry('220x120')
+
+        self.message = tk.StringVar()
+        self.show_message = tk.Label(self.Login , text="", textvariable=self.message)
+        self.show_message.configure(font=("Arial", 13))
+        self.show_message.place(x=10, y=90)
+
+        self.Password = tk.StringVar()  # string variable
+        self.BoxPassword = tk.Entry(self.Login , font="Arial", show='*', textvariable=self.Password)
+        self.BoxPassword.configure(font=("Arial", 20))
+        self.BoxPassword.place(x=20, y=10, width=180, height=35)
+
+        def character_limit(Password):
+            try:
+                if len(Password.get()) > 0:
+                    Password.set(Password.get()[6])
+            except:
+                pass
+
+        self.Password.trace("w", lambda *args: character_limit(self.Password))
+        self.chack_Value_Password = tk.IntVar(value=0)
+
+        self.buttonLogin = tk.Button(self.Login , text="Login",command=self.Search)
+        self.buttonLogin.configure(font=("Arial", 13))
+        self.buttonLogin.configure(justify="center", foreground="green")
+        self.buttonLogin.place(x=80, y=50)
+
+
+
+    def Loginform(self):
+        self.Emp_ID = self.Password.get()
+        with open('Information\Operator.json', 'r') as json_Part:
+            json_object = json.loads(json_Part.read())
+            id_Emp = []
+            for d in json_object:
+                id_Emp.append(d['id_Emp'])
+        for i in range(len(id_Emp)):
+            if id_Emp[i] == self.Emp_ID:
+                return True
+        return False
+
+    def Search(self):
+        if self.Loginform():
+            self.Login.destroy()
+            SaveMaster = tk.Toplevel(self)
+            SaveMaster.title("Save Master")
+            SaveMaster.geometry('280x350')
+
+            Lable_Cam = tk.Label(SaveMaster, text="Cam :")
+            Lable_Cam.configure(font=("Arial", 20))
+            Lable_Cam.configure(fg='Green')
+            Lable_Cam.place(x=10, y=10)
+            n = tk.StringVar()
+            cam = ttk.Combobox(SaveMaster, width=8, height=80, textvariable=n)
+            cam.configure(font=("Arial", 20))
+            cam.configure(justify="center", foreground="green")
+            if Quantity_Cam == 1:
+                cam['values'] = ('Cam1')
+            elif Quantity_Cam == 2:
+                cam['values'] = ('Cam1', 'Cam2')
+            elif Quantity_Cam == 3:
+                cam['values'] = ('Cam1', 'Cam2', 'Cam3')
+            elif Quantity_Cam == 4:
+                cam['values'] = ('Cam1', 'Cam2', 'Cam3', 'Cam4')
+            elif Quantity_Cam == 5:
+                cam['values'] = ('Cam1', 'Cam2', 'Cam3', 'Cam4', 'Cam5')
+            cam.current(0)
+            cam.place(x=120, y=10)
+
+            Lable_Point = tk.Label(SaveMaster, text="Point :")
+            Lable_Point.configure(font=("Arial", 20))
+            Lable_Point.configure(fg='Green')
+            Lable_Point.place(x=10, y=60)
+            Point_Data = tk.StringVar()
+            Chose_Point = ttk.Combobox(SaveMaster, width=8, height=80, textvariable=Point_Data)
+            Chose_Point.configure(font=("Arial", 20))
+            Chose_Point.configure(justify="center", foreground="green")
+            Chose_Point['values'] = ('Point1', 'Point2', 'Point3', 'Point4', 'Point5', 'Point6', 'Point7', 'Point8', 'Point9', 'Point10')
+            Chose_Point.current(0)
+            Chose_Point.place(x=120, y=60)
+
+            Score_Data_Outline = tk.StringVar()
+            Lable_Score_Outline = tk.Label(SaveMaster,text="Outline :")
+            Lable_Score_Outline.configure(font=("Arial", 20))
+            Lable_Score_Outline.configure(fg='Green')
+            Lable_Score_Outline.place(x=10, y=110)
+            Score_Show_Outline = tk.Entry(SaveMaster, font="Arial", textvariable=Score_Data_Outline)
+            Score_Show_Outline.configure(font=("Arial", 20))
+            Score_Show_Outline.configure(fg='Green')
+            Score_Show_Outline.place(x=120, y=110,width=150)
+
+            Score_Data_Area = tk.StringVar()
+            Lable_Score_Area = tk.Label(SaveMaster, text="Area :")
+            Lable_Score_Area.configure(font=("Arial", 20))
+            Lable_Score_Area.configure(fg='Green')
+            Lable_Score_Area.place(x=10, y=160)
+            Score_Show_Area = tk.Entry(SaveMaster, font="Arial", textvariable=Score_Data_Area)
+            Score_Show_Area.configure(font=("Arial", 20))
+            Score_Show_Area.configure(fg='Green')
+            Score_Show_Area.place(x=120, y=160,width=150)
+
+            def Save():
+                Score_Outline = Score_Data_Outline.get()
+                Score_Area = Score_Data_Area.get()
+                Point = Point_Data.get()
+                Cam = n.get()
+                Emp_ID = self.Password.get()
+                if Score_Outline != "" and Score_Area != "":
+                    if int(Score_Outline) >= 500 and int(Score_Area) >= 550:
+                            if Cam == "Cam1":
+                                path = cv.cvtColor(frame0.read()[1], cv.COLOR_BGR2RGB)
+                            elif Cam == "Cam2":
+                                path = cv.cvtColor(frame1.read()[1], cv.COLOR_BGR2RGB)
+                            elif Cam == "Cam3":
+                                path = cv.cvtColor(frame2.read()[1], cv.COLOR_BGR2RGB)
+                            PLTimg1 = Image.fromarray(path)
+                            PLTimg1.save("Current.bmp")
+                            Create = '' + self.Part_API + '/Master'
+                            if not os.path.exists(Create):
+                                os.makedirs(Create)
+                            else:
+                                print("")
+                            refPt = []
+                            cropping = False
+                            def click_and_crop(event, x, y, flags, param):
+                                global refPt, cropping
+                                image = clone.copy()
+
+                                if event == cv.EVENT_LBUTTONDOWN:
+                                    refPt = [(x, y)]
+                                    # print(refPt)
+                                    cropping = True
+                                elif event == cv.EVENT_LBUTTONUP:
+                                    refPt.append((x, y))
+                                    # print(refPt)
+                                    cropping = False
+                                    cv.rectangle(image, refPt[0], refPt[1], (85, 255, 51), 2)
+                                    cv.imshow(Point, image)
+                                    if len(refPt) == 2:
+                                        roi = clone[refPt[0][1]:refPt[1][1], refPt[0][0]:refPt[1][0]]
+                                        x = cv.cvtColor(roi, cv.COLOR_BGR2RGB)
+                                        Left = refPt[0][0]
+                                        Top = refPt[0][1]
+                                        Right = refPt[1][0]
+                                        Bottom = refPt[1][1]
+                                        img = Image.fromarray(x)
+                                        Showtext = cv.putText(image, "Save image " + Point + "", (10, 25),
+                                                              cv.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 1)
+                                        cv.imshow(Point, Showtext)
+                                        img.save('' + Create + '/' + Point + '_Template.bmp')
+                                        if Left and Top and Right and Bottom != 0:
+                                            Master(Left,Top,Right,Bottom,Score_Outline,Score_Area,Cam,Point,Emp_ID)
+                            path = r'Current.bmp'
+                            image = cv.imread(path)
+                            clone = image.copy()
+                            cv.namedWindow(Point)
+                            cv.setMouseCallback(Point, click_and_crop)
+                            cv.imshow(Point, image)
+
+            def Master(Left, Top, Right, Bottom, Score_Outline, Score_Area, Cam, Point, Emp_ID):
+                Score_Outline = int(Score_Outline)
+                Score_Area = int(Score_Area)
+                try:
+                    with open(self.Part_API+'/'+self.Part_API +'.json', 'r') as json_file:
+                        item = json.loads(json_file.read())
+                        for i in range(11):
+                            str_ = str(i)
+                            try:
+                                if Point == "Point" + str_:
+                                    i = i - 1
+                                    item[i]["Point" + str_][0]["Emp ID"] = Emp_ID
+                                    item[i]["Point" + str_][0]["Camera"] = Cam
+                                    item[i]["Point" + str_][0]["Left"] = Left
+                                    item[i]["Point" + str_][0]["Top"] = Top
+                                    item[i]["Point" + str_][0]["Right"] = Right
+                                    item[i]["Point" + str_][0]["Bottom"] = Bottom
+                                    item[i]["Point" + str_][0]["Score Outline"] = Score_Outline
+                                    item[i]["Point" + str_][0]["Score Area"] = Score_Area
+                                    with open(self.Part_API+'/'+self.Part_API +'.json', 'w') as json_file:
+                                        json.dump(item, json_file, indent=6)
+                            except:
+                                # item.append({''+Point+'': [{"Camera": "",'Left': "",'Top': "","Rigth": "","Bottom": "",'Score': ""}]}
+                                with open(self.Part_API+'/'+self.Part_API +'.json', 'r') as json_file:
+                                    item = json.loads(json_file.read())
+                                try:
+                                    logging.debug(item[i - 1])
+                                    item.append({'' + Point + '': [
+                                        {"Emp ID": Emp_ID, "Camera": Cam, 'Left': Left, 'Top': Top, "Right": Right, "Bottom": Bottom,
+                                         'Score Outline': Score_Outline, 'Score Area': Score_Area}]})
+                                    with open(self.Part_API+'/'+self.Part_API +'.json', 'w') as json_file:
+                                        json.dump(item, json_file, indent=6)
+                                except:
+                                    pass
+                except FileNotFoundError as exc:
+                    if Point == "Point1":
+                        item = [
+                            {'' + Point + '': [
+                                {"Emp ID": Emp_ID, "Camera": Cam, 'Left': Left, 'Top': Top, "Right": Right, "Bottom": Bottom, 'Score Outline': Score_Outline, 'Score Area': Score_Area}]}]
+                        with open(self.Part_API+'/'+self.Part_API +'.json', 'w') as json_file:
+                            json.dump(item, json_file, indent=6)
+
+            buttonSave = tk.Button(SaveMaster, text="Save", command=Save)
+            buttonSave.configure(font=("Arial", 30,"bold"))
+            buttonSave.configure(justify="center", foreground="green")
+            buttonSave.place(x=120, y=220,width=150,height=80)
+            def score_limit(*args):
+                    s = Score_Data_Outline.get()
+                    if str.isdigit(s):
+                        if len(s) > 3:
+                            Score_Data_Outline.set(s[:3])
+                    else:
+                        Score_Data_Outline.set(s[:0])
+
+                    x = Score_Data_Area.get()
+                    if str.isdigit(x):
+                        if len(x) > 3:
+                            Score_Data_Area.set(x[:3])
+                    else:
+                        Score_Data_Area.set(x[:0])
+
+            Score_Data_Area.trace("w",score_limit)
+            Score_Data_Outline.trace("w", score_limit)
+            SaveMaster.mainloop()
+
+        else:
+            self.message.set("Password not match")
+            self.show_message.configure(fg="Red")
+
+
+
+    def Img_part(self):
+        try:
+            image1 = Image.open(r"IMG_PART" + "\\" + "" + self.Part_API + "" + ".png")
+            resize_img = image1.resize((600, 340))
+            self.test = ImageTk.PhotoImage(resize_img)
+            self.image_show = tk.Label(image=self.test)
+            self.image_show.image = self.test
+            self.image_show.place(x=615, y=250)
+        except:
+            pass
+
+    def combobox_cam(self):
+        self.n = tk.StringVar()
+        self.cam = ttk.Combobox(self, width=8, height=80, textvariable=self.n)
+        self.cam.configure(font=("Arial", 20))
+        self.cam.configure(justify="center", foreground="green")
+        if Quantity_Cam == 1:
+            self.cam['values'] = ('Cam1')
+        elif Quantity_Cam == 2:
+            self.cam['values'] = ('Cam1', 'Cam2')
+        elif Quantity_Cam == 3:
+            self.cam['values'] = ('Cam1', 'Cam2', 'Cam3')
+        elif Quantity_Cam == 4:
+            self.cam['values'] = ('Cam1', 'Cam2', 'Cam3', 'Cam4')
+        elif Quantity_Cam == 5:
+            self.cam['values'] = ('Cam1', 'Cam2', 'Cam3', 'Cam4', 'Cam5')
+        self.cam.current(0)
+        self.cam.place(x=500, y=15)
+        
+    def callback_cam(self):
+        self.Label_cam.configure(text=self.cam.get())
+
+    def ShowCount(self):
+        self.OK_Data = 0
+        self.NG_Data = 0
+        self.Result_Ok.configure(text=self.OK_Data)
+        self.Result_NG.configure(text=self.NG_Data)
+        self.Alarm(True)
+        self.Speaker = True
+
+        Save_Result(1)
+        self.btn_reset.focus_set()
+        self.Point_ = tk.LabelFrame(self, text="Point", borderwidth=3, relief="ridge", padx=5, pady=10)
+        self.Point_.configure(font=("Arial", 13))
+        self.Point_.configure(fg='Green')
+        self.Point_.place(x=15, y=230, height=740, width=135)
+
+        self.Result_ = tk.LabelFrame(self, text="Result", borderwidth=3, relief="ridge", padx=5, pady=10)
+        self.Result_.configure(font=("Arial", 13))
+        self.Result_.configure(fg='Green')
+        self.Result_.place(x=165, y=230, height=740, width=135)
+
+        self.Score_Outline = tk.LabelFrame(self, text="Score Outline", borderwidth=3, relief="ridge", padx=5, pady=10)
+        self.Score_Outline.configure(font=("Arial", 13))
+        self.Score_Outline.configure(fg='Green')
+        self.Score_Outline.place(x=315, y=230, height=740, width=135)
+
+        self.Score_Area = tk.LabelFrame(self, text="Score Area", borderwidth=3, relief="ridge", padx=5, pady=10)
+        self.Score_Area.configure(font=("Arial", 13))
+        self.Score_Area.configure(fg='Green')
+        self.Score_Area.place(x=465, y=230, height=740, width=135)
+        try:
+            self.dir_path = r"" + self.Part_API + "\Master"
+            self.count = 0
+            for path in os.listdir(self.dir_path):
+                if os.path.isfile(os.path.join(self.dir_path, path)):
+                    if path.endswith('.bmp'):
+                        self.count += 1
+        except:
+            self.count = 0
+        try:
+            with open(self.Part_API+'/'+self.Part_API +'.json', 'r') as json_file:
+                self.Master = json.loads(json_file.read())
+            if self.count != 0:
+                self.Point_Camera = []
+                self.Point_Left = []
+                self.Point_Top = []
+                self.Point_Right = []
+                self.Point_Bottom = []
+                self.Point_Score_Outline = []
+                self.Point_Score_Area = []
+                for k in range(self.count):
+                    self.Point_Camera.append(self.Master[k]["Point" + str(k + 1)][0]["Camera"])
+                    self.Point_Left.append(self.Master[k]["Point" + str(k + 1)][0]["Left"])
+                    self.Point_Top.append(self.Master[k]["Point" + str(k + 1)][0]["Top"])
+                    self.Point_Right.append(self.Master[k]["Point" + str(k + 1)][0]["Right"])
+                    self.Point_Bottom.append(self.Master[k]["Point" + str(k + 1)][0]["Bottom"])
+                    self.Point_Score_Outline.append(self.Master[k]["Point" + str(k + 1)][0]["Score Outline"])
+                    self.Point_Score_Area.append(self.Master[k]["Point" + str(k + 1)][0]["Score Area"])
+                    tk.Label(self.Point_, text="Point" + str(k + 1), borderwidth=3, relief="groove", padx=5, pady=10, font=("Arial", 18)).place(x=20, y=70 * k)
+                    # tk.Label(self.Result_, text="N/A", borderwidth=3, relief="groove", padx=5, pady=10,font=("Arial", 18),fg='#A3A6AB').place(x=35, y=70*k)
+                    # tk.Label(self.Score_Outline, text="", borderwidth=3, relief="groove", padx=55, pady=10,font=("Arial", 18)).place(x=2, y=70*k)
+                    # tk.Label(self.Score_Area, text="", borderwidth=3, relief="groove", padx=55, pady=10,font=("Arial", 18)).place(x=2, y=70*k)
+        except:
+            pass
+
+    def Camera(self):
+        try:
+            if Quantity_Cam == 1:
+                self.Camopen1 = cv.cvtColor(frame0.read()[1], cv.COLOR_BGR2RGB)
+                img = Image.fromarray(self.Camopen1)
+                resize_img = img.resize((600, 420))
+                imgtk = ImageTk.PhotoImage(image=resize_img)
+                self.frame.imgtk = imgtk
+                self.frame.configure(image=imgtk)
+            elif Quantity_Cam == 2:
+                self.Camopen1 = cv.cvtColor(frame0.read()[1], cv.COLOR_BGR2RGB)
+                self.Camopen2 = cv.cvtColor(frame1.read()[1], cv.COLOR_BGR2RGB)
+                if self.Label_cam['text'] == "Cam1":
+                    img = Image.fromarray(self.Camopen1)
+                    resize_img = img.resize((600, 420))
+                elif self.Label_cam['text'] == "Cam2":
+                    img = Image.fromarray(self.Camopen2)
+                    resize_img = img.resize((600, 420))
+                imgtk = ImageTk.PhotoImage(image=resize_img)
+                self.frame.imgtk = imgtk
+                self.frame.configure(image=imgtk)
+            elif Quantity_Cam == 3:
+                self.Camopen1 = cv.cvtColor(frame0.read()[1], cv.COLOR_BGR2RGB)
+                self.Camopen2 = cv.cvtColor(frame1.read()[1], cv.COLOR_BGR2RGB)
+                self.Camopen3 = cv.cvtColor(frame2.read()[1], cv.COLOR_BGR2RGB)
+                if self.Label_cam['text'] == "Cam1":
+                    img = Image.fromarray(self.Camopen1)
+                    resize_img = img.resize((600, 420))
+                elif self.Label_cam['text'] == "Cam2":
+                    img = Image.fromarray(self.Camopen2)
+                    resize_img = img.resize((600, 420))
+                elif self.Label_cam['text'] == "Cam3":
+                    img = Image.fromarray(self.Camopen3)
+                    resize_img = img.resize((600, 420))
+                imgtk = ImageTk.PhotoImage(image=resize_img)
+                self.frame.imgtk = imgtk
+                self.frame.configure(image=imgtk)
+            self.after(1000, self.Camera)
+        except:
+            messagebox.showerror('Python Error', 'Check Cameras')
+
+    def Alarm_continue(self):
+        if not self.Speaker:
+            mixer.init()
+            mixer.music.load('Alarm.mp3')
+            mixer.music.play()
+        elif self.Speaker:
+            mixer.stop()
+
+    def Alarm(self, Result):
+        mixer.init()
+        mixer.music.load('Alarm.mp3')
+        if not Result:
+            self.Run_Alarm = InfiniteTimer(11, self.Alarm_continue)
+            self.Run_Alarm.start()
+            mixer.music.play()
+
+    def Destroy(self):
+        self.Alarm(True)
+        self.Speaker = True
+        response = messagebox.askquestion("Close Programe", "Are you sure?", icon='warning')
+        if response == "yes":
+            try:
+                self.Run_Alarm.cancel()
+            except:
+                pass
+            if Quantity_Cam == 1:
+                frame0.release()
+            elif Quantity_Cam == 2:
+                frame0.release()
+                frame1.release()
+            cv.destroyAllWindows()
+            app.destroy()
+            subprocess.call([r'TerminatedProcess.bat'])
+
+    def SaveImage(self):
+        if Quantity_Cam == 1:
+            self.Seve1 = cv.cvtColor(frame0.read()[1], cv.COLOR_BGR2RGB)
+            self.PLTimg1 = Image.fromarray(self.Seve1)
+            self.PLTimg1.save("Snap1.bmp")
+        elif Quantity_Cam == 2:
+            self.Seve1 = cv.cvtColor(frame0.read()[1], cv.COLOR_BGR2RGB)
+            self.Seve2 = cv.cvtColor(frame1.read()[1], cv.COLOR_BGR2RGB)
+            self.PLTimg1 = Image.fromarray(self.Seve1)
+            self.PLTimg2 = Image.fromarray(self.Seve2)
+            self.PLTimg1.save("Snap1.bmp")
+            self.PLTimg2.save("Snap2.bmp")
+        elif Quantity_Cam == 3:
+            self.Seve1 = cv.cvtColor(frame0.read()[1], cv.COLOR_BGR2RGB)
+            self.Seve2 = cv.cvtColor(frame1.read()[1], cv.COLOR_BGR2RGB)
+            self.Seve3 = cv.cvtColor(frame2.read()[1], cv.COLOR_BGR2RGB)
+            self.PLTimg1 = Image.fromarray(self.Seve1)
+            self.PLTimg2 = Image.fromarray(self.Seve2)
+            self.PLTimg3 = Image.fromarray(self.Seve3)
+            self.PLTimg1.save("Snap1.bmp")
+            self.PLTimg2.save("Snap2.bmp")
+            self.PLTimg3.save("Snap3.bmp")
+
+    def ViewImage(self):
+        if Quantity_Cam == 1:
+            image1 = Image.open(r"Snap1.bmp")
+            resize_img1 = image1.resize((540, 350))
+            image_1 = ImageTk.PhotoImage(resize_img1)
+            self.view1.image_1 = image_1
+            self.view1.configure(image=image_1)
+        elif Quantity_Cam == 2:
+            image1 = Image.open(r"Snap1.bmp")
+            image2 = Image.open(r"Snap2.bmp")
+            resize_img1 = image1.resize((540, 350))
+            resize_img2 = image2.resize((540, 350))
+            image_1 = ImageTk.PhotoImage(resize_img1)
+            self.view1.image_1 = image_1
+            self.view1.configure(image=image_1)
+            image_2 = ImageTk.PhotoImage(resize_img2)
+            self.view2.image_1 = image_2
+            self.view2.configure(image=image_2)
+        elif Quantity_Cam == 3:
+            image1 = Image.open(r"Snap1.bmp")
+            image2 = Image.open(r"Snap2.bmp")
+            image3 = Image.open(r"Snap3.bmp")
+            resize_img1 = image1.resize((540, 350))
+            resize_img2 = image2.resize((540, 350))
+            resize_img3 = image3.resize((540, 350))
+            image_1 = ImageTk.PhotoImage(resize_img1)
+            self.view1.image_1 = image_1
+            self.view1.configure(image=image_1)
+            image_2 = ImageTk.PhotoImage(resize_img2)
+            self.view2.image_1 = image_2
+            self.view2.configure(image=image_2)
+            image_3 = ImageTk.PhotoImage(resize_img3)
+            self.view3.image_1 = image_3
+            self.view3.configure(image=image_3)
+
+    def CallKeyBorad(self):
+        self.LabelKeyBorad = tk.Label(self)
+        self.LabelKeyBorad.bind_all('<KeyRelease>', self.Processing)
+
+    def Processing(self, event):
+            if self.count != 0:
+                self.btn_reset.focus_set()
+                if event.char == '5':
+                    self.Close_Login = True
+                    self.ProcessP.place_forget()
+                    self.ProcessP = tk.Label(self.Process, text="Process")
+                    self.ProcessP.configure(font=("Arial", 18))
+                    self.ProcessP.configure(fg="#8B8B00")
+                    self.ProcessP.place(x=10, y=15, anchor=tk.W)
+                    self.SaveImage()
+                    self.ViewImage()
 
 
 if __name__ == "__main__":
