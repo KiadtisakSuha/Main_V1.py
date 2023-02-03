@@ -15,7 +15,7 @@ from PIL import ImageTk
 from pygame import mixer
 from tkinter import messagebox
 import sys
-#import subprocess
+import subprocess
 
 
 with open('Setting Paramiter.json', 'r') as json_file:
@@ -189,7 +189,7 @@ class App(tk.Tk, Getpart):
         ttk.Style().configure('TNotebook.Tab', font=('Arial', 20),
                               background='black', foreground='#006400', borderwidth=0)
 
-        self.title('Machine Vision Inspection 1.4.0')
+        self.title('Machine Vision Inspection 1.0.5')
         self.geometry("1920x1020+0+0")
         #self.state('zoomed')
         self.attributes('-fullscreen', True)
@@ -273,7 +273,7 @@ class Frame1(ttk.Frame, App):
         self.Machine_Vision.configure(fg=('Green'))
         self.Machine_Vision.place(x=15, y=5)
 
-        self.Machine_Version = tk.Label(self, text='v1.0.4')
+        self.Machine_Version = tk.Label(self, text='v1.0.5')
         self.Machine_Version.configure(font=("Arial", 10))
         self.Machine_Version.configure(fg=('Green'))
         self.Machine_Version.place(x=15, y=45)
@@ -614,7 +614,7 @@ class Frame1(ttk.Frame, App):
                 frame1.release()
             cv.destroyAllWindows()
             app.destroy()
-            #subprocess.call([r'test.bat'])
+            subprocess.call([r'test.bat'])
 
     def Board_run(self):
         ClassBoard = Borad()
