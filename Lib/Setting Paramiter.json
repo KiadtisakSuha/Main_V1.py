@@ -1,9 +1,7 @@
 [
       {
             "MachineName": "E26",
-            "Quantity_Cam": 3,
-            "AutoFocus_1": 0,
-            "AutoFocus_2": 0,
-            "Board_Name": "ASRL3::INSTR"      
+            "Quantity_Cam": 1,
+            "Board_Name": "ASRL4::INSTR"      
       }
 ]

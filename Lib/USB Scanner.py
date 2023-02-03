@@ -335,6 +335,10 @@ class App(tk.Tk):
         self.Camera()
         self.PrintText()
 
+        self.Board_show()
+        self.BoardLoop = InfiniteTimer(0.1, self.Board_show)
+        self.BoardLoop.start()
+
         self.btn_cam = tk.Button(self, text="Choose Camera", command=self.callback_cam)
         self.btn_cam.configure(font=("Arial", 13))
         self.btn_cam.configure(justify="center", foreground="green")
@@ -356,7 +360,6 @@ class App(tk.Tk):
         self.btn_Close.place(x=1850, y=2)
 
         self.ShowCount()
-        self.CallKeyBorad()
 
         self.btn_repart = tk.Button(self, text="Re-order", command=self.CallPart)
         self.btn_repart.configure(font=("Arial", 15))
@@ -364,11 +367,11 @@ class App(tk.Tk):
         self.btn_repart.place(x=1750, y=2)
 
         self.view1 = tk.Label(self)
-        self.view1.place(x=1280, y=205)
+        self.view1.place(x=1280, y=185)
         self.view2 = tk.Label(self)
-        self.view2.place(x=1280, y=605)
+        self.view2.place(x=1280, y=480)
         self.view3 = tk.Label(self)
-        self.view3.place(x=1280, y=1005)
+        self.view3.place(x=1280, y=785)
 
     def CallPart(self):
         self.API_json = Getpart()
@@ -460,6 +463,7 @@ class App(tk.Tk):
         self.buttonLogin.configure(font=("Arial", 13))
         self.buttonLogin.configure(justify="center", foreground="green")
         self.buttonLogin.place(x=80, y=50)
+
 
 
 
@@ -701,8 +705,7 @@ class App(tk.Tk):
         self.NG_Data = 0
         self.Result_Ok.configure(text=self.OK_Data)
         self.Result_NG.configure(text=self.NG_Data)
-        self.Alarm(True)
-        self.Speaker = True
+
 
         Save_Result(1)
         self.btn_reset.focus_set()
@@ -801,25 +804,8 @@ class App(tk.Tk):
         except:
             messagebox.showerror('Python Error', 'Check Cameras')
 
-    def Alarm_continue(self):
-        if not self.Speaker:
-            mixer.init()
-            mixer.music.load('Alarm.mp3')
-            mixer.music.play()
-        elif self.Speaker:
-            mixer.stop()
-
-    def Alarm(self, Result):
-        mixer.init()
-        mixer.music.load('Alarm.mp3')
-        if not Result:
-            self.Run_Alarm = InfiniteTimer(11, self.Alarm_continue)
-            self.Run_Alarm.start()
-            mixer.music.play()
 
     def Destroy(self):
-        self.Alarm(True)
-        self.Speaker = True
         response = messagebox.askquestion("Close Programe", "Are you sure?", icon='warning')
         if response == "yes":
             try:
@@ -880,9 +866,9 @@ class App(tk.Tk):
             image1 = Image.open(r"Snap1.bmp")
             image2 = Image.open(r"Snap2.bmp")
             image3 = Image.open(r"Snap3.bmp")
-            resize_img1 = image1.resize((540, 350))
-            resize_img2 = image2.resize((540, 350))
-            resize_img3 = image3.resize((540, 350))
+            resize_img1 = image1.resize((540, 290))
+            resize_img2 = image2.resize((540, 290))
+            resize_img3 = image3.resize((540, 290))
             image_1 = ImageTk.PhotoImage(resize_img1)
             self.view1.image_1 = image_1
             self.view1.configure(image=image_1)
@@ -892,10 +878,12 @@ class App(tk.Tk):
             image_3 = ImageTk.PhotoImage(resize_img3)
             self.view3.image_1 = image_3
             self.view3.configure(image=image_3)
-
+    """""""""
     def CallKeyBorad(self):
         self.LabelKeyBorad = tk.Label(self)
         self.LabelKeyBorad.bind_all('<KeyRelease>', self.Processing)
+
+
 
     def Processing(self, event):
             if self.count != 0:
@@ -909,6 +897,257 @@ class App(tk.Tk):
                     self.ProcessP.place(x=10, y=15, anchor=tk.W)
                     self.SaveImage()
                     self.ViewImage()
+                    
+                
+    """""""""
+    def Board_run(self):
+        ClassBoard = Borad()
+        Hex = ClassBoard.ReadBorad()[0]
+        return [Hex]
+
+    def Board_show(self):
+        self.Bit = self.Board_run()[0].split("#")
+        self.Bit = bytes(self.Bit[1], "ascii")
+        self.Bit = "{:08b}".format(int(self.Bit.hex(), 16))
+        self.Board = tk.LabelFrame(self, text="I/O Board")
+        self.Board.configure(font=("Arial", 13))
+        self.Board.configure(fg='Green')
+        self.Board.place(x=755, y=150, height=60, width=120)
+        self.BoardP = tk.Label(self.Board, text=self.Board_run()[0])
+        if self.Bit == "110000001100010000110100001010":  # 01
+            self.ProcessP.place_forget()
+            self.ProcessP = tk.Label(self.Process, text="Process")
+            self.ProcessP.configure(font=("Arial", 18))
+            self.ProcessP.configure(fg="#8B8B00")
+            self.ProcessP.place(x=10, y=15, anchor=tk.W)
+            self.SaveImage()
+            self.ViewImage()
+            self.Main()
+            self.ShowScore()
+            self.ShowResult()
+            self.Save_Image()
+            self.ProcessP.place_forget()
+            self.ProcessP = tk.Label(self.Process, text="Ready")
+            self.ProcessP.configure(font=("Arial", 18))
+            self.ProcessP.configure(fg="Green")
+            self.ProcessP.place(x=10, y=15, anchor=tk.W)
+        self.BoardP.configure(font=("Arial", 13))
+        self.BoardP.configure(fg='Green')
+        self.BoardP.place(x=10, y=35, anchor=tk.W)
+
+    def Process_Outline(self, imgframe, imgTemplate, Left, Top, Right, Bottom):
+        img = cv.imread(imgframe, 0)
+        template = cv.imread(imgTemplate, 0)
+        w, h = template.shape[::-1]
+        TemplateThreshold = 0.8
+        curMaxVal = 0
+        c = 0
+        for meth in ['cv.TM_CCOEFF_NORMED']:
+            method = eval(meth)
+            try:
+                crop_image_ = img[(Top - 30):(Bottom + 30), (Left - 30):(Right + 30)]
+                res = cv.matchTemplate(crop_image_, template, method)
+            except:
+                crop_image = img[Top:Bottom, Left:Right]
+                res = cv.matchTemplate(crop_image, template, method)
+            min_val, max_val, min_loc, max_loc = cv.minMaxLoc(res)
+            if max_val > TemplateThreshold and max_val > curMaxVal:
+                curMaxVal = max_val
+                curMaxTemplate = c
+                curMaxLoc = max_loc
+            c = c + 1
+
+        try:
+            if curMaxTemplate == -1:
+                return (0, (0, 0), 0, 0, 0, 0)
+            else:
+                # print((curMaxTemplate % 3, curMaxLoc, 1 - int(curMaxTemplate / 3) * 0.2, curMaxVal, w, h))
+                return (curMaxTemplate % 3, curMaxLoc, 1 - int(curMaxTemplate / 3) * 0.2, curMaxVal, w, h)
+        except:
+            return (0, (0, 0), 0, 0, 0, 0)
+
+    def Crop_image_Area(self, imgframe, Left, Top, Right, Bottom):
+        img = cv.imread(imgframe, 0)
+        # ret2, ImageRealTime = cv.threshold(img, 100, 255, cv.THRESH_BINARY)
+        crop_image = img[Top:Bottom, Left:Right]
+        return crop_image
+
+    def Rule_Of_Thirds(self, ROT):
+        total = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        mod = len(ROT) % 9
+        if mod != 0:
+            for i in range(mod):
+                total[9] += sum(ROT[len(ROT) - mod + i])
+        layout = int(len(ROT) / 9)
+        for i in range(9):
+            i = i + 1
+            for j in range(layout * i):
+                total[i - 1] += sum(ROT[j])
+        point = [total[0]]
+        for k in range(8):
+            point.append(total[k + 1] - total[k])
+        if mod != 0:
+            point.append(total[9])
+        return point
+
+    def Process_Area(self, Data1, Data2):
+        Score_Ture = []
+        Chack = []
+        swapped = False
+        Result_Score = 0
+        for i in range(len(Data1)):
+            total = (((Data1[i] + Data2[i]) / 2) / Data2[i])
+            if total < 1.99:
+                score_out = int(total * 1000)
+                if score_out > 1000:
+                    score_out = 1000 - (score_out - 1000)
+                    Chack.append(1)
+                else:
+                    Chack.append(0)
+                Score_Ture.append(score_out)
+            else:
+                Score_Ture.append(0)
+                Chack.append(0)
+
+        for n in range(len(Score_Ture) - 1, 0, -1):
+            for i in range(n):
+                if Score_Ture[i] > Score_Ture[i + 1]:
+                    swapped = True
+                    Score_Ture[i], Score_Ture[i + 1] = Score_Ture[i + 1], Score_Ture[i]
+        for i in range(len(Score_Ture)):
+            if i <= 4:
+                Result_Score += Score_Ture[i]
+        Result_Score = int(Result_Score / 5)
+        return [Result_Score, sum(Chack)]
+
+    def Main(self):
+        if self.count != 0:
+            self.sts = []
+            self.Color = []
+            self.Color_Show = []
+            self.ImageSave = []
+            self.Result = []
+            self.Score_Outline_Data = []
+            self.Score_Area_Data = []
+            self.padx = []
+            self.place = []
+            for x in range(self.count):
+                if self.Point_Camera[x] == "Cam1":
+                    image = r'Snap1.bmp'
+                elif self.Point_Camera[x] == "Cam2":
+                    image = r'Snap2.bmp'
+                elif self.Point_Camera[x] == "Cam3":
+                    image = r'Snap3.bmp'
+                self.ImageSave.append(cv.imread(image))
+                Template = r"" + self.Part_API + "\Master""\\""Point" + str(x + 1) + "_Template.bmp"
+                (template, top_left, scale, val, w, h) = self.Process_Outline(image, Template, self.Point_Left[x], self.Point_Top[x], self.Point_Right[x], self.Point_Bottom[x])
+                Template_View = cv.imread(Template, 0)
+               #ret1, Template_View = cv.threshold(Template_View, 100, 255, cv.THRESH_BINARY)
+                Master_Image = self.Crop_image_Area(image, self.Point_Left[x], self.Point_Top[x], self.Point_Right[x], self.Point_Bottom[x])
+                (Score_Area_Data, Chack) = self.Process_Area(self.Rule_Of_Thirds(Master_Image), self.Rule_Of_Thirds(Template_View))
+                self.Score_Outline_Data.append(int(round(val * 1000, 0)))
+                self.Score_Area_Data.append(Score_Area_Data)
+                if scale == 1 and (val * 1000) >= self.Point_Score_Outline[x] and Score_Area_Data >= self.Point_Score_Area[x]:
+                    self.Result.append(1)
+                    self.Color.append((0, 255, 0))
+                    self.Color_Show.append("Green")
+                    self.padx.append(35)
+                else:
+                    self.Result.append(0)
+                    self.Color.append((0, 0, 255))
+                    self.Color_Show.append("Red")
+                    self.padx.append(35)
+                self.place.append(x * 70)
+
+    def ResultComfrim(self):
+        if self.Comfrim_Data >= 4:
+            self.NG_Data = self.NG_Data + 1
+            self.Save_Score()
+            self.Result_NG = tk.Label(self.NG, text=self.NG_Data, borderwidth=3, relief="ridge", padx=5, pady=10)
+            self.Result_NG.configure(font=("Arial", 25))
+            self.Result_NG.configure(fg='Red')
+            self.Result_NG.place(x=15, y=0, height=70, width=200)
+
+
+    def ShowResult(self):
+        if self.count != 0:
+            for i in range(len(self.Result)):
+                if self.Result[i] == 1:
+                    if i == len(self.Result) - 1:
+                        self.Couter_Printer()
+                        self.PrintText()
+                        self.OK_Data = self.OK_Data + 1
+                        self.Comfrim_Data = 0
+                        self.Save_Score()
+                        self.Result_Ok = tk.Label(self.OK, text=self.OK_Data, borderwidth=3, relief="ridge", padx=5, pady=10)
+                        self.Result_Ok.configure(font=("Arial", 25))
+                        self.Result_Ok.configure(fg='Green')
+                        self.Result_Ok.place(x=15, y=0, height=70, width=200)
+                        ClassBoard = Borad()
+                        ClassBoard.inst.write("@1 R00")
+                else:
+                    self.Comfrim_Data = self.Comfrim_Data + 1
+                    self.ResultComfrim()
+                    ClassBoard = Borad()
+                    ClassBoard.inst.write("@1 R40")
+                    break
+
+
+    def ShowScore(self):
+        if self.count != 0:
+            for i in range(self.count):
+                if self.Result[i] == 1:
+                    tk.Label(self.Result_, text="OK", borderwidth=3, relief="groove", bg=self.Color_Show[i], font=("Arial", 18), padx=35, pady=8).place(x=2, y=self.place[i])
+                else:
+                    tk.Label(self.Result_, text="NG", borderwidth=3, relief="groove", bg=self.Color_Show[i], font=("Arial", 18), padx=35, pady=8).place(x=2, y=self.place[i])
+                tk.Label(self.Score_Outline, text=str(self.Score_Outline_Data[i]), borderwidth=3, relief="groove", font=("Arial", 18), padx=self.padx[i], pady=8).place(x=2, y=self.place[i])
+                tk.Label(self.Score_Area, text=str(self.Score_Area_Data[i]), borderwidth=3, relief="groove", font=("Arial", 18), padx=self.padx[i], pady=8).place(x=2, y=self.place[i])
+
+    def Save_Image(self):
+        named_tuple = time.localtime()
+        Date = time.strftime("%Y%m%d",named_tuple)
+        Time = time.strftime("%Y%m%d%H%M%S", named_tuple)
+
+        for s in range(self.count):
+            FileFolder_Ok = 'Record/'+Date+'/'+self.Part_API+'/OK'
+            path = os.path.join(FileFolder_Ok)
+            try:
+                os.makedirs(path, exist_ok=True)
+            except OSError as error:
+                pass
+            FileFolder_NG = 'Record/'+Date+'/'+self.Part_API+'/NG'
+            path = os.path.join(FileFolder_NG)
+            try:
+                os.makedirs(path, exist_ok=True)
+            except OSError as error:
+                pass
+            cv.rectangle(self.ImageSave[s], (self.Point_Left[s], self.Point_Top[s]), (self.Point_Right[s], self.Point_Bottom[s]), self.Color[s], 3)
+            cv.putText(self.ImageSave[s], "Score Outline : " + str(self.Score_Outline_Data[s]) + " / " + str(self.Point_Score_Outline[s]), (10, 25), cv.FONT_HERSHEY_SIMPLEX, 1, self.Color[s], 2)
+            cv.putText(self.ImageSave[s], "Score Area : " + str(self.Score_Area_Data[s]) + " / " + str(self.Point_Score_Area[s]), (10, 55), cv.FONT_HERSHEY_SIMPLEX, 1, self.Color[s], 2)
+            cv.putText(self.ImageSave[s], "Time : " + str(Time) + "", (10, 85), cv.FONT_HERSHEY_SIMPLEX, 1, self.Color[s], 2)
+            if self.Result[s] == 1:
+            # cv.imwrite('Record/' + self.Part_API + '/' + self.Result[s] + '/Point' + str(s + 1) + '/' + time_string + '_P0' + str(s + 1) + '.png', self.ImageSave[s])
+                cv.imwrite('Record/'+Date+'/'+self.Part_API+ '/OK/' + Time + '_P0' + str(s + 1) + '.jpg', self.ImageSave[s])
+            else:
+                cv.imwrite('Record/'+Date+'/'+self.Part_API+ '/NG/' + Time + '_P0' + str(s + 1) + '.jpg', self.ImageSave[s])
+
+    def Save_Score(self):
+        named_tuple = time.localtime()
+        #Time = time.strftime("%Y-%m-%d_%H%M%S", named_tuple)
+        Time = time.strftime("%Y%m%d%H%M%S", named_tuple)
+        parent_dir = 'Transaction/'
+        path = os.path.join(parent_dir)
+        try:
+            os.makedirs(path, exist_ok=True)
+        except OSError as error:
+            pass
+        Transition = [dict(PartNumber=self.Part_API, BatchNumber=self.Batch_API, MachineName=self.Machine_API, Details=[])]
+        for s in range(self.count):
+            Transition[0]["Details"].append([dict(Score=int(self.Score_Area_Data[s]),
+                                                  Result=self.Result[s], Point=s + 1)])
+        with open('Transaction/' + Time + '.json', 'w') as json_file:
+            json.dump(Transition, json_file, indent=6)
+
 
 
 if __name__ == "__main__":
