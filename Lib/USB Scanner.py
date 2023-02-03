@@ -23,8 +23,7 @@ with open('Setting Paramiter.json', 'r') as json_file:
 Quantity_Cam = Setting_Paramiter[0]["Quantity_Cam"]
 Board_Name = Setting_Paramiter[0]["Board_Name"]
 Machine = Setting_Paramiter[0]["MachineName"]
-#AutoFocus_1 = Setting_Paramiter[0]["AutoFocus_1"]
-#AutoFocus_2 = Setting_Paramiter[0]["AutoFocus_2"]
+
 
 if Quantity_Cam == 1:
     frame0 = cv.VideoCapture(0, cv.CAP_DSHOW)
@@ -1042,7 +1041,6 @@ class App(tk.Tk):
                 Template = r"" + self.Part_API + "\Master""\\""Point" + str(x + 1) + "_Template.bmp"
                 (template, top_left, scale, val, w, h) = self.Process_Outline(image, Template, self.Point_Left[x], self.Point_Top[x], self.Point_Right[x], self.Point_Bottom[x])
                 Template_View = cv.imread(Template, 0)
-               #ret1, Template_View = cv.threshold(Template_View, 100, 255, cv.THRESH_BINARY)
                 Master_Image = self.Crop_image_Area(image, self.Point_Left[x], self.Point_Top[x], self.Point_Right[x], self.Point_Bottom[x])
                 (Score_Area_Data, Chack) = self.Process_Area(self.Rule_Of_Thirds(Master_Image), self.Rule_Of_Thirds(Template_View))
                 self.Score_Outline_Data.append(int(round(val * 1000, 0)))
