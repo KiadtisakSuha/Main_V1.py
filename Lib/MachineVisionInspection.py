@@ -614,7 +614,7 @@ class Frame1(ttk.Frame, App):
                 frame1.release()
             cv.destroyAllWindows()
             app.destroy()
-            subprocess.call([r'test.bat'])
+            subprocess.call([r'TerminatedProcess.bat'])
 
     def Board_run(self):
         ClassBoard = Borad()
