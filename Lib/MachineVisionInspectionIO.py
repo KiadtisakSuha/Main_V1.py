@@ -370,6 +370,10 @@ class App(tk.Tk):
         self.view3 = tk.Label(self)
         self.view3.place(x=1280, y=785)
 
+        self.Board = tk.LabelFrame(self, text="I/O Board")
+        self.Board.configure(font=("Arial", 13))
+        self.Board.configure(fg='Green')
+
     def CallPart(self):
         self.API_json = Getpart()
         self.API_json.__int__()
@@ -904,9 +908,6 @@ class App(tk.Tk):
         self.Bit = self.Board_run()[0].split("#")
         self.Bit = bytes(self.Bit[1], "ascii")
         self.Bit = "{:08b}".format(int(self.Bit.hex(), 16))
-        self.Board = tk.LabelFrame(self, text="I/O Board")
-        self.Board.configure(font=("Arial", 13))
-        self.Board.configure(fg='Green')
         self.Board.place(x=755, y=150, height=60, width=120)
         self.BoardP = tk.Label(self.Board, text=self.Board_run()[0])
         if self.Bit == "110000001100010000110100001010":  # 01
