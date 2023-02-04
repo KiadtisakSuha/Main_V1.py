@@ -202,7 +202,7 @@ class App(tk.Tk):
         self.Mode_API = self.API_json.Get()[5]
         self.Sever_API = self.API_json.Get()[6]
         self.Packing_API = self.API_json.Get()[7]
-        self.ClassBoard = Borad()
+        #self.ClassBoard = Borad()
         self.Batch_API_Get = self.Batch_API
 
         self.Machine_Vision = tk.Label(self, text='Machine Vision Inspection')
@@ -336,9 +336,9 @@ class App(tk.Tk):
         self.BoardP.configure(fg='Green')
         self.BoardP.place(x=10, y=35, anchor=tk.W)
 
-        self.Board_show()
-        self.BoardLoop = InfiniteTimer(1.0, self.Board_show)
-        self.BoardLoop.start()
+        #self.Board_show()
+        #self.BoardLoop = InfiniteTimer(0.1, self.Board_show)
+        #self.BoardLoop.start()
 
         self.btn_cam = tk.Button(self, text="Choose Camera", command=self.callback_cam)
         self.btn_cam.configure(font=("Arial", 13))
@@ -903,14 +903,15 @@ class App(tk.Tk):
         return [Hex]
 
     """""""""
-
+    """""""""
     def Board_show(self):
         Hex = self.ClassBoard.ReadBorad()[0]
         Bin = self.ClassBoard.ReadBorad()[2]
         self.BoardP.configure(text=Hex)
         if Bin == "110000001100010000110100001010":  # 01
             self.ProcessP.configure(text="Process")
-            self.ProcessP.configure(fg="#8B8B00")
+            self.ProcessP.configure(bg='yellow')
+            time.sleep(2)
             self.SaveImage()
             self.ViewImage()
             self.Main()
@@ -918,9 +919,9 @@ class App(tk.Tk):
             self.ShowResult()
             self.Save_Image()
             self.ProcessP.configure(text="Ready")
-            self.ProcessP.configure(fg="green")
+            self.ProcessP.configure(bg="green")
 
-
+    """""""""
     def Process_Outline(self, imgframe, imgTemplate, Left, Top, Right, Bottom):
         img = cv.imread(imgframe, 0)
         template = cv.imread(imgTemplate, 0)
