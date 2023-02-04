@@ -1073,7 +1073,7 @@ class App(tk.Tk):
                         self.Comfrim_Data = 0
                         self.Save_Score()
                         self.Result_Ok = tk.Label(self.OK, text=self.OK_Data, borderwidth=3, relief="ridge", padx=5, pady=10)
-                        self.Result_Ok.configure(font=("Arial", 25))
+                        self.Result_Ok.configure(font=("Arial", 20))
                         self.Result_Ok.configure(fg='Green')
                         self.Result_Ok.place(x=15, y=0, height=70, width=200)
                         self.ClassBoard.inst.write("@1 R00")
