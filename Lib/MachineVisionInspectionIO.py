@@ -316,7 +316,7 @@ class App(tk.Tk):
         #self.BoardLoop = InfiniteTimer(0.1, self.Board_show)
         #self.BoardLoop.start()
 
-        self.btn_cam = tk.Button(self, text="Choose", command=self.callback_cam)
+        self.btn_cam = tk.Button(self, text="Choose", command=lambda :[self.callback_cam,self.ViewImage()])
         self.btn_cam.configure(font=("Arial", 18))
         self.btn_cam.configure(justify="center", foreground="green")
         self.btn_cam.place(x=1390, y=10)
@@ -345,7 +345,7 @@ class App(tk.Tk):
 
 
         self.view = tk.Label(self)
-        self.view.place(x=1270, y=70)
+        self.view.place(x=950, y=180)
 
 
     def CallPart(self):
@@ -728,7 +728,7 @@ class App(tk.Tk):
                     self.Point_Bottom.append(self.Master[k]["Point" + str(k + 1)][0]["Bottom"])
                     self.Point_Score_Outline.append(self.Master[k]["Point" + str(k + 1)][0]["Score Outline"])
                     self.Point_Score_Area.append(self.Master[k]["Point" + str(k + 1)][0]["Score Area"])
-                    tk.Label(self.Point_, text="Point" + str(k + 1), borderwidth=3, relief="groove", padx=5, pady=10, font=("Arial", 18)).place(x=20, y=70 * k)
+                    tk.Label(self.Point_, text=(k + 1), borderwidth=1, relief="groove", padx=5, pady=8, font=("Arial", 18)).place(x=5, y=70 * k)
                     # tk.Label(self.Result_, text="N/A", borderwidth=3, relief="groove", padx=5, pady=10,font=("Arial", 18),fg='#A3A6AB').place(x=35, y=70*k)
                     # tk.Label(self.Score_Outline, text="", borderwidth=3, relief="groove", padx=55, pady=10,font=("Arial", 18)).place(x=2, y=70*k)
                     # tk.Label(self.Score_Area, text="", borderwidth=3, relief="groove", padx=55, pady=10,font=("Arial", 18)).place(x=2, y=70*k)
@@ -815,40 +815,9 @@ class App(tk.Tk):
             self.PLTimg2.save("Snap2.bmp")
             self.PLTimg3.save("Snap3.bmp")
 
-    def ViewImage(self):
-        if Quantity_Cam == 1:
-            image1 = Image.open(r"Snap1.bmp")
-            resize_img1 = image1.resize((540, 350))
-            image_1 = ImageTk.PhotoImage(resize_img1)
-            self.view1.image_1 = image_1
-            self.view1.configure(image=image_1)
-        elif Quantity_Cam == 2:
-            image1 = Image.open(r"Snap1.bmp")
-            image2 = Image.open(r"Snap2.bmp")
-            resize_img1 = image1.resize((540, 350))
-            resize_img2 = image2.resize((540, 350))
-            image_1 = ImageTk.PhotoImage(resize_img1)
-            self.view1.image_1 = image_1
-            self.view1.configure(image=image_1)
-            image_2 = ImageTk.PhotoImage(resize_img2)
-            self.view2.image_1 = image_2
-            self.view2.configure(image=image_2)
-        elif Quantity_Cam == 3:
-            image1 = Image.open(r"Snap1.bmp")
-            image2 = Image.open(r"Snap2.bmp")
-            image3 = Image.open(r"Snap3.bmp")
-            resize_img1 = image1.resize((540, 290))
-            resize_img2 = image2.resize((540, 290))
-            resize_img3 = image3.resize((540, 290))
-            image_1 = ImageTk.PhotoImage(resize_img1)
-            self.view1.image_1 = image_1
-            self.view1.configure(image=image_1)
-            image_2 = ImageTk.PhotoImage(resize_img2)
-            self.view2.image_1 = image_2
-            self.view2.configure(image=image_2)
-            image_3 = ImageTk.PhotoImage(resize_img3)
-            self.view3.image_1 = image_3
-            self.view3.configure(image=image_3)
+
+
+
 
     """""""""
     def CallKeyBorad(self):
@@ -900,13 +869,14 @@ class App(tk.Tk):
         self.ProcessP.configure(text="Process")
         self.ProcessP.configure(bg='yellow')
         self.SaveImage()
-        self.ViewImage()
         self.Main()
         self.ShowScore()
         self.ShowResult()
         self.Save_Image()
+        self.ViewImage()
         self.ProcessP.configure(text="Ready")
         self.ProcessP.configure(bg="green")
+
 
     def Process_Outline(self, imgframe, imgTemplate, Left, Top, Right, Bottom):
         img = cv.imread(imgframe, 0)
@@ -997,6 +967,7 @@ class App(tk.Tk):
         if self.count != 0:
             self.sts = []
             self.Color = []
+            self.ColorView = []
             self.Color_Show = []
             self.ImageSave = []
             self.Result = []
@@ -1022,23 +993,23 @@ class App(tk.Tk):
                 if scale == 1 and (val * 1000) >= self.Point_Score_Outline[x] and Score_Area_Data >= self.Point_Score_Area[x]:
                     self.Result.append(1)
                     self.Color.append((0, 255, 0))
+                    self.ColorView.append((0, 255, 0))
                     self.Color_Show.append("Green")
-                    self.padx.append(35)
+                    self.padx.append(20)
                 else:
                     self.Result.append(0)
                     self.Color.append((0, 0, 255))
+                    self.ColorView.append((255, 0, 0))
                     self.Color_Show.append("Red")
-                    self.padx.append(35)
+                    self.padx.append(20)
                 self.place.append(x * 70)
 
     def ResultComfrim(self):
         if self.Comfrim_Data >= 4:
             self.NG_Data = self.NG_Data + 1
             self.Save_Score()
-            self.Result_NG = tk.Label(self.NG, text=self.NG_Data, borderwidth=3, relief="ridge", padx=5, pady=10)
-            self.Result_NG.configure(font=("Arial", 25))
-            self.Result_NG.configure(fg='Red')
-            self.Result_NG.place(x=15, y=0, height=70, width=200)
+            self.Result_NG.configure(text="NG : " + str(self.NG_Data))
+
 
     def ShowResult(self):
         if self.count != 0:
@@ -1050,23 +1021,20 @@ class App(tk.Tk):
                         self.OK_Data = self.OK_Data + 1
                         self.Comfrim_Data = 0
                         self.Save_Score()
-                        self.Result_Ok = tk.Label(self.OK, text=self.OK_Data, borderwidth=3, relief="ridge", padx=5, pady=10)
-                        self.Result_Ok.configure(font=("Arial", 20))
-                        self.Result_Ok.configure(fg='Green')
-                        self.Result_Ok.place(x=15, y=0, height=70, width=200)
-                        self.ClassBoard.inst.write("@1 R00")
+                        self.Result_Ok.configure(text="OK : " + str(self.OK_Data))
+                        #self.ClassBoard.inst.write("@1 R00")
                 else:
                     self.Comfrim_Data = self.Comfrim_Data + 1
                     self.ResultComfrim()
-                    self.ClassBoard.inst.write("@1 R40")
+                    #self.ClassBoard.inst.write("@1 R40")
                     break
     def ShowScore(self):
         if self.count != 0:
             for i in range(self.count):
                 if self.Result[i] == 1:
-                    tk.Label(self.Result_, text="OK", borderwidth=3, relief="groove", bg=self.Color_Show[i], font=("Arial", 18), padx=35, pady=8).place(x=2, y=self.place[i])
+                    tk.Label(self.Result_, text="OK", borderwidth=3, relief="groove", bg=self.Color_Show[i], font=("Arial", 18), padx=10, pady=8).place(x=2, y=self.place[i])
                 else:
-                    tk.Label(self.Result_, text="NG", borderwidth=3, relief="groove", bg=self.Color_Show[i], font=("Arial", 18), padx=35, pady=8).place(x=2, y=self.place[i])
+                    tk.Label(self.Result_, text="NG", borderwidth=3, relief="groove", bg=self.Color_Show[i], font=("Arial", 18), padx=10, pady=8).place(x=2, y=self.place[i])
                 tk.Label(self.Score_Outline, text=str(self.Score_Outline_Data[i]), borderwidth=3, relief="groove", font=("Arial", 18), padx=self.padx[i], pady=8).place(x=2, y=self.place[i])
                 tk.Label(self.Score_Area, text=str(self.Score_Area_Data[i]), borderwidth=3, relief="groove", font=("Arial", 18), padx=self.padx[i], pady=8).place(x=2, y=self.place[i])
 
@@ -1097,6 +1065,43 @@ class App(tk.Tk):
                 cv.imwrite('Record/' + Date + '/' + self.Part_API + '/OK/' + Time + '_P0' + str(s + 1) + '.jpg', self.ImageSave[s])
             else:
                 cv.imwrite('Record/' + Date + '/' + self.Part_API + '/NG/' + Time + '_P0' + str(s + 1) + '.jpg', self.ImageSave[s])
+
+
+    def ViewImage(self):
+        if Quantity_Cam == 1:
+            #image1 = Image.open(r"Snap1.bmp")
+            image = cv.imread("Snap1.bmp")
+            image = cv.cvtColor(image ,cv.COLOR_BGR2RGB)
+            for s in range(self.count):
+                cv.rectangle(image, (self.Point_Left[s], self.Point_Top[s]), (self.Point_Right[s], self.Point_Bottom[s]), self.ColorView[s], 2)
+                cv.putText(image, "Point"+str(s+1), (self.Point_Left[s], self.Point_Top[s]), cv.FONT_HERSHEY_SIMPLEX, 0.7, self.ColorView[s], 2)
+            im = Image.fromarray(image)
+            image = ImageTk.PhotoImage(image=im)
+            self.view.image = image
+            self.view.configure(image=image)
+        elif Quantity_Cam == 2:
+            image1 = Image.open(r"Snap1.bmp")
+            image2 = Image.open(r"Snap2.bmp")
+            if self.cam.get() == "Cam1":
+                resize_img = image1.resize((900, 675))
+            elif self.cam.get() == "Cam2":
+                resize_img = image2.resize((900, 675))
+            image = ImageTk.PhotoImage(resize_img)
+            self.view.image = image
+            self.view.configure(image=image)
+        elif Quantity_Cam == 3:
+            image1 = Image.open(r"Snap1.bmp")
+            image2 = Image.open(r"Snap2.bmp")
+            image3 = Image.open(r"Snap3.bmp")
+            if self.cam.get() == "Cam1":
+                resize_img = image1.resize((900, 675))
+            elif self.cam.get() == "Cam2":
+                resize_img = image2.resize((900, 675))
+            elif self.cam.get() == "Cam3":
+                resize_img = image3.resize((900, 675))
+            image = ImageTk.PhotoImage(resize_img)
+            self.view.image = image
+            self.view.configure(image=image)
 
     def Save_Score(self):
         named_tuple = time.localtime()
