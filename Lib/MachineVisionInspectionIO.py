@@ -149,7 +149,7 @@ class Borad():
         elif self.data == "110000001100100000110100001010":  # 02
             self.inst.write("@1 R00")
         """""
-        return [self.Read_Board, self.inst.write]
+        return [self.Read_Board, self.inst.write, self.data]
 
 
 class InfiniteTimer():
@@ -207,6 +207,8 @@ class App(tk.Tk):
         self.Mode_API = self.API_json.Get()[5]
         self.Sever_API = self.API_json.Get()[6]
         self.Packing_API = self.API_json.Get()[7]
+        self.ClassBoard = Borad()
+
 
         self.Batch_API_Get = self.Batch_API
 
@@ -332,6 +334,15 @@ class App(tk.Tk):
         self.Camera()
         self.PrintText()
 
+        self.Board = tk.LabelFrame(self, text="I/O Board")
+        self.Board.configure(font=("Arial", 13))
+        self.Board.configure(fg='Green')
+        self.Board.place(x=755, y=150, height=60, width=120)
+        self.BoardP = tk.Label(self.Board)
+        self.BoardP.configure(font=("Arial", 13))
+        self.BoardP.configure(fg='Green')
+        self.BoardP.place(x=10, y=35, anchor=tk.W)
+
         self.Board_show()
         self.BoardLoop = InfiniteTimer(0.1, self.Board_show)
         self.BoardLoop.start()
@@ -370,9 +381,7 @@ class App(tk.Tk):
         self.view3 = tk.Label(self)
         self.view3.place(x=1280, y=785)
 
-        self.Board = tk.LabelFrame(self, text="I/O Board")
-        self.Board.configure(font=("Arial", 13))
-        self.Board.configure(fg='Green')
+
 
     def CallPart(self):
         self.API_json = Getpart()
@@ -897,45 +906,35 @@ class App(tk.Tk):
                     self.ViewImage()
 
 
-    """""""""
-
     def Board_run(self):
         ClassBoard = Borad()
         Hex = ClassBoard.ReadBorad()[0]
         return [Hex]
 
+    """""""""
+
     def Board_show(self):
-        self.Bit = self.Board_run()[0].split("#")
-        self.Bit = bytes(self.Bit[1], "ascii")
-        self.Bit = "{:08b}".format(int(self.Bit.hex(), 16))
-        self.Board.place(x=755, y=150, height=60, width=120)
-        self.BoardP = tk.Label(self.Board, text=self.Board_run()[0])
-        if self.Bit == "110000001100010000110100001010":  # 01
-            self.ProcessP.place_forget()
-            self.ProcessP = tk.Label(self.Process, text="Process")
-            self.ProcessP.configure(font=("Arial", 18))
+        Hex = self.ClassBoard.ReadBorad()[0]
+        Bin = self.ClassBoard.ReadBorad()[2]
+        self.BoardP.configure(text=Hex)
+        if Bin == "110000001100010000110100001010":  # 01
+            self.ProcessP.configure(text="Process")
             self.ProcessP.configure(fg="#8B8B00")
-            self.ProcessP.place(x=10, y=15, anchor=tk.W)
             self.SaveImage()
             self.ViewImage()
             self.Main()
             self.ShowScore()
             self.ShowResult()
             self.Save_Image()
-            self.ProcessP.place_forget()
-            self.ProcessP = tk.Label(self.Process, text="Ready")
-            self.ProcessP.configure(font=("Arial", 18))
-            self.ProcessP.configure(fg="Green")
-            self.ProcessP.place(x=10, y=15, anchor=tk.W)
-        self.BoardP.configure(font=("Arial", 13))
-        self.BoardP.configure(fg='Green')
-        self.BoardP.place(x=10, y=35, anchor=tk.W)
+            self.ProcessP.configure(text="Ready")
+            self.ProcessP.configure(fg="green")
+
 
     def Process_Outline(self, imgframe, imgTemplate, Left, Top, Right, Bottom):
         img = cv.imread(imgframe, 0)
         template = cv.imread(imgTemplate, 0)
         w, h = template.shape[::-1]
-        TemplateThreshold = 0.8
+        TemplateThreshold = 0.7
         curMaxVal = 0
         c = 0
         for meth in ['cv.TM_CCOEFF_NORMED']:
@@ -1077,13 +1076,11 @@ class App(tk.Tk):
                         self.Result_Ok.configure(font=("Arial", 25))
                         self.Result_Ok.configure(fg='Green')
                         self.Result_Ok.place(x=15, y=0, height=70, width=200)
-                        ClassBoard = Borad()
-                        ClassBoard.inst.write("@1 R00")
+                        self.ClassBoard.inst.write("@1 R00")
                 else:
                     self.Comfrim_Data = self.Comfrim_Data + 1
                     self.ResultComfrim()
-                    ClassBoard = Borad()
-                    ClassBoard.inst.write("@1 R40")
+                    self.ClassBoard.inst.write("@1 R40")
                     break
 
     def ShowScore(self):
