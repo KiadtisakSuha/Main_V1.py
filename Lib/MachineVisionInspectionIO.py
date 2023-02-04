@@ -68,7 +68,6 @@ def Save_Result(Data):
     with open('Result.json', 'w') as json_file:
         json.dump(item, json_file)
 
-
 class Getpart():
     def __init__(self):
         self.Sever = None
@@ -106,7 +105,6 @@ class Getpart():
         return [self.PartNumber, self.BatchNumber, self.PartName, self.CustomerPartNumber, self.MachineName,
                 self.MoldId, self.Sever, self.Packing]
 
-
 class GetEmp():
     def __int__(self):
         dirName = 'Information'
@@ -122,7 +120,6 @@ class GetEmp():
                 json.dump(json_Emp, Operator, indent=6)
         except:
             pass
-
 
 class Borad():
     def __init__(self):
@@ -153,8 +150,6 @@ class Borad():
 
 
 class InfiniteTimer():
-    """A Timer class that does not stop, unless you want it to."""
-
     def __init__(self, seconds, target):
         self._should_continue = False
         self.is_running = False
@@ -169,7 +164,7 @@ class InfiniteTimer():
         self._start_timer()
 
     def _start_timer(self):
-        if self._should_continue:  # Code could have been running when cancel was called.
+        if self._should_continue:
             self.thread = Timer(self.seconds, self._handle_target)
             self.thread.start()
 
@@ -178,14 +173,14 @@ class InfiniteTimer():
             self._should_continue = True
             self._start_timer()
         else:
-            print("Timer already started or running, please wait if you're restarting.")
+            pass
 
     def cancel(self):
         if self.thread is not None:
-            self._should_continue = False  # Just in case thread is running and cancel fails.
+            self._should_continue = False
             self.thread.cancel()
         else:
-            print("Timer never started or failed to initialize.")
+            pass
 
 
 class App(tk.Tk):
@@ -378,8 +373,6 @@ class App(tk.Tk):
         self.view2.place(x=1280, y=480)
         self.view3 = tk.Label(self)
         self.view3.place(x=1280, y=785)
-
-
 
     def CallPart(self):
         self.API_json = Getpart()
