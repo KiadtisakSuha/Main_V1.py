@@ -344,7 +344,7 @@ class App(tk.Tk):
         self.BoardP.place(x=10, y=35, anchor=tk.W)
 
         self.Board_show()
-        self.BoardLoop = InfiniteTimer(0.1, self.Board_show)
+        self.BoardLoop = InfiniteTimer(1.0, self.Board_show)
         self.BoardLoop.start()
 
         self.btn_cam = tk.Button(self, text="Choose Camera", command=self.callback_cam)
