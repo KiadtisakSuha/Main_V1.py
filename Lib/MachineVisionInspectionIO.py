@@ -195,8 +195,8 @@ class App(tk.Tk):
                               background='black', foreground='#006400', borderwidth=0)
         self.title('Machine Vision Inspection 1.1.0')
         self.geometry("1920x1020+0+0")
-        # self.state('zoomed')
-        self.attributes('-fullscreen', True)
+        #self.state('zoomed')
+        #self.attributes('-fullscreen', True)
         self.API_json = Getpart()
         self.API_json.__int__()
         self.Part_API = self.API_json.Get()[0]
@@ -208,8 +208,6 @@ class App(tk.Tk):
         self.Sever_API = self.API_json.Get()[6]
         self.Packing_API = self.API_json.Get()[7]
         self.ClassBoard = Borad()
-
-
         self.Batch_API_Get = self.Batch_API
 
         self.Machine_Vision = tk.Label(self, text='Machine Vision Inspection')
@@ -1082,7 +1080,6 @@ class App(tk.Tk):
                     self.ResultComfrim()
                     self.ClassBoard.inst.write("@1 R40")
                     break
-
     def ShowScore(self):
         if self.count != 0:
             for i in range(self.count):
