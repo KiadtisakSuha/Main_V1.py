@@ -1073,8 +1073,9 @@ class App(tk.Tk):
             image = cv.imread("Snap1.bmp")
             image = cv.cvtColor(image ,cv.COLOR_BGR2RGB)
             for s in range(self.count):
-                cv.rectangle(image, (self.Point_Left[s], self.Point_Top[s]), (self.Point_Right[s], self.Point_Bottom[s]), self.ColorView[s], 2)
-                cv.putText(image, "Point"+str(s+1), (self.Point_Left[s], self.Point_Top[s]), cv.FONT_HERSHEY_SIMPLEX, 0.7, self.ColorView[s], 2)
+                if self.Point_Camera[x] == "Cam1":
+                    cv.rectangle(image, (self.Point_Left[s], self.Point_Top[s]), (self.Point_Right[s], self.Point_Bottom[s]), self.ColorView[s], 2)
+                    cv.putText(image, "Point"+str(s+1), (self.Point_Left[s], self.Point_Top[s]), cv.FONT_HERSHEY_SIMPLEX, 0.7, self.ColorView[s], 2)
             im = Image.fromarray(image)
             image = ImageTk.PhotoImage(image=im)
             self.view.image = image
