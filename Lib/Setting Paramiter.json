@@ -1,5 +1,5 @@
 [
-      {
+      {     "Mode": 2, 
             "MachineName": "E26",
             "Quantity_Cam": 2,
             "Board_Name": "ASRL4::INSTR"      

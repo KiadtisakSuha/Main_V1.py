@@ -22,6 +22,7 @@ with open('Setting Paramiter.json', 'r') as json_file:
 Quantity_Cam = Setting_Paramiter[0]["Quantity_Cam"]
 Board_Name = Setting_Paramiter[0]["Board_Name"]
 Machine = Setting_Paramiter[0]["MachineName"]
+Mode = Setting_Paramiter[0]["Mode"]
 
 if Quantity_Cam == 1:
     frame0 = cv.VideoCapture(0, cv.CAP_DSHOW)
@@ -79,7 +80,7 @@ class Getpart():
 
     def Get(self):
         try:
-            with urllib.request.urlopen(self.Part_Paramiter, timeout=5) as response:
+            with urllib.request.urlopen(self.Part_Paramiter, timeout=3) as response:
                 json_API = json.loads(response.read())
             self.Sever = "Connected"
             self.PartNumber = json_API[0]["PartNumber"]
@@ -314,9 +315,13 @@ class App(tk.Tk):
         self.BoardP.configure(fg='Green')
         self.BoardP.place(x=10, y=35, anchor=tk.W)
 
-        self.Board_show()
-        self.BoardLoop = InfiniteTimer(0.1, self.Board_show)
-        self.BoardLoop.start()
+        if Mode == 1:
+            self.Board_show()
+            self.BoardLoop = InfiniteTimer(0.1, self.Board_show)
+            self.BoardLoop.start()
+        elif Mode == 2:
+            self.CallKeyBorad()
+
 
         self.btn_cam = tk.Button(self, text="Choose", command=lambda :[self.callback_cam,self.ViewImage()])
         self.btn_cam.configure(font=("Arial", 18))
@@ -361,11 +366,16 @@ class App(tk.Tk):
         self.Mode_API = self.API_json.Get()[5]
         self.Sever_API = self.API_json.Get()[6]
         self.Packing_API = self.API_json.Get()[7]
+        if self.Sever_API == "Connected":
+            self.Machine_Vision.configure(fg='Green')
+            self.Machine_Version.configure(fg='Green')
+        else:
+            self.Machine_Vision.configure(fg='Red')
+            self.Machine_Version.configure(fg='Red')
         if self.Batch_API_Get == self.Batch_API:
             pass
         elif self.Batch_API_Get != self.Batch_API:
             self.Batch_API_Get = self.Batch_API
-            self.MachineP.configure(text=self.Machine_API)
             self.PARTP.configure(text=self.Part_API)
             self.PART_NAMEP.configure(text=self.part_name_API)
             self.CUSTOMER_NUMBERP.configure(text=self.Customer_API)
@@ -456,16 +466,16 @@ class App(tk.Tk):
     def Search(self):
         if self.Loginform():
             self.Login.destroy()
-            SaveMaster = tk.Toplevel(self)
-            SaveMaster.title("Save Master")
-            SaveMaster.geometry('280x350')
+            self.SaveMaster = tk.Toplevel(self)
+            self.SaveMaster.title("Save Master")
+            self.SaveMaster.geometry('280x350')
 
-            Lable_Cam = tk.Label(SaveMaster, text="Cam :")
+            Lable_Cam = tk.Label(self.SaveMaster, text="Cam :")
             Lable_Cam.configure(font=("Arial", 20))
             Lable_Cam.configure(fg='Green')
             Lable_Cam.place(x=10, y=10)
             n = tk.StringVar()
-            cam = ttk.Combobox(SaveMaster, width=8, height=80, textvariable=n)
+            cam = ttk.Combobox(self.SaveMaster, width=8, height=80, textvariable=n)
             cam.configure(font=("Arial", 20))
             cam.configure(justify="center", foreground="green")
             if Quantity_Cam == 1:
@@ -481,12 +491,12 @@ class App(tk.Tk):
             cam.current(0)
             cam.place(x=120, y=10)
 
-            Lable_Point = tk.Label(SaveMaster, text="Point :")
+            Lable_Point = tk.Label(self.SaveMaster, text="Point :")
             Lable_Point.configure(font=("Arial", 20))
             Lable_Point.configure(fg='Green')
             Lable_Point.place(x=10, y=60)
             Point_Data = tk.StringVar()
-            Chose_Point = ttk.Combobox(SaveMaster, width=8, height=80, textvariable=Point_Data)
+            Chose_Point = ttk.Combobox(self.SaveMaster, width=8, height=80, textvariable=Point_Data)
             Chose_Point.configure(font=("Arial", 20))
             Chose_Point.configure(justify="center", foreground="green")
             Chose_Point['values'] = ('Point1', 'Point2', 'Point3', 'Point4', 'Point5', 'Point6', 'Point7', 'Point8', 'Point9', 'Point10')
@@ -494,21 +504,21 @@ class App(tk.Tk):
             Chose_Point.place(x=120, y=60)
 
             Score_Data_Outline = tk.StringVar()
-            Lable_Score_Outline = tk.Label(SaveMaster, text="Outline :")
+            Lable_Score_Outline = tk.Label(self.SaveMaster, text="Outline :")
             Lable_Score_Outline.configure(font=("Arial", 20))
             Lable_Score_Outline.configure(fg='Green')
             Lable_Score_Outline.place(x=10, y=110)
-            Score_Show_Outline = tk.Entry(SaveMaster, font="Arial", textvariable=Score_Data_Outline)
+            Score_Show_Outline = tk.Entry(self.SaveMaster, font="Arial", textvariable=Score_Data_Outline)
             Score_Show_Outline.configure(font=("Arial", 20))
             Score_Show_Outline.configure(fg='Green')
             Score_Show_Outline.place(x=120, y=110, width=150)
 
             Score_Data_Area = tk.StringVar()
-            Lable_Score_Area = tk.Label(SaveMaster, text="Area :")
+            Lable_Score_Area = tk.Label(self.SaveMaster, text="Area :")
             Lable_Score_Area.configure(font=("Arial", 20))
             Lable_Score_Area.configure(fg='Green')
             Lable_Score_Area.place(x=10, y=160)
-            Score_Show_Area = tk.Entry(SaveMaster, font="Arial", textvariable=Score_Data_Area)
+            Score_Show_Area = tk.Entry(self.SaveMaster, font="Arial", textvariable=Score_Data_Area)
             Score_Show_Area.configure(font=("Arial", 20))
             Score_Show_Area.configure(fg='Green')
             Score_Show_Area.place(x=120, y=160, width=150)
@@ -615,7 +625,7 @@ class App(tk.Tk):
                         with open(self.Part_API + '/' + self.Part_API + '.json', 'w') as json_file:
                             json.dump(item, json_file, indent=6)
 
-            buttonSave = tk.Button(SaveMaster, text="Save", command=Save)
+            buttonSave = tk.Button(self.SaveMaster, text="Save", command=Save)
             buttonSave.configure(font=("Arial", 30, "bold"))
             buttonSave.configure(justify="center", foreground="green")
             buttonSave.place(x=120, y=220, width=150, height=80)
@@ -637,7 +647,7 @@ class App(tk.Tk):
 
             Score_Data_Area.trace("w", score_limit)
             Score_Data_Outline.trace("w", score_limit)
-            SaveMaster.mainloop()
+            self.SaveMaster.mainloop()
 
         else:
             self.message.set("Password not match")
@@ -657,6 +667,7 @@ class App(tk.Tk):
     def combobox_cam(self):
         self.n = tk.StringVar()
         self.cam = ttk.Combobox(self, width=8, height=80, textvariable=self.n)
+        self.cam['state'] = 'readonly'
         self.cam.configure(font=("Arial", 20))
         self.cam.configure(justify="center", foreground="green")
         if Quantity_Cam == 1:
@@ -821,37 +832,14 @@ class App(tk.Tk):
 
 
 
-    """""""""
-    def CallKeyBorad(self):
-        self.LabelKeyBorad = tk.Label(self)
-        self.LabelKeyBorad.bind_all('<KeyRelease>', self.Processing)
-
-    def Processing(self, event):
-            if self.count != 0:
-                self.btn_reset.focus_set()
-                if event.char == '5':
-                    self.Close_Login = True
-                    self.ProcessP.place_forget()
-                    self.ProcessP = tk.Label(self.Process, text="Process")
-                    self.ProcessP.configure(font=("Arial", 18))
-                    self.ProcessP.configure(fg="#8B8B00")
-                    self.ProcessP.place(x=10, y=15, anchor=tk.W)
-                    self.SaveImage()
-                    self.ViewImage()
-
-    def Board_run(self):
-        ClassBoard = Borad()
-        Hex = ClassBoard.ReadBorad()[0]
-        return [Hex]
-     """""""""
-
-    def Board_show(self):
-        Hex = self.ClassBoard.ReadBorad()[0]
-        Bin = self.ClassBoard.ReadBorad()[2]
-        self.BoardP.configure(text=Hex)
-        if Bin == "110000001100000000110100001010":
-            self.SaveDataBoard = True
-        elif Bin == "110000001100010000110100001010" and self.SaveDataBoard == True: # 01
+    if Mode == 1:
+        def Board_show(self):
+            Hex = self.ClassBoard.ReadBorad()[0]
+            Bin = self.ClassBoard.ReadBorad()[2]
+            self.BoardP.configure(text=Hex)
+            if Bin == "110000001100000000110100001010":
+                self.SaveDataBoard = True
+            elif Bin == "110000001100010000110100001010" and self.SaveDataBoard == True:  # 01
                 self.ProcessP.configure(text="Process")
                 self.ProcessP.configure(bg='yellow')
                 self.SaveImage()
@@ -864,7 +852,34 @@ class App(tk.Tk):
                 self.ProcessP.configure(bg="green")
                 self.SaveDataBoard = False
 
-
+    elif Mode == 2:
+        def CallKeyBorad(self):
+            self.LabelKeyBorad = tk.Label(self)
+            self.LabelKeyBorad.bind_all('<KeyRelease>', self.Processing)
+        def Processing(self, event):
+            self.btn_reset.focus_set()
+            Login = False
+            SaveMaster = False
+            try:
+                self.Login.winfo_geometry()
+            except:
+                Login = True
+            try:
+                self.SaveMaster.winfo_geometry()
+            except:
+                SaveMaster = True
+            if self.count != 0 and Login == True and SaveMaster == True:
+                    if event.char == '5':
+                        self.ProcessP.configure(text="Process")
+                        self.ProcessP.configure(bg='yellow')
+                        self.SaveImage()
+                        self.Main()
+                        self.ShowScore()
+                        self.ShowResult()
+                        self.Save_Image()
+                        self.ViewImage()
+                        self.ProcessP.configure(text="Ready")
+                        self.ProcessP.configure(bg="green")
 
     def Strat(self):
         self.ProcessP.configure(text="Process")
@@ -1011,8 +1026,6 @@ class App(tk.Tk):
                     else:
                         self.padx_outline.append(20)
                         self.padx_area.append(20)
-
-
                 self.place.append(x * 70)
 
     def ResultComfrim(self):
@@ -1033,11 +1046,13 @@ class App(tk.Tk):
                         self.Comfrim_Data = 0
                         self.Save_Score()
                         self.Result_Ok.configure(text="OK : " + str(self.OK_Data))
-                        #self.ClassBoard.inst.write("@1 R00")
+                        if Mode == 1:
+                            self.ClassBoard.inst.write("@1 R00")
                 else:
                     self.Comfrim_Data = self.Comfrim_Data + 1
                     self.ResultComfrim()
-                    #self.ClassBoard.inst.write("@1 R40")
+                    if Mode == 1:
+                        self.ClassBoard.inst.write("@1 R40")
                     break
     def ShowScore(self):
         if self.count != 0:
