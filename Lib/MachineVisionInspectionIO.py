@@ -202,7 +202,7 @@ class App(tk.Tk):
         self.Mode_API = self.API_json.Get()[5]
         self.Sever_API = self.API_json.Get()[6]
         self.Packing_API = self.API_json.Get()[7]
-        #self.ClassBoard = Borad()
+        self.ClassBoard = Borad()
         self.Batch_API_Get = self.Batch_API
 
         self.Machine_Vision = tk.Label(self, text='Machine Vision Inspection '+self.Machine_API)
@@ -312,9 +312,9 @@ class App(tk.Tk):
         self.BoardP.configure(fg='Green')
         self.BoardP.place(x=10, y=35, anchor=tk.W)
 
-        #self.Board_show()
-        #self.BoardLoop = InfiniteTimer(0.1, self.Board_show)
-        #self.BoardLoop.start()
+        self.Board_show()
+        self.BoardLoop = InfiniteTimer(0.1, self.Board_show)
+        self.BoardLoop.start()
 
         self.btn_cam = tk.Button(self, text="Choose", command=lambda :[self.callback_cam,self.ViewImage()])
         self.btn_cam.configure(font=("Arial", 18))
@@ -839,13 +839,11 @@ class App(tk.Tk):
                     self.SaveImage()
                     self.ViewImage()
 
-
     def Board_run(self):
         ClassBoard = Borad()
         Hex = ClassBoard.ReadBorad()[0]
         return [Hex]
 
-    """""""""
     """""""""
     def Board_show(self):
         Hex = self.ClassBoard.ReadBorad()[0]
@@ -854,17 +852,16 @@ class App(tk.Tk):
         if Bin == "110000001100010000110100001010":  # 01
             self.ProcessP.configure(text="Process")
             self.ProcessP.configure(bg='yellow')
-            time.sleep(2)
             self.SaveImage()
-            self.ViewImage()
             self.Main()
             self.ShowScore()
             self.ShowResult()
             self.Save_Image()
+            self.ViewImage()
             self.ProcessP.configure(text="Ready")
             self.ProcessP.configure(bg="green")
 
-    """""""""
+
     def Strat(self):
         self.ProcessP.configure(text="Process")
         self.ProcessP.configure(bg='yellow')
@@ -1056,6 +1053,7 @@ class App(tk.Tk):
                 os.makedirs(path, exist_ok=True)
             except OSError as error:
                 pass
+
             cv.rectangle(self.ImageSave[s], (self.Point_Left[s], self.Point_Top[s]), (self.Point_Right[s], self.Point_Bottom[s]), self.Color[s], 3)
             cv.putText(self.ImageSave[s], "Score Outline : " + str(self.Score_Outline_Data[s]) + " / " + str(self.Point_Score_Outline[s]), (10, 25), cv.FONT_HERSHEY_SIMPLEX, 1, self.Color[s], 2)
             cv.putText(self.ImageSave[s], "Score Area : " + str(self.Score_Area_Data[s]) + " / " + str(self.Point_Score_Area[s]), (10, 55), cv.FONT_HERSHEY_SIMPLEX, 1, self.Color[s], 2)
@@ -1065,7 +1063,6 @@ class App(tk.Tk):
                 cv.imwrite('Record/' + Date + '/' + self.Part_API + '/OK/' + Time + '_P0' + str(s + 1) + '.jpg', self.ImageSave[s])
             else:
                 cv.imwrite('Record/' + Date + '/' + self.Part_API + '/NG/' + Time + '_P0' + str(s + 1) + '.jpg', self.ImageSave[s])
-
 
     def ViewImage(self):
         if Quantity_Cam == 1:
@@ -1081,26 +1078,45 @@ class App(tk.Tk):
             self.view.image = image
             self.view.configure(image=image)
         elif Quantity_Cam == 2:
-            image1 = Image.open(r"Snap1.bmp")
-            image2 = Image.open(r"Snap2.bmp")
-            if self.cam.get() == "Cam1":
-                resize_img = image1.resize((900, 675))
-            elif self.cam.get() == "Cam2":
-                resize_img = image2.resize((900, 675))
-            image = ImageTk.PhotoImage(resize_img)
+            image1 = cv.imread("Snap1.bmp")
+            image1 = cv.cvtColor(image1, cv.COLOR_BGR2RGB)
+            image2 = cv.imread("Snap2.bmp")
+            image2 = cv.cvtColor(image2, cv.COLOR_BGR2RGB)
+            for s in range(self.count):
+                if self.cam.get() == "Cam1" and self.Point_Camera[s] == "Cam1":
+                    cv.rectangle(image1, (self.Point_Left[s], self.Point_Top[s]), (self.Point_Right[s], self.Point_Bottom[s]), self.ColorView[s], 2)
+                    cv.putText(image1, "Point" + str(s + 1), (self.Point_Left[s], self.Point_Top[s]), cv.FONT_HERSHEY_SIMPLEX, 0.7, self.ColorView[s], 2)
+                    im = Image.fromarray(image1)
+                elif self.cam.get() == "Cam2" and self.Point_Camera[s] == "Cam2":
+                    cv.rectangle(image2, (self.Point_Left[s], self.Point_Top[s]), (self.Point_Right[s], self.Point_Bottom[s]), self.ColorView[s], 2)
+                    cv.putText(image2, "Point" + str(s + 1), (self.Point_Left[s], self.Point_Top[s]), cv.FONT_HERSHEY_SIMPLEX, 0.7, self.ColorView[s], 2)
+                    im = Image.fromarray(image2)
+            image = ImageTk.PhotoImage(image=im)
             self.view.image = image
             self.view.configure(image=image)
         elif Quantity_Cam == 3:
-            image1 = Image.open(r"Snap1.bmp")
-            image2 = Image.open(r"Snap2.bmp")
-            image3 = Image.open(r"Snap3.bmp")
-            if self.cam.get() == "Cam1":
-                resize_img = image1.resize((900, 675))
-            elif self.cam.get() == "Cam2":
-                resize_img = image2.resize((900, 675))
-            elif self.cam.get() == "Cam3":
-                resize_img = image3.resize((900, 675))
-            image = ImageTk.PhotoImage(resize_img)
+            image1 = cv.imread("Snap1.bmp")
+            image1 = cv.cvtColor(image1, cv.COLOR_BGR2RGB)
+            image2 = cv.imread("Snap2.bmp")
+            image2 = cv.cvtColor(image2, cv.COLOR_BGR2RGB)
+            image3 = cv.imread("Snap3.bmp")
+            image3 = cv.cvtColor(image3, cv.COLOR_BGR2RGB)
+            for s in range(self.count):
+
+                if self.cam.get() == "Cam1" and self.Point_Camera[s] == "Cam1":
+                    cv.rectangle(image1, (self.Point_Left[s], self.Point_Top[s]), (self.Point_Right[s], self.Point_Bottom[s]), self.ColorView[s], 2)
+                    cv.putText(image1, "Point" + str(s + 1), (self.Point_Left[s], self.Point_Top[s]), cv.FONT_HERSHEY_SIMPLEX, 0.7, self.ColorView[s], 2)
+                    im = Image.fromarray(image1)
+                elif self.cam.get() == "Cam2" and self.Point_Camera[s] == "Cam2":
+                    cv.rectangle(image2, (self.Point_Left[s], self.Point_Top[s]), (self.Point_Right[s], self.Point_Bottom[s]), self.ColorView[s], 2)
+                    cv.putText(image2, "Point" + str(s + 1), (self.Point_Left[s], self.Point_Top[s]), cv.FONT_HERSHEY_SIMPLEX, 0.7, self.ColorView[s], 2)
+                    im = Image.fromarray(image2)
+                elif self.cam.get() == "Cam3" and self.Point_Camera[s] == "Cam3":
+                    cv.rectangle(image3, (self.Point_Left[s], self.Point_Top[s]), (self.Point_Right[s], self.Point_Bottom[s]), self.ColorView[s], 2)
+                    cv.putText(image3, "Point" + str(s + 1), (self.Point_Left[s], self.Point_Top[s]), cv.FONT_HERSHEY_SIMPLEX, 0.7, self.ColorView[s], 2)
+                    im = Image.fromarray(image3)
+
+            image = ImageTk.PhotoImage(image=im)
             self.view.image = image
             self.view.configure(image=image)
 
