@@ -186,13 +186,26 @@ class InfiniteTimer():
 
 class App(tk.Tk):
     def __init__(self):
+
         super().__init__()
+        combostyle = ttk.Style()
+
+        combostyle.theme_create('combostyle', parent='alt',
+                                settings={'TCombobox':
+                                              {'configure':
+                                                   {'selectbackground': 'blue',
+                                                    'fieldbackground': 'black',
+                                                    'background': 'green'
+                                                    }}}
+                                )
+        combostyle.theme_use('combostyle')
         ttk.Style().configure('TNotebook.Tab', font=('Arial', 20),
                               background='black', foreground='#006400', borderwidth=0)
-        self.title('Machine Vision Inspection 1.1.0')
+        self.title('Machine Vision Inspection 0.0.0')
         self.geometry("1920x1020+0+0")
         self.state('zoomed')
         #self.attributes('-fullscreen', True)
+        self.configure(background='black')
         self.API_json = Getpart()
         self.API_json.__int__()
         self.Part_API = self.API_json.Get()[0]
@@ -203,13 +216,11 @@ class App(tk.Tk):
         self.Mode_API = self.API_json.Get()[5]
         self.Sever_API = self.API_json.Get()[6]
         self.Packing_API = self.API_json.Get()[7]
-        self.ClassBoard = Borad()
-        self.Bin_Keep = self.ClassBoard.ReadBorad()[2]
-        self.SaveDataBoard = False
         self.Batch_API_Get = self.Batch_API
 
-        self.Machine_Vision = tk.Label(self, text='Machine Vision Inspection '+self.Machine_API)
-        self.Machine_Version = tk.Label(self, text='v0.0.0')
+
+        self.Machine_Vision = tk.Label(self, text='Machine Vision Inspection '+self.Machine_API,bg='black')
+        self.Machine_Version = tk.Label(self, text='v0.0.0',bg='black')
         if self.Sever_API == "Connected":
             self.Machine_Vision.configure(fg='Green')
             self.Machine_Version.configure(fg='Green')
@@ -221,47 +232,47 @@ class App(tk.Tk):
         self.Machine_Version.configure(font=("Arial", 10))
         self.Machine_Version.place(x=400, y=45)
 
-        self.PART = tk.LabelFrame(self, text="BKF PART NUMBER")
-        self.PART.configure(font=("Arial", 10))
+        self.PART = tk.LabelFrame(self, text="BKF PART NUMBER",bg='black')
+        self.PART.configure(font=("Arial", 10,'bold'))
         self.PART.configure(fg='Green')
         self.PART.place(x=395, y=70, height=60, width=150)
-        self.PARTP = tk.Label(self.PART, text=self.Part_API)
+        self.PARTP = tk.Label(self.PART, text=self.Part_API,bg='black')
         self.PARTP.configure(font=("Arial", 13))
         self.PARTP.configure(fg='Green')
         self.PARTP.place(x=10, y=15, anchor=tk.W)
 
-        self.PART_NAME = tk.LabelFrame(self, text="PART NAME")
-        self.PART_NAME.configure(font=("Arial", 10))
+        self.PART_NAME = tk.LabelFrame(self, text="PART NAME",bg='black')
+        self.PART_NAME.configure(font=("Arial", 10,'bold'))
         self.PART_NAME.configure(fg='Green')
         self.PART_NAME.place(x=555, y=70, height=60, width=390)
-        self.PART_NAMEP = tk.Label(self.PART_NAME, text=self.part_name_API)
+        self.PART_NAMEP = tk.Label(self.PART_NAME, text=self.part_name_API,bg='black')
         self.PART_NAMEP.configure(font=("Arial", 13))
         self.PART_NAMEP.configure(fg='Green')
         self.PART_NAMEP.place(x=10, y=15, anchor=tk.W)
 
-        self.CUSTOMER_NUMBER = tk.LabelFrame(self, text="CUSTOMER NUMBER")
+        self.CUSTOMER_NUMBER = tk.LabelFrame(self, text="CUSTOMER NUMBER",bg='black')
         self.CUSTOMER_NUMBER.configure(font=("Arial", 10))
         self.CUSTOMER_NUMBER.configure(fg='Green')
         self.CUSTOMER_NUMBER.place(x=395, y=150, height=60, width=150)
-        self.CUSTOMER_NUMBERP = tk.Label(self.CUSTOMER_NUMBER, text=self.Customer_API)
+        self.CUSTOMER_NUMBERP = tk.Label(self.CUSTOMER_NUMBER, text=self.Customer_API,bg='black')
         self.CUSTOMER_NUMBERP.configure(font=("Arial", 13))
         self.CUSTOMER_NUMBERP.configure(fg='Green')
         self.CUSTOMER_NUMBERP.place(x=10, y=15, anchor=tk.W)
 
-        self.BATCH_NUMBER = tk.LabelFrame(self, text="BATCH NUMBER")
+        self.BATCH_NUMBER = tk.LabelFrame(self, text="BATCH NUMBER",bg='black')
         self.BATCH_NUMBER.configure(font=("Arial", 10))
         self.BATCH_NUMBER.configure(fg='Green')
         self.BATCH_NUMBER.place(x=555, y=150, height=60, width=150)
-        self.BATCH_NUMBERP = tk.Label(self.BATCH_NUMBER, text=self.Batch_API)
+        self.BATCH_NUMBERP = tk.Label(self.BATCH_NUMBER, text=self.Batch_API,bg='black')
         self.BATCH_NUMBERP.configure(font=("Arial", 13))
         self.BATCH_NUMBERP.configure(fg='Green')
         self.BATCH_NUMBERP.place(x=10, y=15, anchor=tk.W)
 
-        self.MOLD_NUMBER = tk.LabelFrame(self, text="MOLD NUMBER")
+        self.MOLD_NUMBER = tk.LabelFrame(self, text="MOLD NUMBER",bg='black')
         self.MOLD_NUMBER.configure(font=("Arial", 10))
         self.MOLD_NUMBER.configure(fg='Green')
         self.MOLD_NUMBER.place(x=720, y=150, height=60, width=225)
-        self.MOLD_NUMBERP = tk.Label(self.MOLD_NUMBER, text=self.Mode_API)
+        self.MOLD_NUMBERP = tk.Label(self.MOLD_NUMBER, text=self.Mode_API,bg='black')
         self.MOLD_NUMBERP.configure(font=("Arial", 13))
         self.MOLD_NUMBERP.configure(fg='Green')
         self.MOLD_NUMBERP.place(x=10, y=15, anchor=tk.W)
@@ -272,23 +283,23 @@ class App(tk.Tk):
         self.Comfrim_Data = 0
         self.Comfrim_SaveScore = 0
         #tk.Label(self,text="OK : ",font=("Arial", 50,'bold'),fg='Green').place(x=10, y=50)
-        self.Result_Ok = tk.Label(self, text="OK : "+str(self.OK_Data),borderwidth=3, relief="ridge", padx=5, pady=10)
+        self.Result_Ok = tk.Label(self, text="OK : "+str(self.OK_Data),borderwidth=3, relief="ridge", padx=5, pady=10,bg='black')
         self.Result_Ok.configure(font=("Arial", 50,'bold'))
         self.Result_Ok.configure(fg='Green')
         self.Result_Ok.place(x=10, y=50 ,width=350)
 
-        self.Result_NG = tk.Label(self, text="OK : "+str(self.OK_Data), borderwidth=3, relief="ridge", padx=5, pady=10)
+        self.Result_NG = tk.Label(self, text="OK : "+str(self.OK_Data), borderwidth=3, relief="ridge", padx=5, pady=10,bg='black')
         self.Result_NG.configure(font=("Arial", 50,'bold'))
         self.Result_NG.configure(fg='Red')
         self.Result_NG.place(x=10, y=180,width=350)
 
         self.Label_cam = tk.Label(self, text="Cam1")
-        self.frame = tk.Label(self)
+        self.frame = tk.Label(self,bg="black")
         self.frame.place(x=395, y=650)
 
 
 
-        self.Process = tk.LabelFrame(self, text="Process")
+        self.Process = tk.LabelFrame(self, text="Process",bg='black')
         self.Process.configure(font=("Arial", 10))
         self.Process.configure(fg='Green')
         self.Process.place(x=395, y=220, height=60, width=150)
@@ -306,54 +317,61 @@ class App(tk.Tk):
         self.Camera()
         self.PrintText()
 
-        self.Board = tk.LabelFrame(self, text="I/O Board")
+        self.Board = tk.LabelFrame(self, text="I/O Board",bg='black')
         self.Board.configure(font=("Arial", 10))
         self.Board.configure(fg='Green')
         self.Board.place(x=555, y=220, height=60, width=150)
-        self.BoardP = tk.Label(self.Board)
+        self.BoardP = tk.Label(self.Board,bg='black')
         self.BoardP.configure(font=("Arial", 13))
         self.BoardP.configure(fg='Green')
         self.BoardP.place(x=10, y=35, anchor=tk.W)
 
         if Mode == 1:
+            self.ClassBoard = Borad()
+            self.SaveDataBoard = False
+            self.SaveDataBoard_IO = False
             self.Board_show()
-            self.BoardLoop = InfiniteTimer(0.1, self.Board_show)
-            self.BoardLoop.start()
         elif Mode == 2:
             self.CallKeyBorad()
 
 
-        self.btn_cam = tk.Button(self, text="Choose", command=lambda :[self.callback_cam,self.ViewImage()])
+        self.btn_cam = tk.Button(self, text="Choose", command=lambda :[self.callback_cam(),self.ViewImage()],bg='black')
         self.btn_cam.configure(font=("Arial", 18))
         self.btn_cam.configure(justify="center", foreground="green")
         self.btn_cam.place(x=1390, y=10)
 
-        self.btn_add = tk.Button(self, text="Add Master", command=self.AddMaster)
+        self.btn_add = tk.Button(self, text="Add Master", command=self.AddMaster,bg='black')
         self.btn_add.configure(font=("Arial", 18))
         self.btn_add.configure(justify="center", foreground="green")
         self.btn_add.place(x=1650, y=10)
 
-        self.btn_reset = tk.Button(self, text="Initiated", command=self.ShowCount)
+        self.btn_reset = tk.Button(self, text="Initiated", command=self.ShowCount,bg='black')
         self.btn_reset.configure(font=("Arial", 18))
         self.btn_reset.configure(justify="center", foreground="green")
         self.btn_reset.place(x=700, y=10)
 
-        self.btn_Close = tk.Button(self, text="Exit", command=self.Destroy)
+        self.btn_Close = tk.Button(self, text="Exit", command=self.Destroy,bg='black')
         self.btn_Close.configure(font=("Arial", 18))
         self.btn_Close.configure(justify="center", foreground="red")
         self.btn_Close.place(x=1800, y=10,width=100)
 
         self.ShowCount()
 
-        self.btn_repart = tk.Button(self, text="Re-order", command=self.CallPart)
+        self.btn_repart = tk.Button(self, text="Re-order", command=self.CallPart,bg='black')
         self.btn_repart.configure(font=("Arial", 18))
         self.btn_repart.configure(justify="center", foreground="green")
         self.btn_repart.place(x=830, y=10)
 
 
-        self.view = tk.Label(self)
+        self.view = tk.Label(self,bg='black')
         self.view.place(x=950, y=180)
-
+    """""""""
+    def Boradxxx(self):
+        self.Board_show()
+        self.after(100,self.Boradxxx)
+        # self.BoardLoop = InfiniteTimer(0.5, self.Board_show)
+        # self.BoardLoop.start()
+    """""""""
 
     def CallPart(self):
         self.API_json = Getpart()
@@ -390,11 +408,11 @@ class App(tk.Tk):
             Data = json.loads(json_file.read())
         Packing_Couter = Data["Couter"]
         PackPart = Data["Partnumber"]
-        self.PACKING_NUMBER = tk.LabelFrame(self, text="PACKING")
+        self.PACKING_NUMBER = tk.LabelFrame(self, text="PACKING",bg='black')
         self.PACKING_NUMBER.configure(font=("Arial", 10))
         self.PACKING_NUMBER.configure(fg='Green')
         self.PACKING_NUMBER.place(x=725, y=220, height=60, width=160)
-        self.PACKING_NUMBERP = tk.Label(self.PACKING_NUMBER, text=str(Packing_Couter) + "/" + str(self.Packing_API))
+        self.PACKING_NUMBERP = tk.Label(self.PACKING_NUMBER, text=str(Packing_Couter) + "/" + str(self.Packing_API),bg='black')
         self.PACKING_NUMBERP.configure(font=("Arial", 22))
         self.PACKING_NUMBERP.configure(fg='Green')
         self.PACKING_NUMBERP.place(x=10, y=15, anchor=tk.W)
@@ -425,14 +443,15 @@ class App(tk.Tk):
         self.Login = tk.Toplevel(self)
         self.Login.title("Login")
         self.Login.geometry('220x120')
+        self.Login.configure(background='black')
 
         self.message = tk.StringVar()
-        self.show_message = tk.Label(self.Login, text="", textvariable=self.message)
+        self.show_message = tk.Label(self.Login, text="", textvariable=self.message,bg='black')
         self.show_message.configure(font=("Arial", 13))
         self.show_message.place(x=10, y=90)
 
         self.Password = tk.StringVar()  # string variable
-        self.BoxPassword = tk.Entry(self.Login, font="Arial", show='*', textvariable=self.Password)
+        self.BoxPassword = tk.Entry(self.Login, font="Arial", show='*', textvariable=self.Password,bg='black',fg='green')
         self.BoxPassword.configure(font=("Arial", 20))
         self.BoxPassword.place(x=20, y=10, width=180, height=35)
 
@@ -446,7 +465,7 @@ class App(tk.Tk):
         self.Password.trace("w", lambda *args: character_limit(self.Password))
         self.chack_Value_Password = tk.IntVar(value=0)
 
-        self.buttonLogin = tk.Button(self.Login, text="Login", command=self.Search)
+        self.buttonLogin = tk.Button(self.Login, text="Login", command=self.Search,bg='black')
         self.buttonLogin.configure(font=("Arial", 13))
         self.buttonLogin.configure(justify="center", foreground="green")
         self.buttonLogin.place(x=80, y=50)
@@ -469,8 +488,9 @@ class App(tk.Tk):
             self.SaveMaster = tk.Toplevel(self)
             self.SaveMaster.title("Save Master")
             self.SaveMaster.geometry('280x350')
+            self.SaveMaster.configure(background='black')
 
-            Lable_Cam = tk.Label(self.SaveMaster, text="Cam :")
+            Lable_Cam = tk.Label(self.SaveMaster, text="Cam :",bg='black')
             Lable_Cam.configure(font=("Arial", 20))
             Lable_Cam.configure(fg='Green')
             Lable_Cam.place(x=10, y=10)
@@ -491,7 +511,7 @@ class App(tk.Tk):
             cam.current(0)
             cam.place(x=120, y=10)
 
-            Lable_Point = tk.Label(self.SaveMaster, text="Point :")
+            Lable_Point = tk.Label(self.SaveMaster, text="Point :",bg='black')
             Lable_Point.configure(font=("Arial", 20))
             Lable_Point.configure(fg='Green')
             Lable_Point.place(x=10, y=60)
@@ -504,21 +524,21 @@ class App(tk.Tk):
             Chose_Point.place(x=120, y=60)
 
             Score_Data_Outline = tk.StringVar()
-            Lable_Score_Outline = tk.Label(self.SaveMaster, text="Outline :")
+            Lable_Score_Outline = tk.Label(self.SaveMaster, text="Outline :",bg='black')
             Lable_Score_Outline.configure(font=("Arial", 20))
             Lable_Score_Outline.configure(fg='Green')
             Lable_Score_Outline.place(x=10, y=110)
-            Score_Show_Outline = tk.Entry(self.SaveMaster, font="Arial", textvariable=Score_Data_Outline)
+            Score_Show_Outline = tk.Entry(self.SaveMaster, font="Arial", textvariable=Score_Data_Outline,bg='black')
             Score_Show_Outline.configure(font=("Arial", 20))
             Score_Show_Outline.configure(fg='Green')
             Score_Show_Outline.place(x=120, y=110, width=150)
 
             Score_Data_Area = tk.StringVar()
-            Lable_Score_Area = tk.Label(self.SaveMaster, text="Area :")
+            Lable_Score_Area = tk.Label(self.SaveMaster, text="Area :",bg='black')
             Lable_Score_Area.configure(font=("Arial", 20))
             Lable_Score_Area.configure(fg='Green')
             Lable_Score_Area.place(x=10, y=160)
-            Score_Show_Area = tk.Entry(self.SaveMaster, font="Arial", textvariable=Score_Data_Area)
+            Score_Show_Area = tk.Entry(self.SaveMaster, font="Arial", textvariable=Score_Data_Area,bg='black')
             Score_Show_Area.configure(font=("Arial", 20))
             Score_Show_Area.configure(fg='Green')
             Score_Show_Area.place(x=120, y=160, width=150)
@@ -543,7 +563,7 @@ class App(tk.Tk):
                         if not os.path.exists(Create):
                             os.makedirs(Create)
                         else:
-                            print("")
+                            pass
                         refPt = []
                         cropping = False
 
@@ -625,7 +645,7 @@ class App(tk.Tk):
                         with open(self.Part_API + '/' + self.Part_API + '.json', 'w') as json_file:
                             json.dump(item, json_file, indent=6)
 
-            buttonSave = tk.Button(self.SaveMaster, text="Save", command=Save)
+            buttonSave = tk.Button(self.SaveMaster, text="Save", command=Save,bg='black')
             buttonSave.configure(font=("Arial", 30, "bold"))
             buttonSave.configure(justify="center", foreground="green")
             buttonSave.place(x=120, y=220, width=150, height=80)
@@ -658,7 +678,7 @@ class App(tk.Tk):
             image1 = Image.open(r"IMG_PART" + "\\" + "" + self.Part_API + "" + ".png")
             resize_img = image1.resize((545, 340))
             self.test = ImageTk.PhotoImage(resize_img)
-            self.image_show = tk.Label(image=self.test)
+            self.image_show = tk.Label(image=self.test,bg="black")
             self.image_show.image = self.test
             self.image_show.place(x=395, y=305)
         except:
@@ -669,7 +689,8 @@ class App(tk.Tk):
         self.cam = ttk.Combobox(self, width=8, height=80, textvariable=self.n)
         self.cam['state'] = 'readonly'
         self.cam.configure(font=("Arial", 20))
-        self.cam.configure(justify="center", foreground="green")
+        #self.cam.configure(background= "white")
+        self.cam.configure(justify="center", foreground="green",background="black")
         if Quantity_Cam == 1:
             self.cam['values'] = ('Cam1')
         elif Quantity_Cam == 2:
@@ -694,22 +715,22 @@ class App(tk.Tk):
 
         Save_Result(1)
         self.btn_reset.focus_set()
-        self.Point_ = tk.LabelFrame(self, text="Point", borderwidth=3, relief="ridge", padx=5, pady=10)
+        self.Point_ = tk.LabelFrame(self, text="Point", borderwidth=3, relief="ridge", padx=5, pady=10,bg='black')
         self.Point_.configure(font=("Arial", 13))
         self.Point_.configure(fg='Green')
         self.Point_.place(x=15, y=300, height=700, width=60)
 
-        self.Result_ = tk.LabelFrame(self, text="Result", borderwidth=3, relief="ridge", padx=5, pady=10)
+        self.Result_ = tk.LabelFrame(self, text="Result", borderwidth=3, relief="ridge", padx=5, pady=10,bg='black')
         self.Result_.configure(font=("Arial", 13))
         self.Result_.configure(fg='Green')
         self.Result_.place(x=80, y=300, height=700, width=80)
 
-        self.Score_Outline = tk.LabelFrame(self, text="Outline", borderwidth=3, relief="ridge", padx=5, pady=10)
+        self.Score_Outline = tk.LabelFrame(self, text="Outline", borderwidth=3, relief="ridge", padx=5, pady=10,bg='black')
         self.Score_Outline.configure(font=("Arial", 13))
         self.Score_Outline.configure(fg='Green')
         self.Score_Outline.place(x=165, y=300, height=700, width=110)
 
-        self.Score_Area = tk.LabelFrame(self, text="Area", borderwidth=3, relief="ridge", padx=5, pady=10)
+        self.Score_Area = tk.LabelFrame(self, text="Area", borderwidth=3, relief="ridge", padx=5, pady=10,bg='black')
         self.Score_Area.configure(font=("Arial", 13))
         self.Score_Area.configure(fg='Green')
         self.Score_Area.place(x=280, y=300, height=700, width=110)
@@ -741,7 +762,7 @@ class App(tk.Tk):
                     self.Point_Bottom.append(self.Master[k]["Point" + str(k + 1)][0]["Bottom"])
                     self.Point_Score_Outline.append(self.Master[k]["Point" + str(k + 1)][0]["Score Outline"])
                     self.Point_Score_Area.append(self.Master[k]["Point" + str(k + 1)][0]["Score Area"])
-                    tk.Label(self.Point_, text=(k + 1), borderwidth=1, relief="groove", padx=5, pady=8, font=("Arial", 18)).place(x=5, y=70 * k)
+                    tk.Label(self.Point_, text=(k + 1), borderwidth=1, relief="groove", padx=5, pady=8, font=("Arial", 18),bg='black',fg='Green').place(x=5, y=70 * k)
                     # tk.Label(self.Result_, text="N/A", borderwidth=3, relief="groove", padx=5, pady=10,font=("Arial", 18),fg='#A3A6AB').place(x=35, y=70*k)
                     # tk.Label(self.Score_Outline, text="", borderwidth=3, relief="groove", padx=55, pady=10,font=("Arial", 18)).place(x=2, y=70*k)
                     # tk.Label(self.Score_Area, text="", borderwidth=3, relief="groove", padx=55, pady=10,font=("Arial", 18)).place(x=2, y=70*k)
@@ -749,6 +770,8 @@ class App(tk.Tk):
             pass
 
     def Camera(self):
+        pass
+        """""
         try:
             if Quantity_Cam == 1:
                 self.Camopen1 = cv.cvtColor(frame0.read()[1], cv.COLOR_BGR2RGB)
@@ -788,7 +811,7 @@ class App(tk.Tk):
             self.after(60, self.Camera)
         except:
             messagebox.showerror('Python Error', 'Check Cameras')
-
+        """""
     def Destroy(self):
         response = messagebox.askquestion("Close Programe", "Are you sure?", icon='warning')
         if response == "yes":
@@ -851,13 +874,13 @@ class App(tk.Tk):
                 self.ProcessP.configure(text="Ready")
                 self.ProcessP.configure(bg="green")
                 self.SaveDataBoard = False
+            self.after(100,self.Board_show)
 
     elif Mode == 2:
         def CallKeyBorad(self):
             self.LabelKeyBorad = tk.Label(self)
             self.LabelKeyBorad.bind_all('<KeyRelease>', self.Processing)
         def Processing(self, event):
-            self.btn_reset.focus_set()
             Login = False
             SaveMaster = False
             try:
@@ -1019,12 +1042,13 @@ class App(tk.Tk):
                     self.Color.append((0, 0, 255))
                     self.ColorView.append((255, 0, 0))
                     self.Color_Show.append("Red")
-                    if (val * 1000) == 0:
+                    if val * 1000 == 0:
                         self.padx_outline.append(32)
+                    else:
+                        self.padx_outline.append(20)
                     if  Score_Area_Data == 0:
                         self.padx_area.append(32)
                     else:
-                        self.padx_outline.append(20)
                         self.padx_area.append(20)
                 self.place.append(x * 70)
 
@@ -1046,13 +1070,15 @@ class App(tk.Tk):
                         self.Comfrim_Data = 0
                         self.Save_Score()
                         self.Result_Ok.configure(text="OK : " + str(self.OK_Data))
-                        if Mode == 1:
+                        if Mode == 1 and self.SaveDataBoard_IO == False:
                             self.ClassBoard.inst.write("@1 R00")
+                            self.SaveDataBoard_IO = True
                 else:
                     self.Comfrim_Data = self.Comfrim_Data + 1
                     self.ResultComfrim()
-                    if Mode == 1:
+                    if Mode == 1 and self.SaveDataBoard_IO == True:
                         self.ClassBoard.inst.write("@1 R40")
+                        self.SaveDataBoard_IO = False
                     break
     def ShowScore(self):
         if self.count != 0:
@@ -1095,60 +1121,60 @@ class App(tk.Tk):
 
     def ViewImage(self):
         if self.count != 0:
-            if Quantity_Cam == 1:
-                #image1 = Image.open(r"Snap1.bmp")
-                image = cv.imread("Snap1.bmp")
-                image = cv.cvtColor(image ,cv.COLOR_BGR2RGB)
-                for s in range(self.count):
-                    if self.Point_Camera[x] == "Cam1":
-                        cv.rectangle(image, (self.Point_Left[s], self.Point_Top[s]), (self.Point_Right[s], self.Point_Bottom[s]), self.ColorView[s], 2)
-                        cv.putText(image, "Point"+str(s+1), (self.Point_Left[s], self.Point_Top[s]), cv.FONT_HERSHEY_SIMPLEX, 0.7, self.ColorView[s], 2)
-                im = Image.fromarray(image)
-                image = ImageTk.PhotoImage(image=im)
-                self.view.image = image
-                self.view.configure(image=image)
-            elif Quantity_Cam == 2:
-                image1 = cv.imread("Snap1.bmp")
-                image1 = cv.cvtColor(image1, cv.COLOR_BGR2RGB)
-                image2 = cv.imread("Snap2.bmp")
-                image2 = cv.cvtColor(image2, cv.COLOR_BGR2RGB)
-                for s in range(self.count):
-                    if self.cam.get() == "Cam1" and self.Point_Camera[s] == "Cam1":
-                        cv.rectangle(image1, (self.Point_Left[s], self.Point_Top[s]), (self.Point_Right[s], self.Point_Bottom[s]), self.ColorView[s], 2)
-                        cv.putText(image1, "Point" + str(s + 1), (self.Point_Left[s], self.Point_Top[s]), cv.FONT_HERSHEY_SIMPLEX, 0.7, self.ColorView[s], 2)
-                        im = Image.fromarray(image1)
-                    elif self.cam.get() == "Cam2" and self.Point_Camera[s] == "Cam2":
-                        cv.rectangle(image2, (self.Point_Left[s], self.Point_Top[s]), (self.Point_Right[s], self.Point_Bottom[s]), self.ColorView[s], 2)
-                        cv.putText(image2, "Point" + str(s + 1), (self.Point_Left[s], self.Point_Top[s]), cv.FONT_HERSHEY_SIMPLEX, 0.7, self.ColorView[s], 2)
-                        im = Image.fromarray(image2)
-                image = ImageTk.PhotoImage(image=im)
-                self.view.image = image
-                self.view.configure(image=image)
-            elif Quantity_Cam == 3:
-                image1 = cv.imread("Snap1.bmp")
-                image1 = cv.cvtColor(image1, cv.COLOR_BGR2RGB)
-                image2 = cv.imread("Snap2.bmp")
-                image2 = cv.cvtColor(image2, cv.COLOR_BGR2RGB)
-                image3 = cv.imread("Snap3.bmp")
-                image3 = cv.cvtColor(image3, cv.COLOR_BGR2RGB)
-                for s in range(self.count):
-
-                    if self.cam.get() == "Cam1" and self.Point_Camera[s] == "Cam1":
-                        cv.rectangle(image1, (self.Point_Left[s], self.Point_Top[s]), (self.Point_Right[s], self.Point_Bottom[s]), self.ColorView[s], 2)
-                        cv.putText(image1, "Point" + str(s + 1), (self.Point_Left[s], self.Point_Top[s]), cv.FONT_HERSHEY_SIMPLEX, 0.7, self.ColorView[s], 2)
-                        im = Image.fromarray(image1)
-                    elif self.cam.get() == "Cam2" and self.Point_Camera[s] == "Cam2":
-                        cv.rectangle(image2, (self.Point_Left[s], self.Point_Top[s]), (self.Point_Right[s], self.Point_Bottom[s]), self.ColorView[s], 2)
-                        cv.putText(image2, "Point" + str(s + 1), (self.Point_Left[s], self.Point_Top[s]), cv.FONT_HERSHEY_SIMPLEX, 0.7, self.ColorView[s], 2)
-                        im = Image.fromarray(image2)
-                    elif self.cam.get() == "Cam3" and self.Point_Camera[s] == "Cam3":
-                        cv.rectangle(image3, (self.Point_Left[s], self.Point_Top[s]), (self.Point_Right[s], self.Point_Bottom[s]), self.ColorView[s], 2)
-                        cv.putText(image3, "Point" + str(s + 1), (self.Point_Left[s], self.Point_Top[s]), cv.FONT_HERSHEY_SIMPLEX, 0.7, self.ColorView[s], 2)
-                        im = Image.fromarray(image3)
-
-                image = ImageTk.PhotoImage(image=im)
-                self.view.image = image
-                self.view.configure(image=image)
+            try:
+                if Quantity_Cam == 1:
+                    image = cv.imread("Snap1.bmp")
+                    image = cv.cvtColor(image ,cv.COLOR_BGR2RGB)
+                    for s in range(self.count):
+                        if self.Point_Camera[x] == "Cam1":
+                            cv.rectangle(image, (self.Point_Left[s], self.Point_Top[s]), (self.Point_Right[s], self.Point_Bottom[s]), self.ColorView[s], 2)
+                            cv.putText(image, "Point"+str(s+1), (self.Point_Left[s], self.Point_Top[s]), cv.FONT_HERSHEY_SIMPLEX, 0.7, self.ColorView[s], 2)
+                    im = Image.fromarray(image)
+                    image = ImageTk.PhotoImage(image=im)
+                    self.view.image = image
+                    self.view.configure(image=image)
+                elif Quantity_Cam == 2:
+                    image1 = cv.imread("Snap1.bmp")
+                    image1 = cv.cvtColor(image1, cv.COLOR_BGR2RGB)
+                    image2 = cv.imread("Snap2.bmp")
+                    image2 = cv.cvtColor(image2, cv.COLOR_BGR2RGB)
+                    for s in range(self.count):
+                        if self.cam.get() == "Cam1" and self.Point_Camera[s] == "Cam1":
+                            cv.rectangle(image1, (self.Point_Left[s], self.Point_Top[s]), (self.Point_Right[s], self.Point_Bottom[s]), self.ColorView[s], 2)
+                            cv.putText(image1, "Point" + str(s + 1), (self.Point_Left[s], self.Point_Top[s]), cv.FONT_HERSHEY_SIMPLEX, 0.7, self.ColorView[s], 2)
+                            im = Image.fromarray(image1)
+                        elif self.cam.get() == "Cam2" and self.Point_Camera[s] == "Cam2":
+                            cv.rectangle(image2, (self.Point_Left[s], self.Point_Top[s]), (self.Point_Right[s], self.Point_Bottom[s]), self.ColorView[s], 2)
+                            cv.putText(image2, "Point" + str(s + 1), (self.Point_Left[s], self.Point_Top[s]), cv.FONT_HERSHEY_SIMPLEX, 0.7, self.ColorView[s], 2)
+                            im = Image.fromarray(image2)
+                    image = ImageTk.PhotoImage(image=im)
+                    self.view.image = image
+                    self.view.configure(image=image)
+                elif Quantity_Cam == 3:
+                    image1 = cv.imread("Snap1.bmp")
+                    image1 = cv.cvtColor(image1, cv.COLOR_BGR2RGB)
+                    image2 = cv.imread("Snap2.bmp")
+                    image2 = cv.cvtColor(image2, cv.COLOR_BGR2RGB)
+                    image3 = cv.imread("Snap3.bmp")
+                    image3 = cv.cvtColor(image3, cv.COLOR_BGR2RGB)
+                    for s in range(self.count):
+                        if self.cam.get() == "Cam1" and self.Point_Camera[s] == "Cam1":
+                            cv.rectangle(image1, (self.Point_Left[s], self.Point_Top[s]), (self.Point_Right[s], self.Point_Bottom[s]), self.ColorView[s], 2)
+                            cv.putText(image1, "Point" + str(s + 1), (self.Point_Left[s], self.Point_Top[s]), cv.FONT_HERSHEY_SIMPLEX, 0.7, self.ColorView[s], 2)
+                            im = Image.fromarray(image1)
+                        elif self.cam.get() == "Cam2" and self.Point_Camera[s] == "Cam2":
+                            cv.rectangle(image2, (self.Point_Left[s], self.Point_Top[s]), (self.Point_Right[s], self.Point_Bottom[s]), self.ColorView[s], 2)
+                            cv.putText(image2, "Point" + str(s + 1), (self.Point_Left[s], self.Point_Top[s]), cv.FONT_HERSHEY_SIMPLEX, 0.7, self.ColorView[s], 2)
+                            im = Image.fromarray(image2)
+                        elif self.cam.get() == "Cam3" and self.Point_Camera[s] == "Cam3":
+                            cv.rectangle(image3, (self.Point_Left[s], self.Point_Top[s]), (self.Point_Right[s], self.Point_Bottom[s]), self.ColorView[s], 2)
+                            cv.putText(image3, "Point" + str(s + 1), (self.Point_Left[s], self.Point_Top[s]), cv.FONT_HERSHEY_SIMPLEX, 0.7, self.ColorView[s], 2)
+                            im = Image.fromarray(image3)
+                    image = ImageTk.PhotoImage(image=im)
+                    self.view.image = image
+                    self.view.configure(image=image)
+            except:
+                pass
 
     def Save_Score(self):
         named_tuple = time.localtime()
