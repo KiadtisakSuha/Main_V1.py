@@ -141,6 +141,7 @@ class Borad():
         self.data = self.Read_Board.split("#")
         self.data = bytes(self.data[1], "ascii")
         self.data = "{:08b}".format(int(self.data.hex(), 16))
+
         """""
         if self.data == "110000001100010000110100001010":  # 01
             self.inst.write("@1 R20")
@@ -201,7 +202,7 @@ class App(tk.Tk):
         combostyle.theme_use('combostyle')
         ttk.Style().configure('TNotebook.Tab', font=('Arial', 20),
                               background='black', foreground='#006400', borderwidth=0)
-        self.title('Machine Vision Inspection 0.0.0')
+        self.title('Machine Vision Inspection 1.0.0')
         self.geometry("1920x1020+0+0")
         self.state('zoomed')
         #self.attributes('-fullscreen', True)
@@ -220,7 +221,7 @@ class App(tk.Tk):
 
 
         self.Machine_Vision = tk.Label(self, text='Machine Vision Inspection '+self.Machine_API,bg='black')
-        self.Machine_Version = tk.Label(self, text='v0.0.0',bg='black')
+        self.Machine_Version = tk.Label(self, text='v1.0.0',bg='black')
         if self.Sever_API == "Connected":
             self.Machine_Vision.configure(fg='Green')
             self.Machine_Version.configure(fg='Green')
@@ -331,6 +332,8 @@ class App(tk.Tk):
             self.SaveDataBoard = False
             self.SaveDataBoard_IO = False
             self.Board_show()
+            self.BoardLoop = InfiniteTimer(0.1, self.Board_show)
+            self.BoardLoop.start()
         elif Mode == 2:
             self.CallKeyBorad()
 
@@ -770,8 +773,19 @@ class App(tk.Tk):
             pass
 
     def Camera(self):
-        pass
-        """""
+        if Quantity_Cam == 1:
+            self.Run_Camera_1 = cv.cvtColor(frame0.read()[1], cv.COLOR_BGR2RGB)
+        elif Quantity_Cam == 2:
+            self.Run_Camera_1 = cv.cvtColor(frame0.read()[1], cv.COLOR_BGR2RGB)
+            self.Run_Camera_2 = cv.cvtColor(frame1.read()[1], cv.COLOR_BGR2RGB)
+        elif Quantity_Cam == 3:
+            self.Run_Camera_1 = cv.cvtColor(frame0.read()[1], cv.COLOR_BGR2RGB)
+            self.Run_Camera_2 = cv.cvtColor(frame1.read()[1], cv.COLOR_BGR2RGB)
+            self.Run_Camera_3 = cv.cvtColor(frame2.read()[1], cv.COLOR_BGR2RGB)
+        self.after(60, self.Camera)
+        
+
+        """""""""
         try:
             if Quantity_Cam == 1:
                 self.Camopen1 = cv.cvtColor(frame0.read()[1], cv.COLOR_BGR2RGB)
@@ -811,7 +825,7 @@ class App(tk.Tk):
             self.after(60, self.Camera)
         except:
             messagebox.showerror('Python Error', 'Check Cameras')
-        """""
+        """""""""
     def Destroy(self):
         response = messagebox.askquestion("Close Programe", "Are you sure?", icon='warning')
         if response == "yes":
@@ -827,31 +841,6 @@ class App(tk.Tk):
             cv.destroyAllWindows()
             app.destroy()
             subprocess.call([r'TerminatedProcess.bat'])
-
-    def SaveImage(self):
-        if Quantity_Cam == 1:
-            self.Seve1 = cv.cvtColor(frame0.read()[1], cv.COLOR_BGR2RGB)
-            self.PLTimg1 = Image.fromarray(self.Seve1)
-            self.PLTimg1.save("Snap1.bmp")
-        elif Quantity_Cam == 2:
-            self.Seve1 = cv.cvtColor(frame0.read()[1], cv.COLOR_BGR2RGB)
-            self.Seve2 = cv.cvtColor(frame1.read()[1], cv.COLOR_BGR2RGB)
-            self.PLTimg1 = Image.fromarray(self.Seve1)
-            self.PLTimg2 = Image.fromarray(self.Seve2)
-            self.PLTimg1.save("Snap1.bmp")
-            self.PLTimg2.save("Snap2.bmp")
-        elif Quantity_Cam == 3:
-            self.Seve1 = cv.cvtColor(frame0.read()[1], cv.COLOR_BGR2RGB)
-            self.Seve2 = cv.cvtColor(frame1.read()[1], cv.COLOR_BGR2RGB)
-            self.Seve3 = cv.cvtColor(frame2.read()[1], cv.COLOR_BGR2RGB)
-            self.PLTimg1 = Image.fromarray(self.Seve1)
-            self.PLTimg2 = Image.fromarray(self.Seve2)
-            self.PLTimg3 = Image.fromarray(self.Seve3)
-            self.PLTimg1.save("Snap1.bmp")
-            self.PLTimg2.save("Snap2.bmp")
-            self.PLTimg3.save("Snap3.bmp")
-
-
 
 
 
@@ -874,7 +863,7 @@ class App(tk.Tk):
                 self.ProcessP.configure(text="Ready")
                 self.ProcessP.configure(bg="green")
                 self.SaveDataBoard = False
-            self.after(100,self.Board_show)
+            #self.after(100,self.Board_show)
 
     elif Mode == 2:
         def CallKeyBorad(self):
@@ -903,6 +892,7 @@ class App(tk.Tk):
                         self.ViewImage()
                         self.ProcessP.configure(text="Ready")
                         self.ProcessP.configure(bg="green")
+                        #os.remove("Snap1.bmp")
 
     def Strat(self):
         self.ProcessP.configure(text="Process")
@@ -1002,6 +992,23 @@ class App(tk.Tk):
         Result_Score = int(Result_Score / 5)
         return [Result_Score, sum(Chack)]
 
+    def SaveImage(self):
+        if Quantity_Cam == 1:
+            Save_Image_1 = Image.fromarray(self.Run_Camera_1)
+            Save_Image_1.save("Snap1.bmp")
+        elif Quantity_Cam == 2:
+            Save_Image_1 = Image.fromarray(self.Run_Camera_1)
+            Save_Image_2 = Image.fromarray(self.Run_Camera_2)
+            Save_Image_1.save("Snap1.bmp")
+            Save_Image_2.save("Snap2.bmp")
+        elif Quantity_Cam == 3:
+            Save_Image_1 = Image.fromarray(self.Run_Camera_1)
+            Save_Image_2 = Image.fromarray(self.Run_Camera_2)
+            Save_Image_3 = Image.fromarray(self.Run_Camera_3)
+            Save_Image_1.save("Snap1.bmp")
+            Save_Image_2.save("Snap2.bmp")
+            Save_Image_3.save("Snap2.bmp")
+
     def Main(self):
         if self.count != 0:
             self.sts = []
@@ -1073,12 +1080,17 @@ class App(tk.Tk):
                         if Mode == 1 and self.SaveDataBoard_IO == False:
                             self.ClassBoard.inst.write("@1 R00")
                             self.SaveDataBoard_IO = True
+                            print("OK")
+                            self.ClassBoard.inst.clear()
                 else:
                     self.Comfrim_Data = self.Comfrim_Data + 1
                     self.ResultComfrim()
                     if Mode == 1 and self.SaveDataBoard_IO == True:
                         self.ClassBoard.inst.write("@1 R40")
                         self.SaveDataBoard_IO = False
+                        print("NG")
+                        self.ClassBoard.inst.clear()
+                        
                     break
     def ShowScore(self):
         if self.count != 0:
@@ -1126,7 +1138,7 @@ class App(tk.Tk):
                     image = cv.imread("Snap1.bmp")
                     image = cv.cvtColor(image ,cv.COLOR_BGR2RGB)
                     for s in range(self.count):
-                        if self.Point_Camera[x] == "Cam1":
+                        if self.cam.get() == "Cam1" and self.Point_Camera[s] == "Cam1":
                             cv.rectangle(image, (self.Point_Left[s], self.Point_Top[s]), (self.Point_Right[s], self.Point_Bottom[s]), self.ColorView[s], 2)
                             cv.putText(image, "Point"+str(s+1), (self.Point_Left[s], self.Point_Top[s]), cv.FONT_HERSHEY_SIMPLEX, 0.7, self.ColorView[s], 2)
                     im = Image.fromarray(image)
