@@ -202,10 +202,13 @@ class App(tk.Tk):
         combostyle.theme_use('combostyle')
         ttk.Style().configure('TNotebook.Tab', font=('Arial', 20),
                               background='black', foreground='#006400', borderwidth=0)
-        self.title('Machine Vision Inspection 1.0.0')
+        self.title('Machine Vision Inspection')
+
         self.geometry("1920x1020+0+0")
-        self.state('zoomed')
+        self.overrideredirect(1)
+        #self.state('zoomed')
         #self.attributes('-fullscreen', True)
+        #self.resizable(0,0)
         self.configure(background='black')
         self.API_json = Getpart()
         self.API_json.__int__()
@@ -287,12 +290,12 @@ class App(tk.Tk):
         self.Result_Ok = tk.Label(self, text="OK : "+str(self.OK_Data),borderwidth=3, relief="ridge", padx=5, pady=10,bg='black')
         self.Result_Ok.configure(font=("Arial", 50,'bold'))
         self.Result_Ok.configure(fg='Green')
-        self.Result_Ok.place(x=10, y=50 ,width=350)
+        self.Result_Ok.place(x=5, y=50 ,width=375)
 
         self.Result_NG = tk.Label(self, text="OK : "+str(self.OK_Data), borderwidth=3, relief="ridge", padx=5, pady=10,bg='black')
         self.Result_NG.configure(font=("Arial", 50,'bold'))
         self.Result_NG.configure(fg='Red')
-        self.Result_NG.place(x=10, y=180,width=350)
+        self.Result_NG.place(x=5, y=180,width=375)
 
         self.Label_cam = tk.Label(self, text="Cam1")
         self.frame = tk.Label(self,bg="black")
@@ -304,14 +307,14 @@ class App(tk.Tk):
         self.Process.configure(font=("Arial", 10))
         self.Process.configure(fg='Green')
         self.Process.place(x=395, y=220, height=60, width=150)
-        self.ProcessP = tk.Label(self.Process, text="Ready", bg='Green',fg="#FFFFFF")
+        self.ProcessP = tk.Label(self.Process, text="Ready",fg='green',bg="black")
         self.ProcessP.configure(font=("Arial", 20))
         self.ProcessP.place(x=10, y=15, anchor=tk.W)
 
-        self.btn_Start = tk.Button(self,text="Start",command=self.Strat)
-        self.btn_Start.configure(font=("Arial", 18))
-        self.btn_Start.configure(fg='Yellow',bg="black")
-        self.btn_Start.place(x=1260, y=10, width=120)
+        #self.btn_Start = tk.Button(self,text="Start",command=self.Strat)
+        #self.btn_Start.configure(font=("Arial", 18))
+        #self.btn_Start.configure(fg='Yellow',bg="black")
+        #self.btn_Start.place(x=1260, y=10, width=120)
 
         self.Img_part()
         self.combobox_cam()
@@ -414,7 +417,7 @@ class App(tk.Tk):
         self.PACKING_NUMBER = tk.LabelFrame(self, text="PACKING",bg='black')
         self.PACKING_NUMBER.configure(font=("Arial", 10))
         self.PACKING_NUMBER.configure(fg='Green')
-        self.PACKING_NUMBER.place(x=725, y=220, height=60, width=160)
+        self.PACKING_NUMBER.place(x=720, y=220, height=60, width=225)
         self.PACKING_NUMBERP = tk.Label(self.PACKING_NUMBER, text=str(Packing_Couter) + "/" + str(self.Packing_API),bg='black')
         self.PACKING_NUMBERP.configure(font=("Arial", 22))
         self.PACKING_NUMBERP.configure(fg='Green')
@@ -721,22 +724,22 @@ class App(tk.Tk):
         self.Point_ = tk.LabelFrame(self, text="Point", borderwidth=3, relief="ridge", padx=5, pady=10,bg='black')
         self.Point_.configure(font=("Arial", 13))
         self.Point_.configure(fg='Green')
-        self.Point_.place(x=15, y=300, height=700, width=60)
+        self.Point_.place(x=5, y=300, height=700, width=60)
 
         self.Result_ = tk.LabelFrame(self, text="Result", borderwidth=3, relief="ridge", padx=5, pady=10,bg='black')
         self.Result_.configure(font=("Arial", 13))
         self.Result_.configure(fg='Green')
-        self.Result_.place(x=80, y=300, height=700, width=80)
+        self.Result_.place(x=70, y=300, height=700, width=80)
 
         self.Score_Outline = tk.LabelFrame(self, text="Outline", borderwidth=3, relief="ridge", padx=5, pady=10,bg='black')
         self.Score_Outline.configure(font=("Arial", 13))
         self.Score_Outline.configure(fg='Green')
-        self.Score_Outline.place(x=165, y=300, height=700, width=110)
+        self.Score_Outline.place(x=155, y=300, height=700, width=110)
 
         self.Score_Area = tk.LabelFrame(self, text="Area", borderwidth=3, relief="ridge", padx=5, pady=10,bg='black')
         self.Score_Area.configure(font=("Arial", 13))
         self.Score_Area.configure(fg='Green')
-        self.Score_Area.place(x=280, y=300, height=700, width=110)
+        self.Score_Area.place(x=270, y=300, height=700, width=110)
         try:
             self.dir_path = r"" + self.Part_API + "\Master"
             self.count = 0
@@ -783,7 +786,7 @@ class App(tk.Tk):
             self.Run_Camera_2 = cv.cvtColor(frame1.read()[1], cv.COLOR_BGR2RGB)
             self.Run_Camera_3 = cv.cvtColor(frame2.read()[1], cv.COLOR_BGR2RGB)
         self.after(60, self.Camera)
-        
+
 
         """""""""
         try:
@@ -853,7 +856,7 @@ class App(tk.Tk):
                 self.SaveDataBoard = True
             elif Bin == "110000001100010000110100001010" and self.SaveDataBoard == True:  # 01
                 self.ProcessP.configure(text="Process")
-                self.ProcessP.configure(bg='yellow')
+                self.ProcessP.configure(fg='yellow')
                 self.SaveImage()
                 self.Main()
                 self.ShowScore()
@@ -861,7 +864,7 @@ class App(tk.Tk):
                 self.Save_Image()
                 self.ViewImage()
                 self.ProcessP.configure(text="Ready")
-                self.ProcessP.configure(bg="green")
+                self.ProcessP.configure(fg="green")
                 self.SaveDataBoard = False
             #self.after(100,self.Board_show)
 
@@ -883,7 +886,7 @@ class App(tk.Tk):
             if self.count != 0 and Login == True and SaveMaster == True:
                     if event.char == '5':
                         self.ProcessP.configure(text="Process")
-                        self.ProcessP.configure(bg='yellow')
+                        self.ProcessP.configure(fg='yellow')
                         self.SaveImage()
                         self.Main()
                         self.ShowScore()
@@ -891,12 +894,12 @@ class App(tk.Tk):
                         self.Save_Image()
                         self.ViewImage()
                         self.ProcessP.configure(text="Ready")
-                        self.ProcessP.configure(bg="green")
+                        self.ProcessP.configure(fg="green")
                         #os.remove("Snap1.bmp")
 
     def Strat(self):
         self.ProcessP.configure(text="Process")
-        self.ProcessP.configure(bg='yellow')
+        self.ProcessP.configure(fg='yellow')
         self.SaveImage()
         self.Main()
         self.ShowScore()
@@ -904,7 +907,7 @@ class App(tk.Tk):
         self.Save_Image()
         self.ViewImage()
         self.ProcessP.configure(text="Ready")
-        self.ProcessP.configure(bg="green")
+        self.ProcessP.configure(fg="green")
 
 
     def Process_Outline(self, imgframe, imgTemplate, Left, Top, Right, Bottom):
@@ -1090,7 +1093,6 @@ class App(tk.Tk):
                         self.SaveDataBoard_IO = False
                         print("NG")
                         self.ClassBoard.inst.clear()
-                        
                     break
     def ShowScore(self):
         if self.count != 0:
