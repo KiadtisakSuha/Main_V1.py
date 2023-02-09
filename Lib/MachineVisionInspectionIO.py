@@ -449,15 +449,15 @@ class App(tk.Tk):
         self.Login = tk.Toplevel(self)
         self.Login.title("Login")
         self.Login.geometry('220x120')
-        self.Login.configure(background='black')
+        self.Login.configure(background='#D4D4D4')
 
         self.message = tk.StringVar()
-        self.show_message = tk.Label(self.Login, text="", textvariable=self.message,bg='black')
+        self.show_message = tk.Label(self.Login, text="", textvariable=self.message,bg='#D4D4D4')
         self.show_message.configure(font=("Arial", 13))
         self.show_message.place(x=10, y=90)
 
         self.Password = tk.StringVar()  # string variable
-        self.BoxPassword = tk.Entry(self.Login, font="Arial", show='*', textvariable=self.Password,bg='black',fg='green')
+        self.BoxPassword = tk.Entry(self.Login, font="Arial", show='*', textvariable=self.Password,bg='#A1E9FF',fg='green')
         self.BoxPassword.configure(font=("Arial", 20))
         self.BoxPassword.place(x=20, y=10, width=180, height=35)
 
@@ -494,9 +494,9 @@ class App(tk.Tk):
             self.SaveMaster = tk.Toplevel(self)
             self.SaveMaster.title("Save Master")
             self.SaveMaster.geometry('280x350')
-            self.SaveMaster.configure(background='black')
+            self.SaveMaster.configure(background='#D4D4D4')
 
-            Lable_Cam = tk.Label(self.SaveMaster, text="Cam :",bg='black')
+            Lable_Cam = tk.Label(self.SaveMaster, text="Cam :",bg='#D4D4D4')
             Lable_Cam.configure(font=("Arial", 20))
             Lable_Cam.configure(fg='Green')
             Lable_Cam.place(x=10, y=10)
@@ -517,7 +517,7 @@ class App(tk.Tk):
             cam.current(0)
             cam.place(x=120, y=10)
 
-            Lable_Point = tk.Label(self.SaveMaster, text="Point :",bg='black')
+            Lable_Point = tk.Label(self.SaveMaster, text="Point :",bg='#D4D4D4')
             Lable_Point.configure(font=("Arial", 20))
             Lable_Point.configure(fg='Green')
             Lable_Point.place(x=10, y=60)
@@ -530,21 +530,21 @@ class App(tk.Tk):
             Chose_Point.place(x=120, y=60)
 
             Score_Data_Outline = tk.StringVar()
-            Lable_Score_Outline = tk.Label(self.SaveMaster, text="Outline :",bg='black')
+            Lable_Score_Outline = tk.Label(self.SaveMaster, text="Outline :",bg='#D4D4D4')
             Lable_Score_Outline.configure(font=("Arial", 20))
             Lable_Score_Outline.configure(fg='Green')
             Lable_Score_Outline.place(x=10, y=110)
-            Score_Show_Outline = tk.Entry(self.SaveMaster, font="Arial", textvariable=Score_Data_Outline,bg='black')
+            Score_Show_Outline = tk.Entry(self.SaveMaster, font="Arial", textvariable=Score_Data_Outline,bg='#A1E9FF')
             Score_Show_Outline.configure(font=("Arial", 20))
             Score_Show_Outline.configure(fg='Green')
             Score_Show_Outline.place(x=120, y=110, width=150)
 
             Score_Data_Area = tk.StringVar()
-            Lable_Score_Area = tk.Label(self.SaveMaster, text="Area :",bg='black')
+            Lable_Score_Area = tk.Label(self.SaveMaster, text="Area :",bg='#D4D4D4')
             Lable_Score_Area.configure(font=("Arial", 20))
             Lable_Score_Area.configure(fg='Green')
             Lable_Score_Area.place(x=10, y=160)
-            Score_Show_Area = tk.Entry(self.SaveMaster, font="Arial", textvariable=Score_Data_Area,bg='black')
+            Score_Show_Area = tk.Entry(self.SaveMaster, font="Arial", textvariable=Score_Data_Area,bg='#A1E9FF')
             Score_Show_Area.configure(font=("Arial", 20))
             Score_Show_Area.configure(fg='Green')
             Score_Show_Area.place(x=120, y=160, width=150)
@@ -1043,7 +1043,7 @@ class App(tk.Tk):
                 (Score_Area_Data, Chack) = self.Process_Area(self.Rule_Of_Thirds(Master_Image), self.Rule_Of_Thirds(Template_View))
                 self.Score_Outline_Data.append(int(round(val * 1000, 0)))
                 self.Score_Area_Data.append(Score_Area_Data)
-                if scale == 1 and (val * 1000) >= self.Point_Score_Outline[x] and Score_Area_Data >= self.Point_Score_Area[x]:
+                if ((val * 1000 )>= self.Point_Score_Outline[x]) and (Score_Area_Data >= self.Point_Score_Area[x]):
                     self.Result.append(1)
                     self.Color.append((0, 255, 0))
                     self.ColorView.append((0, 255, 0))
