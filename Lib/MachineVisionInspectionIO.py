@@ -752,26 +752,29 @@ class App(tk.Tk):
         try:
             with open(self.Part_API + '/' + self.Part_API + '.json', 'r') as json_file:
                 self.Master = json.loads(json_file.read())
-            if self.count != 0:
-                self.Point_Camera = []
-                self.Point_Left = []
-                self.Point_Top = []
-                self.Point_Right = []
-                self.Point_Bottom = []
-                self.Point_Score_Outline = []
-                self.Point_Score_Area = []
-                for k in range(self.count):
-                    self.Point_Camera.append(self.Master[k]["Point" + str(k + 1)][0]["Camera"])
-                    self.Point_Left.append(self.Master[k]["Point" + str(k + 1)][0]["Left"])
-                    self.Point_Top.append(self.Master[k]["Point" + str(k + 1)][0]["Top"])
-                    self.Point_Right.append(self.Master[k]["Point" + str(k + 1)][0]["Right"])
-                    self.Point_Bottom.append(self.Master[k]["Point" + str(k + 1)][0]["Bottom"])
-                    self.Point_Score_Outline.append(self.Master[k]["Point" + str(k + 1)][0]["Score Outline"])
-                    self.Point_Score_Area.append(self.Master[k]["Point" + str(k + 1)][0]["Score Area"])
-                    tk.Label(self.Point_, text=(k + 1), borderwidth=1, relief="groove", padx=5, pady=8, font=("Arial", 18),bg='black',fg='Green').place(x=5, y=70 * k)
-                    # tk.Label(self.Result_, text="N/A", borderwidth=3, relief="groove", padx=5, pady=10,font=("Arial", 18),fg='#A3A6AB').place(x=35, y=70*k)
-                    # tk.Label(self.Score_Outline, text="", borderwidth=3, relief="groove", padx=55, pady=10,font=("Arial", 18)).place(x=2, y=70*k)
-                    # tk.Label(self.Score_Area, text="", borderwidth=3, relief="groove", padx=55, pady=10,font=("Arial", 18)).place(x=2, y=70*k)
+            if self.count == len(self.Master):
+                if self.count != 0:
+                    self.Point_Camera = []
+                    self.Point_Left = []
+                    self.Point_Top = []
+                    self.Point_Right = []
+                    self.Point_Bottom = []
+                    self.Point_Score_Outline = []
+                    self.Point_Score_Area = []
+                    for k in range(self.count):
+                        self.Point_Camera.append(self.Master[k]["Point" + str(k + 1)][0]["Camera"])
+                        self.Point_Left.append(self.Master[k]["Point" + str(k + 1)][0]["Left"])
+                        self.Point_Top.append(self.Master[k]["Point" + str(k + 1)][0]["Top"])
+                        self.Point_Right.append(self.Master[k]["Point" + str(k + 1)][0]["Right"])
+                        self.Point_Bottom.append(self.Master[k]["Point" + str(k + 1)][0]["Bottom"])
+                        self.Point_Score_Outline.append(self.Master[k]["Point" + str(k + 1)][0]["Score Outline"])
+                        self.Point_Score_Area.append(self.Master[k]["Point" + str(k + 1)][0]["Score Area"])
+                        tk.Label(self.Point_, text=(k + 1), borderwidth=1, relief="groove", padx=5, pady=8, font=("Arial", 18),bg='black',fg='Green').place(x=5, y=70 * k)
+                        # tk.Label(self.Result_, text="N/A", borderwidth=3, relief="groove", padx=5, pady=10,font=("Arial", 18),fg='#A3A6AB').place(x=35, y=70*k)
+                        # tk.Label(self.Score_Outline, text="", borderwidth=3, relief="groove", padx=55, pady=10,font=("Arial", 18)).place(x=2, y=70*k)
+                        # tk.Label(self.Score_Area, text="", borderwidth=3, relief="groove", padx=55, pady=10,font=("Arial", 18)).place(x=2, y=70*k)
+            else:
+                messagebox.showwarning("Warning", "MasterImage & MasterData Dont's Match")
         except:
             pass
 
