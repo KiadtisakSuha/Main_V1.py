@@ -205,9 +205,11 @@ class App(tk.Tk):
         self.title('Machine Vision Inspection')
 
         self.geometry("1920x1020+0+0")
-        #self.overrideredirect(1)
-        self.state('zoomed')
-        self.attributes('-fullscreen', True)
+        self.overrideredirect(1)
+        #self.state('zoomed')
+        #self.protocol("WM_DELETE_WINDOW", self.Destroy)
+        #self.attributes('-toolwindow', False)
+        #self.attributes('-fullscreen', True)
         #self.resizable(0,0)
         self.configure(background='black')
         self.API_json = Getpart()
@@ -356,10 +358,12 @@ class App(tk.Tk):
         self.btn_reset.configure(justify="center", foreground="green")
         self.btn_reset.place(x=700, y=10)
 
-        self.btn_Close = tk.Button(self, text="Exit", command=self.Destroy,bg='black')
+        #Logo = Image.open('Image/Logo_BKF.png')
+        #Logo = ImageTk.PhotoImage(Logo)
+        self.btn_Close = tk.Button(self, text="Exit", command=self.Destroy, bg='black')
         self.btn_Close.configure(font=("Arial", 18))
         self.btn_Close.configure(justify="center", foreground="red")
-        self.btn_Close.place(x=1800, y=10,width=100)
+        self.btn_Close.place(x=1800, y=10, width=100)
 
         self.ShowCount()
 
