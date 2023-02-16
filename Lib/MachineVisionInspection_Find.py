@@ -740,11 +740,11 @@ class Frame1(ttk.Frame, App):
     def Process_Outline(self, imgframe, imgTemplate, Left,Top, Right,Bottom):
         image = cv.imread(imgframe, 0)
         image = image[(Top - 30):(Bottom + 30), (Left - 30):(Right + 30)]
-        cv.imshow("image",image)
-        cv.waitKey(0)
+        #cv.imshow("image",image)
+        #cv.waitKey(0)
         Template = cv.imread(imgTemplate, 0)
-        cv.imshow("Template", Template)
-        cv.waitKey(0)
+        #cv.imshow("Template", Template)
+        #cv.waitKey(0)
 
         w, h = Template.shape[::-1]
         c = 0
@@ -810,13 +810,24 @@ class Frame1(ttk.Frame, App):
     def Process_Area(self,Master, Template):
         Score_Ture = []
         Result_Score = 0
+        swapped = False
         Couter = len(Master)
         for i in range(Couter):
             if Master[i]<Template[i]:
                 Score_Ture.append((Master[i]/Template[i])*1000)
             else:
                 Score_Ture.append((Template[i] / Master[i]) * 1000)
-        return int(sum(Score_Ture)/Couter)
+        #print(Score_Ture)
+        for n in range(len(Score_Ture) - 1, 0, -1):
+                for i in range(n):
+                    if Score_Ture[i] > Score_Ture[i + 1]:
+                        swapped = True
+                        Score_Ture[i], Score_Ture[i + 1] = Score_Ture[i + 1], Score_Ture[i]
+        for i in range(len(Score_Ture)):
+            if i < 8:
+                Result_Score += Score_Ture[i]
+        Result_Score = int(Result_Score / 8)
+        return Result_Score
 
     def Crop_find(self,image,Left,Top, Right,Bottom,top_left,bottom_right,scale):
         image = cv.imread(image, 0)
@@ -854,8 +865,8 @@ class Frame1(ttk.Frame, App):
                 Template = r"" + self.Part_API + "\Master""\\""Point" + str(x + 1) + "_Template.bmp"
                 (template, top_left, scale, val,bottom_right) = self.Process_Outline(image, Template,self.Point_Left[x], self.Point_Top[x], self.Point_Right[x], self.Point_Bottom[x])
                 Master = self.Crop_find(image,self.Point_Left[x], self.Point_Top[x], self.Point_Right[x], self.Point_Bottom[x],top_left,bottom_right,scale)
-                cv.imshow("Crop_find",Master)
-                cv.waitKey(0)
+                #cv.imshow("Crop_find",Master)
+                #cv.waitKey(0)
                 Template = cv.imread(Template, 0)
                 Score_Area = self.Process_Area(self.Rule_Of_Thirds(Template), self.Rule_Of_Thirds(Master))
                 self.Score_Outline_Data.append(int(round(val * 1000, 0)))
