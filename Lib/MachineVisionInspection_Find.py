@@ -28,7 +28,7 @@ Machine = Setting_Paramiter[0]["MachineName"]
 #AutoFocus_2 = Setting_Paramiter[0]["AutoFocus_2"]
 
 if Quantity_Cam == 1:
-    frame0 = cv.VideoCapture(0, cv.CAP_DSHOW)
+    frame0 = cv.VideoCapture(1, cv.CAP_DSHOW)
     frame0.set(cv.CAP_PROP_FRAME_WIDTH, 1024)
     frame0.set(cv.CAP_PROP_FRAME_HEIGHT, 768)
     frame0.set(cv.CAP_PROP_AUTO_EXPOSURE,0)
@@ -737,9 +737,15 @@ class Frame1(ttk.Frame, App):
                 with open('Printer.txt', 'w') as f:
                     f.write('Printer')
 
-    def Process_Outline(self, imgframe, imgTemplate):
+    def Process_Outline(self, imgframe, imgTemplate, Left,Top, Right,Bottom):
         image = cv.imread(imgframe, 0)
+        image = image[(Top - 30):(Bottom + 30), (Left - 30):(Right + 30)]
+        cv.imshow("image",image)
+        cv.waitKey(0)
         Template = cv.imread(imgTemplate, 0)
+        cv.imshow("Template", Template)
+        cv.waitKey(0)
+
         w, h = Template.shape[::-1]
         c = 0
         TemplateThreshold = 0.7
@@ -801,36 +807,29 @@ class Frame1(ttk.Frame, App):
         if mod != 0:
             point.append(total[9])
         return point
-    def Process_Area(self, Data1, Data2):
-            Score_Ture = []
-            Chack = []
-            swapped = False
-            Result_Score = 0
-            for i in range(len(Data1)):
-                total = (((Data1[i] + Data2[i]) / 2) / Data2[i])
-                if total < 1.99:
-                    score_out = int(total * 1000)
-                    if score_out > 1000:
-                        score_out = 1000 - (score_out - 1000)
-                        Chack.append(1)
-                    else:
-                        Chack.append(0)
-                    Score_Ture.append(score_out)
-                else:
-                    Score_Ture.append(0)
-                    Chack.append(0)
+    def Process_Area(self,Master, Template):
+        Score_Ture = []
+        Result_Score = 0
+        Couter = len(Master)
+        for i in range(Couter):
+            if Master[i]<Template[i]:
+                Score_Ture.append((Master[i]/Template[i])*1000)
+            else:
+                Score_Ture.append((Template[i] / Master[i]) * 1000)
+        return int(sum(Score_Ture)/Couter)
 
-            for n in range(len(Score_Ture) - 1, 0, -1):
-                for i in range(n):
-                    if Score_Ture[i] > Score_Ture[i + 1]:
-                        swapped = True
-                        Score_Ture[i], Score_Ture[i + 1] = Score_Ture[i + 1], Score_Ture[i]
-            for i in range(len(Score_Ture)):
-                if i <= 4:
-                    Result_Score += Score_Ture[i]
-            Result_Score = int(Result_Score/5)
-            return [Result_Score, sum(Chack)]
-
+    def Crop_find(self,image,Left,Top, Right,Bottom,top_left,bottom_right,scale):
+        image = cv.imread(image, 0)
+        if scale == 1:
+            image = image[(Top - 30):(Bottom + 30), (Left - 30):(Right + 30)]
+            Left = top_left[0]
+            Top = top_left[1]
+            Right = bottom_right[0]
+            Bottom = bottom_right[1]
+            image = image[Top:Bottom,Left:Right]
+        else:
+            image = image[Top:Bottom, Left:Right]
+        return image
     def Main(self):
         if self.count != 0:
             self.sts = []
@@ -853,29 +852,15 @@ class Frame1(ttk.Frame, App):
                     image = r'Snap2.bmp'
                 self.ImageSave.append(cv.imread(image))
                 Template = r"" + self.Part_API + "\Master""\\""Point" + str(x + 1) + "_Template.bmp"
-                (template, top_left, scale, val,bottom_right) = self.Process_Outline(image, Template)
-                Master_Image = cv.imread(Template, 0)
-                self.Return_Left.append(top_left[0])
-                self.Return_Top.append(top_left[1])
-                self.Return_Right.append(bottom_right[0])
-                self.Return_Bottom.append(bottom_right[1])
-
-                #plt.imshow(Master_Image)
-                #plt.show()
-                #cv.imshow("Template_View",Master_Image)
-                #cv.waitKey(0)
-               #ret1, Template_View = cv.threshold(Template_View, 100, 255, cv.THRESH_BINARY)
-                #print(bottom_right,top_left)
-                #print(self.Point_Left[x], self.Point_Top[x], self.Point_Right[x], self.Point_Bottom[x])
-                Realtime_Image = self.Crop_image_Area(image, self.Point_Left[x], self.Point_Top[x], self.Point_Right[x], self.Point_Bottom[x],top_left,bottom_right,scale)
-                #cv.imshow("Master_Image", Realtime_Image)
-                #cv.waitKey(0)
-                #plt.imshow(Realtime_Image)
-                #plt.show()
-                (Score_Area_Data, Chack) = self.Process_Area(self.Rule_Of_Thirds(Realtime_Image), self.Rule_Of_Thirds(Master_Image))
+                (template, top_left, scale, val,bottom_right) = self.Process_Outline(image, Template,self.Point_Left[x], self.Point_Top[x], self.Point_Right[x], self.Point_Bottom[x])
+                Master = self.Crop_find(image,self.Point_Left[x], self.Point_Top[x], self.Point_Right[x], self.Point_Bottom[x],top_left,bottom_right,scale)
+                cv.imshow("Crop_find",Master)
+                cv.waitKey(0)
+                Template = cv.imread(Template, 0)
+                Score_Area = self.Process_Area(self.Rule_Of_Thirds(Template), self.Rule_Of_Thirds(Master))
                 self.Score_Outline_Data.append(int(round(val * 1000, 0)))
-                self.Score_Area_Data.append(Score_Area_Data)
-                if scale == 1 and (val * 1000) >= self.Point_Score_Outline[x] and Score_Area_Data >= self.Point_Score_Area[x]:
+                self.Score_Area_Data.append(Score_Area)
+                if ((val * 1000) >= self.Point_Score_Outline[x]) and (Score_Area >= self.Point_Score_Area[x]):
                     self.Result.append(1)
                     self.Color.append((0, 255, 0))
                     self.Color_Show.append("Green")
@@ -962,8 +947,8 @@ class Frame1(ttk.Frame, App):
             except OSError as error:
                 pass
 
-            # cv.rectangle(self.ImageSave[s], (self.Point_Left[s], self.Point_Top[s]), (self.Point_Right[s], self.Point_Bottom[s]), self.Color[s], 3)
-            cv.rectangle(self.ImageSave[s], (self.Return_Left[s], self.Return_Top[s]), (self.Return_Right[s], self.Return_Bottom[s]), self.Color[s], 3)
+            cv.rectangle(self.ImageSave[s], (self.Point_Left[s], self.Point_Top[s]), (self.Point_Right[s], self.Point_Bottom[s]), self.Color[s], 3)
+            #cv.rectangle(self.ImageSave[s], (self.Return_Left[s], self.Return_Top[s]), (self.Return_Right[s], self.Return_Bottom[s]), self.Color[s], 3)
             cv.putText(self.ImageSave[s], "Score Outline : " + str(self.Score_Outline_Data[s]) + " / " + str(self.Point_Score_Outline[s]), (10, 25), cv.FONT_HERSHEY_SIMPLEX, 1, self.Color[s], 2)
             cv.putText(self.ImageSave[s], "Score Area : " + str(self.Score_Area_Data[s]) + " / " + str(self.Point_Score_Area[s]), (10, 55), cv.FONT_HERSHEY_SIMPLEX, 1, self.Color[s], 2)
             cv.putText(self.ImageSave[s], "Time : " + str(Time) + "", (10, 85), cv.FONT_HERSHEY_SIMPLEX, 1, self.Color[s], 2)
@@ -1176,44 +1161,11 @@ class Frame2(ttk.Frame, App):
                             Showtext = cv.putText(image, "Save image " + Point + "", (10, 25),
                                                   cv.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 1)
                             cv.imshow(Point, Showtext)
-                            img.save('' + Create + '/' + Point + '_Position.bmp')
+                            img.save('' + Create + '/' + Point + '_Template.bmp')
 
                             if Left and Top and Right and Bottom != 0:
-                                print(Left, Top, Right, Bottom)
-                                def click(event, x, y, flags, param):
-                                    global refPt, cropping
-                                    image_Area = clone_Area.copy()
-                                    if event == cv.EVENT_LBUTTONDOWN:
-                                        refPt = [(x, y)]
-                                        # print(refPt)
-                                        cropping = True
-                                    elif event == cv.EVENT_LBUTTONUP:
-                                        refPt.append((x, y))
-                                        # print(refPt)
-                                        cropping = False
-                                        cv.rectangle(image_Area, refPt[0], refPt[1], (85, 255, 51), 2)
-                                        cv.imshow(Point, image_Area)
-                                        if len(refPt) == 2:
-                                            roi = clone_Area[refPt[0][1]:refPt[1][1], refPt[0][0]:refPt[1][0]]
-                                            x = cv.cvtColor(roi, cv.COLOR_BGR2RGB)
-                                            Left = refPt[0][0]
-                                            Top = refPt[0][1]
-                                            Right = refPt[1][0]
-                                            Bottom = refPt[1][1]
-                                            img = Image.fromarray(x)
-                                            Showtext = cv.putText(image_Area, "Save image " + Point + "", (10, 25),
-                                                                  cv.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 1)
-                                            cv.imshow(Point, Showtext)
-                                            img.save('' + Create + '/' + Point + '_Template.bmp')
-                                            if Left and Top and Right and Bottom != 0:
-                                                print(Left, Top, Right, Bottom)
-                                path = r'D:\labview vision\Python Build\Lib\TMTU515ROO\Master\Point1_Position.bmp'
-                                image_Area = cv.imread(path)
-                                clone_Area  = image_Area.copy()
-                                cv.namedWindow(Point)
-                                cv.setMouseCallback(Point, click)
-                                cv.imshow(Point, image_Area)
-                                #self.Master(Left, Top, Right, Bottom, Score_Outline, Score_Area, Cam, Point, Emp_ID)
+                                self.Master(Left, Top, Right, Bottom, Score_Outline, Score_Area, Cam, Point, Emp_ID)
+
                 path = r'Current.bmp'
                 image_Position = cv.imread(path)
                 clone_Position = image_Position.copy()

@@ -205,9 +205,9 @@ class App(tk.Tk):
         self.title('Machine Vision Inspection')
 
         self.geometry("1920x1020+0+0")
-        self.overrideredirect(1)
-        #self.state('zoomed')
-        #self.attributes('-fullscreen', True)
+        #self.overrideredirect(1)
+        self.state('zoomed')
+        self.attributes('-fullscreen', True)
         #self.resizable(0,0)
         self.configure(background='black')
         self.API_json = Getpart()
@@ -852,24 +852,40 @@ class App(tk.Tk):
 
     if Mode == 1:
         def Board_show(self):
-            Hex = self.ClassBoard.ReadBorad()[0]
-            Bin = self.ClassBoard.ReadBorad()[2]
-            self.BoardP.configure(text=Hex)
-            if Bin == "110000001100000000110100001010":
-                self.SaveDataBoard = True
-            elif Bin == "110000001100010000110100001010" and self.SaveDataBoard == True:  # 01
-                self.ProcessP.configure(text="Process")
-                self.ProcessP.configure(fg='yellow')
-                self.SaveImage()
-                self.Main()
-                self.ShowScore()
-                self.ShowResult()
-                self.Save_Image()
-                self.ViewImage()
-                self.ProcessP.configure(text="Ready")
-                self.ProcessP.configure(fg="green")
-                self.SaveDataBoard = False
-            #self.after(100,self.Board_show)
+                Login = False
+                SaveMaster = False
+                try:
+                    self.Login.winfo_geometry()
+                except:
+                    Login = True
+                try:
+                    self.SaveMaster.winfo_geometry()
+                except:
+                    SaveMaster = True
+                if Login == True and SaveMaster == True:
+                    Hex = self.ClassBoard.ReadBorad()[0]
+                    Bin = self.ClassBoard.ReadBorad()[2]
+                    self.BoardP.configure(text=Hex)
+                    if Bin == "110000001100000000110100001010":
+                        self.SaveDataBoard = True
+                    elif Bin == "110000001100010000110100001010" and self.SaveDataBoard == True:  # 01
+                        try:
+                            self.ProcessP.configure(text="Process")
+                            self.ProcessP.configure(fg='yellow')
+                            self.SaveImage()
+                            self.Main()
+                            self.ShowScore()
+                            self.ShowResult()
+                            self.Save_Image()
+
+                            self.ViewImage()
+                            self.ProcessP.configure(text="Ready")
+                            self.ProcessP.configure(fg="green")
+                            self.SaveDataBoard = False
+                        except:
+                            messagebox.showerror('Program Error', 'Process')
+                    #self.after(100,self.Board_show)
+
 
     elif Mode == 2:
         def CallKeyBorad(self):
@@ -987,6 +1003,7 @@ class App(tk.Tk):
                 Score_Ture.append(0)
                 Chack.append(0)
 
+        """""""""
         for n in range(len(Score_Ture) - 1, 0, -1):
             for i in range(n):
                 if Score_Ture[i] > Score_Ture[i + 1]:
@@ -996,7 +1013,8 @@ class App(tk.Tk):
             if i <= 4:
                 Result_Score += Score_Ture[i]
         Result_Score = int(Result_Score / 5)
-        return [Result_Score, sum(Chack)]
+        """""""""
+        return [min(Score_Ture), sum(Chack)]
 
     def SaveImage(self):
         if Quantity_Cam == 1:
