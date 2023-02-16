@@ -25,7 +25,7 @@ Machine = Setting_Paramiter[0]["MachineName"]
 Mode = Setting_Paramiter[0]["Mode"]
 
 if Quantity_Cam == 1:
-    frame0 = cv.VideoCapture(0, cv.CAP_DSHOW)
+    frame0 = cv.VideoCapture(1, cv.CAP_DSHOW)
     frame0.set(cv.CAP_PROP_FRAME_WIDTH, 1024)
     frame0.set(cv.CAP_PROP_FRAME_HEIGHT, 768)
     frame0.set(cv.CAP_PROP_AUTO_EXPOSURE, 0)
@@ -929,40 +929,45 @@ class App(tk.Tk):
         self.ProcessP.configure(fg="green")
 
 
-    def Process_Outline(self, imgframe, imgTemplate, Left, Top, Right, Bottom):
-        img = cv.imread(imgframe, 0)
-        template = cv.imread(imgTemplate, 0)
-        w, h = template.shape[::-1]
-        TemplateThreshold = 0.65
-        curMaxVal = 0
+    def Process_Outline(self, image, Template, Left, Top, Right, Bottom):
+        image = cv.imread(image, 0)
+        Template = cv.imread(Template, 0)
+        w, h = Template.shape[::-1]
         c = 0
+        TemplateThreshold = 0.7
+        curMaxVal = 0
+        curMaxTemplate = -1
+        curMaxLoc = (0, 0)
         for meth in ['cv.TM_CCOEFF_NORMED']:
             method = eval(meth)
             try:
-                crop_image_ = img[(Top - 30):(Bottom + 30), (Left - 30):(Right + 30)]
-                res = cv.matchTemplate(crop_image_, template, method)
+                image = image[(Top - 30):(Bottom + 30), (Left - 30):(Right + 30)]
+                res = cv.matchTemplate(image, Template, method)
             except:
-                crop_image = img[Top:Bottom, Left:Right]
-                res = cv.matchTemplate(crop_image, template, method)
+                image = image[Top:Bottom, Left:Right]
+                res = cv.matchTemplate(image, Template, method)
             min_val, max_val, min_loc, max_loc = cv.minMaxLoc(res)
             if max_val > TemplateThreshold and max_val > curMaxVal:
+                if method in [cv.TM_SQDIFF]:
+                    top_left = min_loc
+                else:
+                    top_left = max_loc
                 curMaxVal = max_val
                 curMaxTemplate = c
                 curMaxLoc = max_loc
             c = c + 1
+            try:
+                if curMaxTemplate == -1:
+                    return (0, (0, 0), 0, 0, (0, 0))
+                else:
+                    bottom_right = (top_left[0] + w, top_left[1] + h)
+                    return (curMaxTemplate % 3, curMaxLoc, 1 - int(curMaxTemplate / 3) * 0.2, curMaxVal, bottom_right)
+            except:
+                return (0, (0, 0), 0, 0, (0, 0))
 
-        try:
-            if curMaxTemplate == -1:
-                return (0, (0, 0), 0, 0, 0, 0)
-            else:
-                # print((curMaxTemplate % 3, curMaxLoc, 1 - int(curMaxTemplate / 3) * 0.2, curMaxVal, w, h))
-                return (curMaxTemplate % 3, curMaxLoc, 1 - int(curMaxTemplate / 3) * 0.2, curMaxVal, w, h)
-        except:
-            return (0, (0, 0), 0, 0, 0, 0)
 
     def Crop_image_Area(self, imgframe, Left, Top, Right, Bottom):
         img = cv.imread(imgframe, 0)
-        # ret2, ImageRealTime = cv.threshold(img, 100, 255, cv.THRESH_BINARY)
         crop_image = img[Top:Bottom, Left:Right]
         return crop_image
 
@@ -984,37 +989,27 @@ class App(tk.Tk):
             point.append(total[9])
         return point
 
-    def Process_Area(self, Data1, Data2):
+    def Process_Area(self,Master, Template):
         Score_Ture = []
-        Chack = []
-        swapped = False
         Result_Score = 0
-        for i in range(len(Data1)):
-            total = (((Data1[i] + Data2[i]) / 2) / Data2[i])
-            if total < 1.99:
-                score_out = int(total * 1000)
-                if score_out > 1000:
-                    score_out = 1000 - (score_out - 1000)
-                    Chack.append(1)
-                else:
-                    Chack.append(0)
-                Score_Ture.append(score_out)
+        swapped = False
+        Couter = len(Master)
+        for i in range(Couter):
+            if Master[i] < Template[i]:
+                Score_Ture.append((Master[i] / Template[i]) * 1000)
             else:
-                Score_Ture.append(0)
-                Chack.append(0)
-
-        """""""""
+                Score_Ture.append((Template[i] / Master[i]) * 1000)
+        # print(Score_Ture)
         for n in range(len(Score_Ture) - 1, 0, -1):
             for i in range(n):
                 if Score_Ture[i] > Score_Ture[i + 1]:
                     swapped = True
                     Score_Ture[i], Score_Ture[i + 1] = Score_Ture[i + 1], Score_Ture[i]
         for i in range(len(Score_Ture)):
-            if i <= 4:
+            if i < 8:
                 Result_Score += Score_Ture[i]
-        Result_Score = int(Result_Score / 5)
-        """""""""
-        return [min(Score_Ture), sum(Chack)]
+        Result_Score = int(Result_Score / 8)
+        return Result_Score
 
     def SaveImage(self):
         if Quantity_Cam == 1:
@@ -1032,6 +1027,19 @@ class App(tk.Tk):
             Save_Image_1.save("Snap1.bmp")
             Save_Image_2.save("Snap2.bmp")
             Save_Image_3.save("Snap2.bmp")
+
+    def Crop_find(self,image,Left,Top, Right,Bottom,top_left,bottom_right,scale):
+        image = cv.imread(image, 0)
+        if scale == 1:
+            image = image[(Top - 30):(Bottom + 30), (Left - 30):(Right + 30)]
+            Left = top_left[0]
+            Top = top_left[1]
+            Right = bottom_right[0]
+            Bottom = bottom_right[1]
+            image = image[Top:Bottom,Left:Right]
+        else:
+            image = image[Top:Bottom, Left:Right]
+        return image
 
     def Main(self):
         if self.count != 0:
@@ -1055,10 +1063,12 @@ class App(tk.Tk):
                     image = r'Snap3.bmp'
                 self.ImageSave.append(cv.imread(image))
                 Template = r"" + self.Part_API + "\Master""\\""Point" + str(x + 1) + "_Template.bmp"
-                (template, top_left, scale, val, w, h) = self.Process_Outline(image, Template, self.Point_Left[x], self.Point_Top[x], self.Point_Right[x], self.Point_Bottom[x])
-                Template_View = cv.imread(Template, 0)
-                Master_Image = self.Crop_image_Area(image, self.Point_Left[x], self.Point_Top[x], self.Point_Right[x], self.Point_Bottom[x])
-                (Score_Area_Data, Chack) = self.Process_Area(self.Rule_Of_Thirds(Master_Image), self.Rule_Of_Thirds(Template_View))
+                #print(self.Point_Left[x], self.Point_Top[x], self.Point_Right[x], self.Point_Bottom[x])
+                (template, top_left, scale, val,bottom_right) = self.Process_Outline(image, Template, self.Point_Left[x], self.Point_Top[x], self.Point_Right[x], self.Point_Bottom[x])
+                Template = cv.imread(Template, 0)
+                Master = self.Crop_find(image,self.Point_Left[x], self.Point_Top[x], self.Point_Right[x], self.Point_Bottom[x],top_left,bottom_right,scale)
+                #Master_Image = self.Crop_image_Area(image, self.Point_Left[x], self.Point_Top[x], self.Point_Right[x], self.Point_Bottom[x])
+                Score_Area_Data = self.Process_Area(self.Rule_Of_Thirds(Master), self.Rule_Of_Thirds(Template))
                 self.Score_Outline_Data.append(int(round(val * 1000, 0)))
                 self.Score_Area_Data.append(Score_Area_Data)
                 if ((val * 1000 )>= self.Point_Score_Outline[x]) and (Score_Area_Data >= self.Point_Score_Area[x]):
@@ -1143,8 +1153,8 @@ class App(tk.Tk):
                 os.makedirs(path, exist_ok=True)
             except OSError as error:
                 pass
-
-            cv.rectangle(self.ImageSave[s], (self.Point_Left[s], self.Point_Top[s]), (self.Point_Right[s], self.Point_Bottom[s]), self.Color[s], 3)
+            #print((self.Point_Left[s], self.Point_Top[s]), (self.Point_Right[s], self.Point_Bottom[s]))
+            cv.rectangle(self.ImageSave[s], (self.Point_Left[s]-30, self.Point_Top[s]-30), (self.Point_Right[s]+30, self.Point_Bottom[s]+30), self.Color[s], 3)
             cv.putText(self.ImageSave[s], "Score Outline : " + str(self.Score_Outline_Data[s]) + " / " + str(self.Point_Score_Outline[s]), (10, 25), cv.FONT_HERSHEY_SIMPLEX, 1, self.Color[s], 2)
             cv.putText(self.ImageSave[s], "Score Area : " + str(self.Score_Area_Data[s]) + " / " + str(self.Point_Score_Area[s]), (10, 55), cv.FONT_HERSHEY_SIMPLEX, 1, self.Color[s], 2)
             cv.putText(self.ImageSave[s], "Time : " + str(Time) + "", (10, 85), cv.FONT_HERSHEY_SIMPLEX, 1, self.Color[s], 2)
@@ -1162,8 +1172,8 @@ class App(tk.Tk):
                     image = cv.cvtColor(image ,cv.COLOR_BGR2RGB)
                     for s in range(self.count):
                         if self.cam.get() == "Cam1" and self.Point_Camera[s] == "Cam1":
-                            cv.rectangle(image, (self.Point_Left[s], self.Point_Top[s]), (self.Point_Right[s], self.Point_Bottom[s]), self.ColorView[s], 2)
-                            cv.putText(image, "Point"+str(s+1), (self.Point_Left[s], self.Point_Top[s]), cv.FONT_HERSHEY_SIMPLEX, 0.7, self.ColorView[s], 2)
+                            cv.rectangle(image, (self.Point_Left[s]-30, self.Point_Top[s]-30), (self.Point_Right[s]+30, self.Point_Bottom[s]+30), self.ColorView[s], 2)
+                            cv.putText(image, "Point"+str(s+1), (self.Point_Left[s]-30, self.Point_Top[s]-30), cv.FONT_HERSHEY_SIMPLEX, 0.7, self.ColorView[s], 2)
                     im = Image.fromarray(image)
                     image = ImageTk.PhotoImage(image=im)
                     self.view.image = image
@@ -1175,12 +1185,12 @@ class App(tk.Tk):
                     image2 = cv.cvtColor(image2, cv.COLOR_BGR2RGB)
                     for s in range(self.count):
                         if self.cam.get() == "Cam1" and self.Point_Camera[s] == "Cam1":
-                            cv.rectangle(image1, (self.Point_Left[s], self.Point_Top[s]), (self.Point_Right[s], self.Point_Bottom[s]), self.ColorView[s], 2)
-                            cv.putText(image1, "Point" + str(s + 1), (self.Point_Left[s], self.Point_Top[s]), cv.FONT_HERSHEY_SIMPLEX, 0.7, self.ColorView[s], 2)
+                            cv.rectangle(image1, (self.Point_Left[s]-30, self.Point_Top[s]-30), (self.Point_Right[s]+30, self.Point_Bottom[s]+30), self.ColorView[s], 2)
+                            cv.putText(image1, "Point" + str(s + 1), (self.Point_Left[s]-30, self.Point_Top[s]-30), cv.FONT_HERSHEY_SIMPLEX, 0.7, self.ColorView[s], 2)
                             im = Image.fromarray(image1)
                         elif self.cam.get() == "Cam2" and self.Point_Camera[s] == "Cam2":
-                            cv.rectangle(image2, (self.Point_Left[s], self.Point_Top[s]), (self.Point_Right[s], self.Point_Bottom[s]), self.ColorView[s], 2)
-                            cv.putText(image2, "Point" + str(s + 1), (self.Point_Left[s], self.Point_Top[s]), cv.FONT_HERSHEY_SIMPLEX, 0.7, self.ColorView[s], 2)
+                            cv.rectangle(image2, (self.Point_Left[s]-30, self.Point_Top[s]-30), (self.Point_Right[s]+30, self.Point_Bottom[s]+30), self.ColorView[s], 2)
+                            cv.putText(image2, "Point" + str(s + 1), (self.Point_Left[s]-30, self.Point_Top[s]-30), cv.FONT_HERSHEY_SIMPLEX, 0.7, self.ColorView[s], 2)
                             im = Image.fromarray(image2)
                     image = ImageTk.PhotoImage(image=im)
                     self.view.image = image
@@ -1194,16 +1204,17 @@ class App(tk.Tk):
                     image3 = cv.cvtColor(image3, cv.COLOR_BGR2RGB)
                     for s in range(self.count):
                         if self.cam.get() == "Cam1" and self.Point_Camera[s] == "Cam1":
-                            cv.rectangle(image1, (self.Point_Left[s], self.Point_Top[s]), (self.Point_Right[s], self.Point_Bottom[s]), self.ColorView[s], 2)
-                            cv.putText(image1, "Point" + str(s + 1), (self.Point_Left[s], self.Point_Top[s]), cv.FONT_HERSHEY_SIMPLEX, 0.7, self.ColorView[s], 2)
+
+                            cv.rectangle(image1, (self.Point_Left[s]-30, self.Point_Top[s]-30), (self.Point_Right[s]+30, self.Point_Bottom[s]+30), self.ColorView[s], 2)
+                            cv.putText(image1, "Point" + str(s + 1), (self.Point_Left[s]-30, self.Point_Top[s]-30), cv.FONT_HERSHEY_SIMPLEX, 0.7, self.ColorView[s], 2)
                             im = Image.fromarray(image1)
                         elif self.cam.get() == "Cam2" and self.Point_Camera[s] == "Cam2":
-                            cv.rectangle(image2, (self.Point_Left[s], self.Point_Top[s]), (self.Point_Right[s], self.Point_Bottom[s]), self.ColorView[s], 2)
-                            cv.putText(image2, "Point" + str(s + 1), (self.Point_Left[s], self.Point_Top[s]), cv.FONT_HERSHEY_SIMPLEX, 0.7, self.ColorView[s], 2)
+                            cv.rectangle(image2, (self.Point_Left[s]-30, self.Point_Top[s]-30), (self.Point_Right[s]+30, self.Point_Bottom[s]+30), self.ColorView[s], 2)
+                            cv.putText(image2, "Point" + str(s + 1), (self.Point_Left[s]-30, self.Point_Top[s]-30), cv.FONT_HERSHEY_SIMPLEX, 0.7, self.ColorView[s], 2)
                             im = Image.fromarray(image2)
                         elif self.cam.get() == "Cam3" and self.Point_Camera[s] == "Cam3":
-                            cv.rectangle(image3, (self.Point_Left[s], self.Point_Top[s]), (self.Point_Right[s], self.Point_Bottom[s]), self.ColorView[s], 2)
-                            cv.putText(image3, "Point" + str(s + 1), (self.Point_Left[s], self.Point_Top[s]), cv.FONT_HERSHEY_SIMPLEX, 0.7, self.ColorView[s], 2)
+                            cv.rectangle(image3, (self.Point_Left[s]-30, self.Point_Top[s]-30), (self.Point_Right[s]+30, self.Point_Bottom[s]+30), self.ColorView[s], 2)
+                            cv.putText(image3, "Point" + str(s + 1), (self.Point_Left[s]-30, self.Point_Top[s]-30), cv.FONT_HERSHEY_SIMPLEX, 0.7, self.ColorView[s], 2)
                             im = Image.fromarray(image3)
                     image = ImageTk.PhotoImage(image=im)
                     self.view.image = image
