@@ -25,7 +25,7 @@ Machine = Setting_Paramiter[0]["MachineName"]
 Mode = Setting_Paramiter[0]["Mode"]
 
 if Quantity_Cam == 1:
-    frame0 = cv.VideoCapture(1, cv.CAP_DSHOW)
+    frame0 = cv.VideoCapture(0, cv.CAP_DSHOW)
     frame0.set(cv.CAP_PROP_FRAME_WIDTH, 1024)
     frame0.set(cv.CAP_PROP_FRAME_HEIGHT, 768)
     frame0.set(cv.CAP_PROP_AUTO_EXPOSURE, 0)
@@ -63,11 +63,11 @@ elif Quantity_Cam == 3:
 
 font = cv.FONT_HERSHEY_SIMPLEX
 
-
+"""
 def Save_Result(Data):
     item = [{'Result': Data}]
     with open('Result.json', 'w') as json_file:
-        json.dump(item, json_file)
+        json.dump(item, json_file)"""
 
 class Getpart():
     def __init__(self):
@@ -90,10 +90,10 @@ class Getpart():
             self.MachineName = json_API[0]["MachineName"]
             self.MoldId = json_API[0]["MoldId"]
             self.Packing = json_API[0]["PackingStd"]
-            with open('Part.json', 'w') as Keep_Part:
+            with open('Planning Data.json', 'w') as Keep_Part:
                 json.dump(json_API, Keep_Part, indent=6)
         except:
-            with open('Part.json', 'r') as json_Part:
+            with open('Planning Data.json', 'r') as json_Part:
                 json_Part_Disconnet = json.loads(json_Part.read())
             self.Sever = "Disconnect"
             self.PartNumber = json_Part_Disconnet[0]["PartNumber"]
@@ -106,8 +106,9 @@ class Getpart():
         return [self.PartNumber, self.BatchNumber, self.PartName, self.CustomerPartNumber, self.MachineName,
                 self.MoldId, self.Sever, self.Packing]
 
-class GetEmp():
-    def __int__(self):
+class GetEmp:
+    @staticmethod
+    def Information():
         dirName = 'Information'
         try:
             os.mkdir(dirName)
@@ -187,7 +188,7 @@ class InfiniteTimer():
 
 class App(tk.Tk):
     def __init__(self):
-
+        GetEmp.Information()
         super().__init__()
         combostyle = ttk.Style()
 
@@ -226,7 +227,7 @@ class App(tk.Tk):
 
 
         self.Machine_Vision = tk.Label(self, text='Machine Vision Inspection '+self.Machine_API,bg='black')
-        self.Machine_Version = tk.Label(self, text='v1.0.0',bg='black')
+        self.Machine_Version = tk.Label(self, text='v1.0.1',bg='black')
         if self.Sever_API == "Connected":
             self.Machine_Vision.configure(fg='Green')
             self.Machine_Version.configure(fg='Green')
@@ -317,10 +318,11 @@ class App(tk.Tk):
         #self.btn_Start.configure(font=("Arial", 18))
         #self.btn_Start.configure(fg='Yellow',bg="black")
         #self.btn_Start.place(x=1260, y=10, width=120)
-
-        self.Img_part()
+        self.IMAGE()
+        self.Call_IMAGE()
         self.combobox_cam()
         self.Camera()
+        self.Printer()
         self.PrintText()
 
         self.Board = tk.LabelFrame(self, text="I/O Board",bg='black')
@@ -409,14 +411,31 @@ class App(tk.Tk):
             self.CUSTOMER_NUMBERP.configure(text=self.Customer_API)
             self.BATCH_NUMBERP.configure(text=self.Batch_API)
             self.MOLD_NUMBERP.configure(text=self.Mode_API)
-            self.Img_part()
+            self.Call_IMAGE()
             self.ShowCount()
             self.PrintText()
 
+    def IMAGE(self):
+        path = "IMAGE"
+        try:
+            os.mkdir(path)
+        except OSError as error:
+            print(error)
+
+    def Printer(self):
+        file_path = 'Counter_Printer.json'
+        try:
+            with open(file_path, 'r') as json_file:
+                data = json.load(json_file)
+        except FileNotFoundError:
+            data = {"Partnumber": self.Part_API, "Counter": 0, "Packing": self.Packing_API}
+        with open(file_path, 'w') as json_file:
+            json.dump(data, json_file, indent=6)
+
     def PrintText(self):
-        with open('Couter_Printer.json', 'r') as json_file:
+        with open('Counter_Printer.json', 'r') as json_file:
             Data = json.loads(json_file.read())
-        Packing_Couter = Data["Couter"]
+        Packing_Couter = Data["Counter"]
         PackPart = Data["Partnumber"]
         self.PACKING_NUMBER = tk.LabelFrame(self, text="PACKING",bg='black')
         self.PACKING_NUMBER.configure(font=("Arial", 10))
@@ -428,26 +447,24 @@ class App(tk.Tk):
         self.PACKING_NUMBERP.place(x=10, y=15, anchor=tk.W)
 
     def Couter_Printer(self):
-        with open('Couter_Printer.json', 'r') as json_file:
-            Data = json.loads(json_file.read())
-        Packing_Couter = Data["Couter"]
-        PackPart = Data["Partnumber"]
+        file_path = 'Counter_Printer.json'
+        with open(file_path, 'r') as json_file:
+            data = json.load(json_file)
 
-        if PackPart != self.Part_API:
-            Printer = {"Partnumber": self.Part_API, "Couter": 1, "Packing": self.Packing_API}
-            with open('Couter_Printer.json', 'w') as json_file:
-                json.dump(Printer, json_file, indent=6)
+        packing_counter = data["Counter"] + 1
+        pack_part = data["Partnumber"]
+        if pack_part != self.Part_API:
+            printer = {"Partnumber": self.Part_API, "Counter": 1, "Packing": self.Packing_API}
         else:
-            Printer = {"Partnumber": self.Part_API, "Couter": Packing_Couter + 1, "Packing": self.Packing_API}
-            with open('Couter_Printer.json', 'w') as json_file:
-                json.dump(Printer, json_file, indent=6)
+            printer = {"Partnumber": self.Part_API, "Counter": packing_counter, "Packing": self.Packing_API}
 
-            if self.Packing_API == Packing_Couter:
-                Printer = {"Partnumber": self.Part_API, "Couter": 1, "Packing": self.Packing_API}
-                with open('Couter_Printer.json', 'w') as json_file:
-                    json.dump(Printer, json_file, indent=6)
-                with open('Printer.txt', 'w') as f:
-                    f.write('Printer')
+        if packing_counter >= self.Packing_API:
+            printer = {"Partnumber": self.Part_API, "Counter": 0, "Packing": self.Packing_API}
+            with open('Printer.txt', 'w') as f:
+                f.write('Printer')
+
+        with open(file_path, 'w') as json_file:
+            json.dump(printer, json_file, indent=6)
 
     def AddMaster(self):
         self.Login = tk.Toplevel(self)
@@ -683,9 +700,9 @@ class App(tk.Tk):
             self.message.set("Password not match")
             self.show_message.configure(fg="Red")
 
-    def Img_part(self):
+    def Call_IMAGE(self):
         try:
-            image1 = Image.open(r"IMG_PART" + "\\" + "" + self.Part_API + "" + ".png")
+            image1 = Image.open(r"IMAGE" + "\\" + "" + self.Part_API + "" + ".png")
             resize_img = image1.resize((545, 340))
             self.test = ImageTk.PhotoImage(resize_img)
             self.image_show = tk.Label(image=self.test,bg="black")
@@ -723,7 +740,7 @@ class App(tk.Tk):
         self.Result_Ok.configure(text="OK : "+str(self.OK_Data))
         self.Result_NG.configure(text="NG : "+str(self.NG_Data))
 
-        Save_Result(1)
+        #Save_Result(1)
         self.btn_reset.focus_set()
         self.Point_ = tk.LabelFrame(self, text="Point", borderwidth=3, relief="ridge", padx=5, pady=10,bg='black')
         self.Point_.configure(font=("Arial", 13))
@@ -1010,9 +1027,9 @@ class App(tk.Tk):
                     swapped = True
                     Score_Ture[i], Score_Ture[i + 1] = Score_Ture[i + 1], Score_Ture[i]
         for i in range(len(Score_Ture)):
-            if i < 8:
+            if i < 3:
                 Result_Score += Score_Ture[i]
-        Result_Score = int(Result_Score / 8)
+        Result_Score = int(Result_Score / 3)
         return Result_Score
 
     def SaveImage(self):
@@ -1118,7 +1135,6 @@ class App(tk.Tk):
                         if Mode == 1 and self.SaveDataBoard_IO == False:
                             self.ClassBoard.inst.write("@1 R00")
                             self.SaveDataBoard_IO = True
-                            print("OK")
                             self.ClassBoard.inst.clear()
                 else:
                     self.Comfrim_Data = self.Comfrim_Data + 1
@@ -1126,7 +1142,6 @@ class App(tk.Tk):
                     if Mode == 1 and self.SaveDataBoard_IO == True:
                         self.ClassBoard.inst.write("@1 R40")
                         self.SaveDataBoard_IO = False
-                        print("NG")
                         self.ClassBoard.inst.clear()
                     break
     def ShowScore(self):
