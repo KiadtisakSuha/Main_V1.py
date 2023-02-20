@@ -25,7 +25,7 @@ Machine = Setting_Paramiter[0]["MachineName"]
 Mode = Setting_Paramiter[0]["Mode"]
 
 if Quantity_Cam == 1:
-    frame0 = cv.VideoCapture(0, cv.CAP_DSHOW)
+    frame0 = cv.VideoCapture(1, cv.CAP_DSHOW)
     frame0.set(cv.CAP_PROP_FRAME_WIDTH, 1024)
     frame0.set(cv.CAP_PROP_FRAME_HEIGHT, 768)
     frame0.set(cv.CAP_PROP_AUTO_EXPOSURE, 0)
@@ -185,6 +185,54 @@ class InfiniteTimer():
         else:
             pass
 
+class Save_Data:
+    @staticmethod
+    def Save_Image(Partnumber,Counter,Image,Left,Top,Right,Bottom,Left_Find,Top_Find,Right_Find,Bottom_Find,Color,Outline_Score,Outline_Score_Set,Area_Score,Area_set_Score,Result,ROI):
+        named_tuple = time.localtime()
+        Time = time.strftime("%Y%m%d%H%M%S", named_tuple)
+        for s in range(Counter):
+                FileFolder_Ok = 'Record/' + Partnumber + '/OK/Point' + str(s + 1)
+                path = os.path.join(FileFolder_Ok)
+                try:
+                    os.makedirs(path, exist_ok=True)
+                except OSError as error:
+                    pass
+                FileFolder_NG = 'Record/' + Partnumber + '/NG/Point' + str(s + 1)
+                path = os.path.join(FileFolder_NG)
+                try:
+                    os.makedirs(path, exist_ok=True)
+                except OSError as error:
+                    pass
+                cv.rectangle(Image[s], (Left_Find[s], Top_Find[s]), (Right_Find[s], Bottom_Find[s]), Color[s], 2)
+                cv.rectangle(Image[s], (Left[s]-ROI, Top[s]-ROI), (Right[s]+ROI, Bottom[s]+ROI), Color[s], 3)
+                cv.putText(Image[s], "Score Outline : " + str(Outline_Score[s]) + " / " + str(Outline_Score_Set[s]), (10, 55), cv.FONT_HERSHEY_SIMPLEX, 1, Color[s], 2)
+                cv.putText(Image[s], "Score Area : " + str(Area_Score[s]) + " / " + str(Area_set_Score[s]), (10, 85), cv.FONT_HERSHEY_SIMPLEX, 1, Color[s], 2)
+                cv.putText(Image[s], "Time : " + str(Time) + "", (10, 115), cv.FONT_HERSHEY_SIMPLEX, 1, Color[s], 2)
+                if s <= 8:
+                    Point = "0"
+                else:
+                    Point = ""
+                if Result[s] == 1:
+                    cv.imwrite('Record/' + Partnumber +'/OK/Point' + str(s + 1)+'/'+Time + '_P' + Point + str(s + 1) + '.jpg', Image[s])
+                else:
+                    cv.imwrite('Record/' + Partnumber +'/NG/Point' + str(s + 1)+'/'+Time + '_P' + Point + str(s + 1) + '.jpg', Image[s])
+
+    @staticmethod
+    def Save_Score(Partnumber, Batch, Machine, Couter, Score, Result):
+        named_tuple = time.localtime()
+        Time = time.strftime("%Y%m%d%H%M%S", named_tuple)
+        parent_dir = 'Transaction/'
+        path = os.path.join(parent_dir)
+        try:
+            os.makedirs(path, exist_ok=True)
+        except OSError as error:
+            pass
+        Transition = [dict(PartNumber=Partnumber, BatchNumber=Batch, MachineName=Machine, Details=[])]
+        for s in range(Couter):
+            Transition[0]["Details"].append([dict(Score=int(Score[s]),
+                                                  Result=Result[s], Point=s + 1)])
+        with open('Transaction/' + Time + '.json', 'w') as json_file:
+            json.dump(Transition, json_file, indent=6)
 
 class App(tk.Tk):
     def __init__(self):
@@ -377,13 +425,6 @@ class App(tk.Tk):
 
         self.view = tk.Label(self,bg='black')
         self.view.place(x=950, y=180)
-    """""""""
-    def Boradxxx(self):
-        self.Board_show()
-        self.after(100,self.Boradxxx)
-        # self.BoardLoop = InfiniteTimer(0.5, self.Board_show)
-        # self.BoardLoop.start()
-    """""""""
 
     def CallPart(self):
         self.API_json = Getpart()
@@ -853,6 +894,7 @@ class App(tk.Tk):
         except:
             messagebox.showerror('Python Error', 'Check Cameras')
         """""""""
+
     def Destroy(self):
         response = messagebox.askquestion("Close Programe", "Are you sure?", icon='warning')
         if response == "yes":
@@ -868,8 +910,6 @@ class App(tk.Tk):
             cv.destroyAllWindows()
             app.destroy()
             subprocess.call([r'TerminatedProcess.bat'])
-
-
 
     if Mode == 1:
         def Board_show(self):
@@ -907,7 +947,6 @@ class App(tk.Tk):
                             messagebox.showerror('Program Error', 'Process')
                     #self.after(100,self.Board_show)
 
-
     elif Mode == 2:
         def CallKeyBorad(self):
             self.LabelKeyBorad = tk.Label(self)
@@ -931,11 +970,11 @@ class App(tk.Tk):
                         self.Main()
                         self.ShowScore()
                         self.ShowResult()
-                        self.Save_Image()
+                        Save_Data.Save_Image(self.Part_API, self.count, self.ImageSave, self.Point_Left, self.Point_Top, self.Point_Right, self.Point_Bottom, self.Left_Find, self.Top_Find, self.Right_Find, self.Bottom_Find, self.Color,
+                                             self.Score_Outline_Data, self.Point_Score_Outline, self.Score_Area_Data, self.Point_Score_Area, self.Result,30)
                         self.ViewImage()
                         self.ProcessP.configure(text="Ready")
                         self.ProcessP.configure(fg="green")
-                        #os.remove("Snap1.bmp")
 
     def Strat(self):
         self.ProcessP.configure(text="Process")
@@ -948,7 +987,6 @@ class App(tk.Tk):
         self.ViewImage()
         self.ProcessP.configure(text="Ready")
         self.ProcessP.configure(fg="green")
-
 
     def Process_Outline(self, image, Template, Left, Top, Right, Bottom):
         image = cv.imread(image, 0)
@@ -985,7 +1023,6 @@ class App(tk.Tk):
                     return (curMaxTemplate % 3, curMaxLoc, 1 - int(curMaxTemplate / 3) * 0.2, curMaxVal, bottom_right)
             except:
                 return (0, (0, 0), 0, 0, (0, 0))
-
 
     def Crop_image_Area(self, imgframe, Left, Top, Right, Bottom):
         img = cv.imread(imgframe, 0)
@@ -1027,9 +1064,9 @@ class App(tk.Tk):
                     swapped = True
                     Score_Ture[i], Score_Ture[i + 1] = Score_Ture[i + 1], Score_Ture[i]
         for i in range(len(Score_Ture)):
-            if i < 3:
+            if i < 5:
                 Result_Score += Score_Ture[i]
-        Result_Score = int(Result_Score / 3)
+        Result_Score = int(Result_Score / 5)
         return Result_Score
 
     def SaveImage(self):
@@ -1075,6 +1112,10 @@ class App(tk.Tk):
             self.padx_outline = []
             self.padx_area = []
             self.place = []
+            self.Left_Find = []
+            self.Top_Find = []
+            self.Right_Find = []
+            self.Bottom_Find = []
             for x in range(self.count):
                 if self.Point_Camera[x] == "Cam1":
                     image = r'Snap1.bmp'
@@ -1084,11 +1125,13 @@ class App(tk.Tk):
                     image = r'Snap3.bmp'
                 self.ImageSave.append(cv.imread(image))
                 Template = r"" + self.Part_API + "\Master""\\""Point" + str(x + 1) + "_Template.bmp"
-                #print(self.Point_Left[x], self.Point_Top[x], self.Point_Right[x], self.Point_Bottom[x])
                 (template, top_left, scale, val,bottom_right) = self.Process_Outline(image, Template, self.Point_Left[x], self.Point_Top[x], self.Point_Right[x], self.Point_Bottom[x])
+                self.Left_Find.append(self.Point_Left[x]+top_left[0]-30)
+                self.Top_Find.append(self.Point_Top[x]+top_left[1]-30)
+                self.Right_Find.append(self.Point_Right[x]+top_left[0]-30)
+                self.Bottom_Find.append(self.Point_Bottom[x]+top_left[1]-30)
                 Template = cv.imread(Template, 0)
                 Master = self.Crop_find(image,self.Point_Left[x], self.Point_Top[x], self.Point_Right[x], self.Point_Bottom[x],top_left,bottom_right,scale)
-                #Master_Image = self.Crop_image_Area(image, self.Point_Left[x], self.Point_Top[x], self.Point_Right[x], self.Point_Bottom[x])
                 Score_Area_Data = self.Process_Area(self.Rule_Of_Thirds(Master), self.Rule_Of_Thirds(Template))
                 self.Score_Outline_Data.append(int(round(val * 1000, 0)))
                 self.Score_Area_Data.append(Score_Area_Data)
@@ -1117,9 +1160,8 @@ class App(tk.Tk):
     def ResultComfrim(self):
         if self.Comfrim_Data >= 4:
             self.NG_Data = self.NG_Data + 1
-            self.Save_Score()
+            Save_Data.Save_Score(self.Part_API, self.Batch_API, self.Machine_API, self.count, self.Score_Area_Data, self.Result)
             self.Result_NG.configure(text="NG : " + str(self.NG_Data))
-
 
     def ShowResult(self):
         if self.count != 0:
@@ -1130,7 +1172,7 @@ class App(tk.Tk):
                         self.PrintText()
                         self.OK_Data = self.OK_Data + 1
                         self.Comfrim_Data = 0
-                        self.Save_Score()
+                        Save_Data.Save_Score(self.Part_API, self.Batch_API, self.Machine_API, self.count, self.Score_Area_Data, self.Result)
                         self.Result_Ok.configure(text="OK : " + str(self.OK_Data))
                         if Mode == 1 and self.SaveDataBoard_IO == False:
                             self.ClassBoard.inst.write("@1 R00")
@@ -1144,6 +1186,7 @@ class App(tk.Tk):
                         self.SaveDataBoard_IO = False
                         self.ClassBoard.inst.clear()
                     break
+
     def ShowScore(self):
         if self.count != 0:
             for i in range(self.count):
@@ -1154,35 +1197,6 @@ class App(tk.Tk):
                 tk.Label(self.Score_Outline, text=str(self.Score_Outline_Data[i]), borderwidth=3, relief="groove", font=("Arial", 18), padx=self.padx_outline[i], pady=8).place(x=2, y=self.place[i])
                 tk.Label(self.Score_Area, text=str(self.Score_Area_Data[i]), borderwidth=3, relief="groove", font=("Arial", 18), padx=self.padx_area[i], pady=8).place(x=2, y=self.place[i])
 
-    def Save_Image(self):
-        named_tuple = time.localtime()
-        Date = time.strftime("%Y%m%d", named_tuple)
-        Time = time.strftime("%Y%m%d%H%M%S", named_tuple)
-
-        for s in range(self.count):
-            FileFolder_Ok = 'Record/' + Date + '/' + self.Part_API + '/OK'
-            path = os.path.join(FileFolder_Ok)
-            try:
-                os.makedirs(path, exist_ok=True)
-            except OSError as error:
-                pass
-            FileFolder_NG = 'Record/' + Date + '/' + self.Part_API + '/NG'
-            path = os.path.join(FileFolder_NG)
-            try:
-                os.makedirs(path, exist_ok=True)
-            except OSError as error:
-                pass
-            #print((self.Point_Left[s], self.Point_Top[s]), (self.Point_Right[s], self.Point_Bottom[s]))
-            cv.rectangle(self.ImageSave[s], (self.Point_Left[s]-30, self.Point_Top[s]-30), (self.Point_Right[s]+30, self.Point_Bottom[s]+30), self.Color[s], 3)
-            cv.putText(self.ImageSave[s], "Score Outline : " + str(self.Score_Outline_Data[s]) + " / " + str(self.Point_Score_Outline[s]), (10, 25), cv.FONT_HERSHEY_SIMPLEX, 1, self.Color[s], 2)
-            cv.putText(self.ImageSave[s], "Score Area : " + str(self.Score_Area_Data[s]) + " / " + str(self.Point_Score_Area[s]), (10, 55), cv.FONT_HERSHEY_SIMPLEX, 1, self.Color[s], 2)
-            cv.putText(self.ImageSave[s], "Time : " + str(Time) + "", (10, 85), cv.FONT_HERSHEY_SIMPLEX, 1, self.Color[s], 2)
-            if self.Result[s] == 1:
-                # cv.imwrite('Record/' + self.Part_API + '/' + self.Result[s] + '/Point' + str(s + 1) + '/' + time_string + '_P0' + str(s + 1) + '.png', self.ImageSave[s])
-                cv.imwrite('Record/' + Date + '/' + self.Part_API + '/OK/' + Time + '_P0' + str(s + 1) + '.jpg', self.ImageSave[s])
-            else:
-                cv.imwrite('Record/' + Date + '/' + self.Part_API + '/NG/' + Time + '_P0' + str(s + 1) + '.jpg', self.ImageSave[s])
-
     def ViewImage(self):
         if self.count != 0:
             try:
@@ -1191,6 +1205,7 @@ class App(tk.Tk):
                     image = cv.cvtColor(image ,cv.COLOR_BGR2RGB)
                     for s in range(self.count):
                         if self.cam.get() == "Cam1" and self.Point_Camera[s] == "Cam1":
+                            cv.rectangle(image, (self.Left_Find[s], self.Top_Find[s]), (self.Right_Find[s], self.Bottom_Find[s]), self.ColorView[s], 2)
                             cv.rectangle(image, (self.Point_Left[s]-30, self.Point_Top[s]-30), (self.Point_Right[s]+30, self.Point_Bottom[s]+30), self.ColorView[s], 2)
                             cv.putText(image, "Point"+str(s+1), (self.Point_Left[s]-30, self.Point_Top[s]-30), cv.FONT_HERSHEY_SIMPLEX, 0.7, self.ColorView[s], 2)
                     im = Image.fromarray(image)
@@ -1204,10 +1219,12 @@ class App(tk.Tk):
                     image2 = cv.cvtColor(image2, cv.COLOR_BGR2RGB)
                     for s in range(self.count):
                         if self.cam.get() == "Cam1" and self.Point_Camera[s] == "Cam1":
+                            cv.rectangle(image1, (self.Left_Find[s], self.Top_Find[s]), (self.Right_Find[s], self.Bottom_Find[s]), self.ColorView[s], 2)
                             cv.rectangle(image1, (self.Point_Left[s]-30, self.Point_Top[s]-30), (self.Point_Right[s]+30, self.Point_Bottom[s]+30), self.ColorView[s], 2)
                             cv.putText(image1, "Point" + str(s + 1), (self.Point_Left[s]-30, self.Point_Top[s]-30), cv.FONT_HERSHEY_SIMPLEX, 0.7, self.ColorView[s], 2)
                             im = Image.fromarray(image1)
                         elif self.cam.get() == "Cam2" and self.Point_Camera[s] == "Cam2":
+                            cv.rectangle(image2, (self.Left_Find[s], self.Top_Find[s]), (self.Right_Find[s], self.Bottom_Find[s]), self.ColorView[s], 2)
                             cv.rectangle(image2, (self.Point_Left[s]-30, self.Point_Top[s]-30), (self.Point_Right[s]+30, self.Point_Bottom[s]+30), self.ColorView[s], 2)
                             cv.putText(image2, "Point" + str(s + 1), (self.Point_Left[s]-30, self.Point_Top[s]-30), cv.FONT_HERSHEY_SIMPLEX, 0.7, self.ColorView[s], 2)
                             im = Image.fromarray(image2)
@@ -1223,15 +1240,17 @@ class App(tk.Tk):
                     image3 = cv.cvtColor(image3, cv.COLOR_BGR2RGB)
                     for s in range(self.count):
                         if self.cam.get() == "Cam1" and self.Point_Camera[s] == "Cam1":
-
+                            cv.rectangle(image1, (self.Left_Find[s], self.Top_Find[s]), (self.Right_Find[s], self.Bottom_Find[s]), self.ColorView[s], 2)
                             cv.rectangle(image1, (self.Point_Left[s]-30, self.Point_Top[s]-30), (self.Point_Right[s]+30, self.Point_Bottom[s]+30), self.ColorView[s], 2)
                             cv.putText(image1, "Point" + str(s + 1), (self.Point_Left[s]-30, self.Point_Top[s]-30), cv.FONT_HERSHEY_SIMPLEX, 0.7, self.ColorView[s], 2)
                             im = Image.fromarray(image1)
                         elif self.cam.get() == "Cam2" and self.Point_Camera[s] == "Cam2":
+                            cv.rectangle(image2, (self.Left_Find[s], self.Top_Find[s]), (self.Right_Find[s], self.Bottom_Find[s]), self.ColorView[s], 2)
                             cv.rectangle(image2, (self.Point_Left[s]-30, self.Point_Top[s]-30), (self.Point_Right[s]+30, self.Point_Bottom[s]+30), self.ColorView[s], 2)
                             cv.putText(image2, "Point" + str(s + 1), (self.Point_Left[s]-30, self.Point_Top[s]-30), cv.FONT_HERSHEY_SIMPLEX, 0.7, self.ColorView[s], 2)
                             im = Image.fromarray(image2)
                         elif self.cam.get() == "Cam3" and self.Point_Camera[s] == "Cam3":
+                            cv.rectangle(image3, (self.Left_Find[s], self.Top_Find[s]), (self.Right_Find[s], self.Bottom_Find[s]), self.ColorView[s], 2)
                             cv.rectangle(image3, (self.Point_Left[s]-30, self.Point_Top[s]-30), (self.Point_Right[s]+30, self.Point_Bottom[s]+30), self.ColorView[s], 2)
                             cv.putText(image3, "Point" + str(s + 1), (self.Point_Left[s]-30, self.Point_Top[s]-30), cv.FONT_HERSHEY_SIMPLEX, 0.7, self.ColorView[s], 2)
                             im = Image.fromarray(image3)
@@ -1240,24 +1259,6 @@ class App(tk.Tk):
                     self.view.configure(image=image)
             except:
                 pass
-
-    def Save_Score(self):
-        named_tuple = time.localtime()
-        # Time = time.strftime("%Y-%m-%d_%H%M%S", named_tuple)
-        Time = time.strftime("%Y%m%d%H%M%S", named_tuple)
-        parent_dir = 'Transaction/'
-        path = os.path.join(parent_dir)
-        try:
-            os.makedirs(path, exist_ok=True)
-        except OSError as error:
-            pass
-        Transition = [dict(PartNumber=self.Part_API, BatchNumber=self.Batch_API, MachineName=self.Machine_API, Details=[])]
-        for s in range(self.count):
-            Transition[0]["Details"].append([dict(Score=int(self.Score_Area_Data[s]),
-                                                  Result=self.Result[s], Point=s + 1)])
-        with open('Transaction/' + Time + '.json', 'w') as json_file:
-            json.dump(Transition, json_file, indent=6)
-
 
 if __name__ == "__main__":
     app = App()
