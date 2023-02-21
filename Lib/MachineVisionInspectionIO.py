@@ -31,7 +31,7 @@ frame0.set(cv.CAP_PROP_AUTO_EXPOSURE, 0)
 frame0.set(cv.CAP_PROP_AUTOFOCUS, 0)"""
 
 if Quantity_Cam == 1:
-    frame0 = cv.VideoCapture(1, cv.CAP_DSHOW)
+    frame0 = cv.VideoCapture(0, cv.CAP_DSHOW)
     frame0.set(cv.CAP_PROP_FRAME_WIDTH, 1980)
     frame0.set(cv.CAP_PROP_FRAME_HEIGHT, 1080)
     frame0.set(cv.CAP_PROP_AUTO_EXPOSURE, 0)
