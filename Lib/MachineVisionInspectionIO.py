@@ -22,6 +22,7 @@ with open('Setting Paramiter.json', 'r') as json_file:
     Setting_Paramiter = json.loads(json_file.read())
 Quantity_Cam = Setting_Paramiter[0]["Quantity_Cam"]
 Board_Name = Setting_Paramiter[0]["Board_Name"]
+
 Machine = Setting_Paramiter[0]["MachineName"]
 Mode = Setting_Paramiter[0]["Mode"]
 
@@ -453,6 +454,9 @@ class App(tk.Tk):
 
         if Mode == 1:
             self.ClassBoard = Borad()
+            #Hex = self.ClassBoard.ReadBorad()[0]
+            #print(Hex)
+
             self.SaveDataBoard = False
             self.SaveDataBoard_IO = False
             self.Board_show()
@@ -935,7 +939,9 @@ class App(tk.Tk):
                     SaveMaster = True
                 if Login == True and SaveMaster == True:
                     Hex = self.ClassBoard.ReadBorad()[0]
+
                     Bin = self.ClassBoard.ReadBorad()[2]
+
                     self.BoardP.configure(text=Hex)
                     if Bin == "110000001100000000110100001010":
                         self.SaveDataBoard = True
