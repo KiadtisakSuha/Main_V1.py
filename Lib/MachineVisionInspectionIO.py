@@ -1205,6 +1205,7 @@ class App(tk.Tk):
                             cv.rectangle(image, (self.Point_Left[s]-30, self.Point_Top[s]-30), (self.Point_Right[s]+30, self.Point_Bottom[s]+30), self.ColorView[s], 2)
                             cv.putText(image, "Point"+str(s+1), (self.Point_Left[s]-30, self.Point_Top[s]-30), cv.FONT_HERSHEY_SIMPLEX, 0.7, self.ColorView[s], 2)
                     im = Image.fromarray(image)
+                    im = im.resize((960, 720))
                     image = ImageTk.PhotoImage(image=im)
                     self.view.image = image
                     self.view.configure(image=image)
@@ -1224,6 +1225,7 @@ class App(tk.Tk):
                             cv.rectangle(image2, (self.Point_Left[s]-30, self.Point_Top[s]-30), (self.Point_Right[s]+30, self.Point_Bottom[s]+30), self.ColorView[s], 2)
                             cv.putText(image2, "Point" + str(s + 1), (self.Point_Left[s]-30, self.Point_Top[s]-30), cv.FONT_HERSHEY_SIMPLEX, 0.7, self.ColorView[s], 2)
                             im = Image.fromarray(image2)
+                    im = im.resize((960, 720))
                     image = ImageTk.PhotoImage(image=im)
                     self.view.image = image
                     self.view.configure(image=image)
@@ -1250,6 +1252,7 @@ class App(tk.Tk):
                             cv.rectangle(image3, (self.Point_Left[s]-30, self.Point_Top[s]-30), (self.Point_Right[s]+30, self.Point_Bottom[s]+30), self.ColorView[s], 2)
                             cv.putText(image3, "Point" + str(s + 1), (self.Point_Left[s]-30, self.Point_Top[s]-30), cv.FONT_HERSHEY_SIMPLEX, 0.7, self.ColorView[s], 2)
                             im = Image.fromarray(image3)
+                    im = im.resize((960, 720))
                     image = ImageTk.PhotoImage(image=im)
                     self.view.image = image
                     self.view.configure(image=image)
