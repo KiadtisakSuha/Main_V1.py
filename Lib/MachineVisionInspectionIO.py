@@ -16,6 +16,7 @@ from pygame import mixer
 from tkinter import messagebox
 import sys
 import subprocess
+import numpy as np
 
 with open('Setting Paramiter.json', 'r') as json_file:
     Setting_Paramiter = json.loads(json_file.read())
@@ -24,40 +25,45 @@ Board_Name = Setting_Paramiter[0]["Board_Name"]
 Machine = Setting_Paramiter[0]["MachineName"]
 Mode = Setting_Paramiter[0]["Mode"]
 
+"""frame0.set(cv.CAP_PROP_FRAME_WIDTH, 1024)
+frame0.set(cv.CAP_PROP_FRAME_HEIGHT, 768)
+frame0.set(cv.CAP_PROP_AUTO_EXPOSURE, 0)
+frame0.set(cv.CAP_PROP_AUTOFOCUS, 0)"""
+
 if Quantity_Cam == 1:
     frame0 = cv.VideoCapture(1, cv.CAP_DSHOW)
-    frame0.set(cv.CAP_PROP_FRAME_WIDTH, 1024)
-    frame0.set(cv.CAP_PROP_FRAME_HEIGHT, 768)
+    frame0.set(cv.CAP_PROP_FRAME_WIDTH, 1980)
+    frame0.set(cv.CAP_PROP_FRAME_HEIGHT, 1080)
     frame0.set(cv.CAP_PROP_AUTO_EXPOSURE, 0)
     frame0.set(cv.CAP_PROP_AUTOFOCUS, 0)
 elif Quantity_Cam == 2:
     frame0 = cv.VideoCapture(0, cv.CAP_DSHOW)
-    frame0.set(cv.CAP_PROP_FRAME_WIDTH, 1024)
-    frame0.set(cv.CAP_PROP_FRAME_HEIGHT, 768)
+    frame0.set(cv.CAP_PROP_FRAME_WIDTH, 1980)
+    frame0.set(cv.CAP_PROP_FRAME_HEIGHT, 1080)
     frame0.set(cv.CAP_PROP_AUTO_EXPOSURE, 0)
     frame0.set(cv.CAP_PROP_AUTOFOCUS, 0)
     frame1 = cv.VideoCapture(1, cv.CAP_DSHOW)
-    frame1.set(cv.CAP_PROP_FRAME_WIDTH, 1024)
-    frame1.set(cv.CAP_PROP_FRAME_HEIGHT, 768)
+    frame1.set(cv.CAP_PROP_FRAME_WIDTH, 1980)
+    frame1.set(cv.CAP_PROP_FRAME_HEIGHT, 1080)
     frame1.set(cv.CAP_PROP_AUTO_EXPOSURE, 0)
     frame1.set(cv.CAP_PROP_AUTOFOCUS, 0)
 
 elif Quantity_Cam == 3:
     frame0 = cv.VideoCapture(0, cv.CAP_DSHOW)
-    frame0.set(cv.CAP_PROP_FRAME_WIDTH, 1024)
-    frame0.set(cv.CAP_PROP_FRAME_HEIGHT, 768)
+    frame0.set(cv.CAP_PROP_FRAME_WIDTH, 1980)
+    frame0.set(cv.CAP_PROP_FRAME_HEIGHT, 1080)
     frame0.set(cv.CAP_PROP_AUTO_EXPOSURE, 0)
     frame0.set(cv.CAP_PROP_AUTOFOCUS, 0)
 
     frame1 = cv.VideoCapture(1, cv.CAP_DSHOW)
-    frame1.set(cv.CAP_PROP_FRAME_WIDTH, 1024)
-    frame1.set(cv.CAP_PROP_FRAME_HEIGHT, 768)
+    frame1.set(cv.CAP_PROP_FRAME_WIDTH, 1980)
+    frame1.set(cv.CAP_PROP_FRAME_HEIGHT, 1080)
     frame1.set(cv.CAP_PROP_AUTO_EXPOSURE, 0)
     frame1.set(cv.CAP_PROP_AUTOFOCUS, 0)
 
     frame2 = cv.VideoCapture(2, cv.CAP_DSHOW)
-    frame2.set(cv.CAP_PROP_FRAME_WIDTH, 1024)
-    frame2.set(cv.CAP_PROP_FRAME_HEIGHT, 768)
+    frame2.set(cv.CAP_PROP_FRAME_WIDTH, 1980)
+    frame2.set(cv.CAP_PROP_FRAME_HEIGHT, 1080)
     frame2.set(cv.CAP_PROP_AUTO_EXPOSURE, 0)
     frame2.set(cv.CAP_PROP_AUTOFOCUS, 0)
 
@@ -187,6 +193,18 @@ class InfiniteTimer():
 
 class Save_Data:
     @staticmethod
+    def Save_Imaga_Run(Camera1,Camera2,Camera3):
+            if Quantity_Cam >= 1:
+                Save_Image_1 = Image.fromarray(Camera1)
+                Save_Image_1.save("Snap1.bmp")
+                if Quantity_Cam >= 2:
+                    Save_Image_2 = Image.fromarray(Camera2)
+                    Save_Image_2.save("Snap2.bmp")
+                    if Quantity_Cam >= 3:
+                        Save_Image_3 = Image.fromarray(Camera3)
+                        Save_Image_3.save("Snap3.bmp")
+
+    @staticmethod
     def Save_Image(Partnumber,Counter,Image,Left,Top,Right,Bottom,Left_Find,Top_Find,Right_Find,Bottom_Find,Color,Outline_Score,Outline_Score_Set,Area_Score,Area_set_Score,Result,ROI):
         named_tuple = time.localtime()
         Time = time.strftime("%Y%m%d%H%M%S", named_tuple)
@@ -234,6 +252,53 @@ class Save_Data:
         with open('Transaction/' + Time + '.json', 'w') as json_file:
             json.dump(Transition, json_file, indent=6)
 
+    @staticmethod
+
+
+    def Master(Left, Top, Right, Bottom, Score_Outline,Score_Area,Cam,Point, Emp_ID, Partnumber):
+            Score_Outline = int(Score_Outline)
+            Score_Area = int(Score_Area)
+            try:
+                with open(Partnumber + '/' + Partnumber + '.json', 'r') as json_file:
+                    item = json.loads(json_file.read())
+                    for i in range(11):
+                        str_ = str(i)
+                        try:
+                            if Point == "Point" + str_:
+                                i = i - 1
+                                item[i]["Point" + str_][0]["Emp ID"] = Emp_ID
+                                item[i]["Point" + str_][0]["Camera"] = Cam
+                                item[i]["Point" + str_][0]["Left"] = Left
+                                item[i]["Point" + str_][0]["Top"] = Top
+                                item[i]["Point" + str_][0]["Right"] = Right
+                                item[i]["Point" + str_][0]["Bottom"] = Bottom
+                                item[i]["Point" + str_][0]["Score Outline"] = Score_Outline
+                                item[i]["Point" + str_][0]["Score Area"] = Score_Area
+                                with open(Partnumber + '/' + Partnumber + '.json', 'w') as json_file:
+                                    json.dump(item, json_file, indent=6)
+                        except:
+                            # item.append({''+Point+'': [{"Camera": "",'Left': "",'Top': "","Rigth": "","Bottom": "",'Score': ""}]}
+                            with open(Partnumber + '/' + Partnumber + '.json', 'r') as json_file:
+                                item = json.loads(json_file.read())
+                            try:
+                                logging.debug(item[i - 1])
+                                item.append({'' + Point + '': [
+                                    {"Emp ID": Emp_ID, "Camera": Cam, 'Left': Left, 'Top': Top, "Right": Right, "Bottom": Bottom,
+                                     'Score Outline': Score_Outline, 'Score Area': Score_Area}]})
+                                with open(Partnumber + '/' + Partnumber + '.json', 'w') as json_file:
+                                    json.dump(item, json_file, indent=6)
+                            except:
+                                pass
+            except FileNotFoundError as exc:
+                if Point == "Point1":
+                    item = [
+                        {'' + Point + '': [
+                            {"Emp ID": Emp_ID, "Camera": Cam, 'Left': Left, 'Top': Top, "Right": Right, "Bottom": Bottom, 'Score Outline': Score_Outline, 'Score Area': Score_Area}]}]
+                    with open(Partnumber + '/' + Partnumber+ '.json', 'w') as json_file:
+                        json.dump(item, json_file, indent=6)
+
+
+
 class App(tk.Tk):
     def __init__(self):
         GetEmp.Information()
@@ -262,6 +327,10 @@ class App(tk.Tk):
         #self.resizable(0,0)
         self.configure(background='black')
         self.API_json = Getpart()
+        self.Run_Camera_1 = None
+        self.Run_Camera_2 = None
+        self.Run_Camera_3 = None
+        self.Close_Camera = False
         self.API_json.__int__()
         self.Part_API = self.API_json.Get()[0]
         self.Batch_API = self.API_json.Get()[1]
@@ -641,11 +710,9 @@ class App(tk.Tk):
 
                             if event == cv.EVENT_LBUTTONDOWN:
                                 refPt = [(x, y)]
-                                # print(refPt)
                                 cropping = True
                             elif event == cv.EVENT_LBUTTONUP:
                                 refPt.append((x, y))
-                                # print(refPt)
                                 cropping = False
                                 cv.rectangle(image, refPt[0], refPt[1], (85, 255, 51), 2)
                                 cv.imshow(Point, image)
@@ -662,7 +729,7 @@ class App(tk.Tk):
                                     cv.imshow(Point, Showtext)
                                     img.save('' + Create + '/' + Point + '_Template.bmp')
                                     if Left and Top and Right and Bottom != 0:
-                                        Master(Left, Top, Right, Bottom, Score_Outline, Score_Area, Cam, Point, Emp_ID)
+                                        Save_Data.Master(Left, Top, Right, Bottom, Score_Outline, Score_Area, Cam, Point, Emp_ID, self.Part_API)
 
                         path = r'Current.bmp'
                         image = cv.imread(path)
@@ -670,48 +737,6 @@ class App(tk.Tk):
                         cv.namedWindow(Point)
                         cv.setMouseCallback(Point, click_and_crop)
                         cv.imshow(Point, image)
-
-            def Master(Left, Top, Right, Bottom, Score_Outline, Score_Area, Cam, Point, Emp_ID):
-                Score_Outline = int(Score_Outline)
-                Score_Area = int(Score_Area)
-                try:
-                    with open(self.Part_API + '/' + self.Part_API + '.json', 'r') as json_file:
-                        item = json.loads(json_file.read())
-                        for i in range(11):
-                            str_ = str(i)
-                            try:
-                                if Point == "Point" + str_:
-                                    i = i - 1
-                                    item[i]["Point" + str_][0]["Emp ID"] = Emp_ID
-                                    item[i]["Point" + str_][0]["Camera"] = Cam
-                                    item[i]["Point" + str_][0]["Left"] = Left
-                                    item[i]["Point" + str_][0]["Top"] = Top
-                                    item[i]["Point" + str_][0]["Right"] = Right
-                                    item[i]["Point" + str_][0]["Bottom"] = Bottom
-                                    item[i]["Point" + str_][0]["Score Outline"] = Score_Outline
-                                    item[i]["Point" + str_][0]["Score Area"] = Score_Area
-                                    with open(self.Part_API + '/' + self.Part_API + '.json', 'w') as json_file:
-                                        json.dump(item, json_file, indent=6)
-                            except:
-                                # item.append({''+Point+'': [{"Camera": "",'Left': "",'Top': "","Rigth": "","Bottom": "",'Score': ""}]}
-                                with open(self.Part_API + '/' + self.Part_API + '.json', 'r') as json_file:
-                                    item = json.loads(json_file.read())
-                                try:
-                                    logging.debug(item[i - 1])
-                                    item.append({'' + Point + '': [
-                                        {"Emp ID": Emp_ID, "Camera": Cam, 'Left': Left, 'Top': Top, "Right": Right, "Bottom": Bottom,
-                                         'Score Outline': Score_Outline, 'Score Area': Score_Area}]})
-                                    with open(self.Part_API + '/' + self.Part_API + '.json', 'w') as json_file:
-                                        json.dump(item, json_file, indent=6)
-                                except:
-                                    pass
-                except FileNotFoundError as exc:
-                    if Point == "Point1":
-                        item = [
-                            {'' + Point + '': [
-                                {"Emp ID": Emp_ID, "Camera": Cam, 'Left': Left, 'Top': Top, "Right": Right, "Bottom": Bottom, 'Score Outline': Score_Outline, 'Score Area': Score_Area}]}]
-                        with open(self.Part_API + '/' + self.Part_API + '.json', 'w') as json_file:
-                            json.dump(item, json_file, indent=6)
 
             buttonSave = tk.Button(self.SaveMaster, text="Save", command=Save,bg='black')
             buttonSave.configure(font=("Arial", 30, "bold"))
@@ -776,6 +801,7 @@ class App(tk.Tk):
         self.Label_cam.configure(text=self.cam.get())
 
     def ShowCount(self):
+        self.Close_Camera = False
         self.OK_Data = 0
         self.NG_Data = 0
         self.Result_Ok.configure(text="OK : "+str(self.OK_Data))
@@ -841,59 +867,43 @@ class App(tk.Tk):
             pass
 
     def Camera(self):
-        if Quantity_Cam == 1:
-            self.Run_Camera_1 = cv.cvtColor(frame0.read()[1], cv.COLOR_BGR2RGB)
-        elif Quantity_Cam == 2:
-            self.Run_Camera_1 = cv.cvtColor(frame0.read()[1], cv.COLOR_BGR2RGB)
-            self.Run_Camera_2 = cv.cvtColor(frame1.read()[1], cv.COLOR_BGR2RGB)
-        elif Quantity_Cam == 3:
-            self.Run_Camera_1 = cv.cvtColor(frame0.read()[1], cv.COLOR_BGR2RGB)
-            self.Run_Camera_2 = cv.cvtColor(frame1.read()[1], cv.COLOR_BGR2RGB)
-            self.Run_Camera_3 = cv.cvtColor(frame2.read()[1], cv.COLOR_BGR2RGB)
-        self.after(60, self.Camera)
-
-
-        """""""""
         try:
-            if Quantity_Cam == 1:
-                self.Camopen1 = cv.cvtColor(frame0.read()[1], cv.COLOR_BGR2RGB)
-                img = Image.fromarray(self.Camopen1)
-                resize_img = img.resize((540, 340))
-                imgtk = ImageTk.PhotoImage(image=resize_img)
-                self.frame.imgtk = imgtk
-                self.frame.configure(image=imgtk)
-            elif Quantity_Cam == 2:
-                self.Camopen1 = cv.cvtColor(frame0.read()[1], cv.COLOR_BGR2RGB)
-                self.Camopen2 = cv.cvtColor(frame1.read()[1], cv.COLOR_BGR2RGB)
-                if self.Label_cam['text'] == "Cam1":
-                    img = Image.fromarray(self.Camopen1)
+                if Quantity_Cam == 1:
+                    self.Run_Camera_1 = cv.cvtColor(frame0.read()[1], cv.COLOR_BGR2RGB)
+                    img = Image.fromarray(self.Run_Camera_1)
                     resize_img = img.resize((540, 340))
-                elif self.Label_cam['text'] == "Cam2":
-                    img = Image.fromarray(self.Camopen2)
-                    resize_img = img.resize((540, 340))
-                imgtk = ImageTk.PhotoImage(image=resize_img)
-                self.frame.imgtk = imgtk
-                self.frame.configure(image=imgtk)
-            elif Quantity_Cam == 3:
-                self.Camopen1 = cv.cvtColor(frame0.read()[1], cv.COLOR_BGR2RGB)
-                self.Camopen2 = cv.cvtColor(frame1.read()[1], cv.COLOR_BGR2RGB)
-                self.Camopen3 = cv.cvtColor(frame2.read()[1], cv.COLOR_BGR2RGB)
-                if self.Label_cam['text'] == "Cam1":
-                    img = Image.fromarray(self.Camopen1)
-                    resize_img = img.resize((540, 340))
-                elif self.Label_cam['text'] == "Cam2":
-                    img = Image.fromarray(self.Camopen2)
-                    resize_img = img.resize((540, 340))
-                elif self.Label_cam['text'] == "Cam3":
-                    img = Image.fromarray(self.Camopen3)
-                    resize_img = img.resize((540, 340))
-                imgtk = ImageTk.PhotoImage(image=resize_img)
-                self.frame.imgtk = imgtk
-                self.frame.configure(image=imgtk)
-            self.after(60, self.Camera)
+                    imgtk = ImageTk.PhotoImage(image=resize_img)
+                elif Quantity_Cam == 2:
+                    self.Run_Camera_1 = cv.cvtColor(frame0.read()[1], cv.COLOR_BGR2RGB)
+                    self.Run_Camera_2 = cv.cvtColor(frame1.read()[1], cv.COLOR_BGR2RGB)
+                    if self.Label_cam['text'] == "Cam1":
+                        img = Image.fromarray(self.Run_Camera_1)
+                        resize_img = img.resize((540, 340))
+                    elif self.Label_cam['text'] == "Cam2":
+                        img = Image.fromarray(self.Run_Camera_2)
+                        resize_img = img.resize((540, 340))
+                    imgtk = ImageTk.PhotoImage(image=resize_img)
+                elif Quantity_Cam == 3:
+                    self.Run_Camera_1 = cv.cvtColor(frame0.read()[1], cv.COLOR_BGR2RGB)
+                    self.Run_Camera_2 = cv.cvtColor(frame1.read()[1], cv.COLOR_BGR2RGB)
+                    self.Run_Camera_3 = cv.cvtColor(frame2.read()[1], cv.COLOR_BGR2RGB)
+                    if self.Label_cam['text'] == "Cam1":
+                        img = Image.fromarray(self.Run_Camera_1)
+                        resize_img = img.resize((540, 340))
+                    elif self.Label_cam['text'] == "Cam2":
+                        img = Image.fromarray(self.Run_Camera_2)
+                        resize_img = img.resize((540, 340))
+                    elif self.Label_cam['text'] == "Cam3":
+                        img = Image.fromarray(self.Run_Camera_3)
+                        resize_img = img.resize((540, 340))
+                    imgtk = ImageTk.PhotoImage(image=resize_img)
+                if self.Close_Camera == False:
+                    self.frame.imgtk = imgtk
+                    self.frame.configure(image=imgtk)
+                self.after(60, self.Camera)
         except:
             messagebox.showerror('Python Error', 'Check Cameras')
-        """""""""
+
 
     def Destroy(self):
         response = messagebox.askquestion("Close Programe", "Are you sure?", icon='warning')
@@ -931,14 +941,15 @@ class App(tk.Tk):
                         self.SaveDataBoard = True
                     elif Bin == "110000001100010000110100001010" and self.SaveDataBoard == True:  # 01
                         try:
+                            self.Close_Camera = True
                             self.ProcessP.configure(text="Process")
                             self.ProcessP.configure(fg='yellow')
-                            self.SaveImage()
+                            Save_Data.Save_Imaga_Run(self.Run_Camera_1,self.Run_Camera_2,self.Run_Camera_3)
                             self.Main()
                             self.ShowScore()
                             self.ShowResult()
-                            self.Save_Image()
-
+                            Save_Data.Save_Image(self.Part_API, self.count, self.ImageSave, self.Point_Left, self.Point_Top, self.Point_Right, self.Point_Bottom, self.Left_Find, self.Top_Find, self.Right_Find, self.Bottom_Find, self.Color,
+                                                 self.Score_Outline_Data, self.Point_Score_Outline, self.Score_Area_Data, self.Point_Score_Area, self.Result, 30)
                             self.ViewImage()
                             self.ProcessP.configure(text="Ready")
                             self.ProcessP.configure(fg="green")
@@ -964,9 +975,10 @@ class App(tk.Tk):
                 SaveMaster = True
             if self.count != 0 and Login == True and SaveMaster == True:
                     if event.char == '5':
+                        self.Close_Camera = True
                         self.ProcessP.configure(text="Process")
                         self.ProcessP.configure(fg='yellow')
-                        self.SaveImage()
+                        Save_Data.Save_Imaga_Run(self.Run_Camera_1,self.Run_Camera_2,self.Run_Camera_3)
                         self.Main()
                         self.ShowScore()
                         self.ShowResult()
@@ -977,13 +989,15 @@ class App(tk.Tk):
                         self.ProcessP.configure(fg="green")
 
     def Strat(self):
+        self.Close_Camera = True
         self.ProcessP.configure(text="Process")
         self.ProcessP.configure(fg='yellow')
-        self.SaveImage()
+        Save_Data.Save_Imaga_Run(self.Run_Camera_1,self.Run_Camera_2,self.Run_Camera_3)
         self.Main()
         self.ShowScore()
         self.ShowResult()
-        self.Save_Image()
+        Save_Data.Save_Image(self.Part_API, self.count, self.ImageSave, self.Point_Left, self.Point_Top, self.Point_Right, self.Point_Bottom, self.Left_Find, self.Top_Find, self.Right_Find, self.Bottom_Find, self.Color,
+                             self.Score_Outline_Data, self.Point_Score_Outline, self.Score_Area_Data, self.Point_Score_Area, self.Result, 30)
         self.ViewImage()
         self.ProcessP.configure(text="Ready")
         self.ProcessP.configure(fg="green")
@@ -1057,7 +1071,6 @@ class App(tk.Tk):
                 Score_Ture.append((Master[i] / Template[i]) * 1000)
             else:
                 Score_Ture.append((Template[i] / Master[i]) * 1000)
-        # print(Score_Ture)
         for n in range(len(Score_Ture) - 1, 0, -1):
             for i in range(n):
                 if Score_Ture[i] > Score_Ture[i + 1]:
@@ -1068,23 +1081,6 @@ class App(tk.Tk):
                 Result_Score += Score_Ture[i]
         Result_Score = int(Result_Score / 5)
         return Result_Score
-
-    def SaveImage(self):
-        if Quantity_Cam == 1:
-            Save_Image_1 = Image.fromarray(self.Run_Camera_1)
-            Save_Image_1.save("Snap1.bmp")
-        elif Quantity_Cam == 2:
-            Save_Image_1 = Image.fromarray(self.Run_Camera_1)
-            Save_Image_2 = Image.fromarray(self.Run_Camera_2)
-            Save_Image_1.save("Snap1.bmp")
-            Save_Image_2.save("Snap2.bmp")
-        elif Quantity_Cam == 3:
-            Save_Image_1 = Image.fromarray(self.Run_Camera_1)
-            Save_Image_2 = Image.fromarray(self.Run_Camera_2)
-            Save_Image_3 = Image.fromarray(self.Run_Camera_3)
-            Save_Image_1.save("Snap1.bmp")
-            Save_Image_2.save("Snap2.bmp")
-            Save_Image_3.save("Snap2.bmp")
 
     def Crop_find(self,image,Left,Top, Right,Bottom,top_left,bottom_right,scale):
         image = cv.imread(image, 0)
