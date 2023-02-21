@@ -1083,9 +1083,9 @@ class App(tk.Tk):
                     swapped = True
                     Score_Ture[i], Score_Ture[i + 1] = Score_Ture[i + 1], Score_Ture[i]
         for i in range(len(Score_Ture)):
-            if i < 5:
+            if i < 2:
                 Result_Score += Score_Ture[i]
-        Result_Score = int(Result_Score / 5)
+        Result_Score = int(Result_Score / 2)
         return Result_Score
 
     def Crop_find(self,image,Left,Top, Right,Bottom,top_left,bottom_right,scale):
