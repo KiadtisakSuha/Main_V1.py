@@ -10,16 +10,17 @@ import numpy as np
 from PIL import Image, ImageTk
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
-
+#(279.0, 250.0) (254, 58) 15
 # load the image
 img = cv.imread('xxx.png',0)
-Template2 = cv.imread('Template2.bmp',0)
+Template2 = cv.imread('Template2.png',0)
 
 
-center = (328, 267)
-width = 384
-height = 93
-angle = 13
+
+center = (279.0, 250.0)
+width = 254
+height = 58
+angle = 15
 
 # compute the vertices of the rotated rectangle
 rect = ((center[0], center[1]), (width, height), angle)
@@ -45,7 +46,7 @@ roi = cv.bitwise_and(img, mask)
 # crop the ROI using the bounding box of the rotated rectangle
 roi = roi[y_min:y_max, x_min:x_max]
 
-fig = plt.figure()
+"""fig = plt.figure()
 ax = fig.add_subplot(2, 1, 1)
 ax.set_title('Template2')
 ax.imshow(Template2)
@@ -56,9 +57,9 @@ ax2.imshow(roi)
 ax2.autoscale(False)
 plt.show()
 
-
-
 """
+
+
 def Process_Outline(image, Template):
     #image = cv.imread(image, 0)
     #Template = cv.imread(Template, 0)
@@ -92,7 +93,8 @@ def Process_Outline(image, Template):
 
 
 print(Process_Outline(roi,Template2))
-
+#print(sum(roi))
+#print(sum(Template2))
 
 def Rule_Of_Thirds(ROT):
     total = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
@@ -111,7 +113,7 @@ def Rule_Of_Thirds(ROT):
     if mod != 0:
         point.append(total[9])
     return point
-print(Rule_Of_Thirds(roi),Rule_Of_Thirds(Template2))
+#print(Rule_Of_Thirds(roi),Rule_Of_Thirds(Template2))
 
 
 def Process_Area(Master, Template):
@@ -135,12 +137,14 @@ def Process_Area(Master, Template):
     Result_Score = int(Result_Score / 5)
     return Result_Score
 
-print(Process_Area(Rule_Of_Thirds(roi),Rule_Of_Thirds(Template2)))"""
+print(Process_Area(Rule_Of_Thirds(roi),Rule_Of_Thirds(Template2)))
 
-"""cv.imshow("Template", roi)
-cv.waitKey(0)
-cv.imshow("Template1", Template2)
-cv.waitKey(0)"""
+#cv.imshow("Template", roi)
+#cv.waitKey(0)
+#cv.imshow("Template1", Template2)
+#cv.waitKey(0)
+
+
 #plt.imshow(roi)
 #plt.imshow(Template2)
 #plt.show()

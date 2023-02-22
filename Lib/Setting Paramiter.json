@@ -2,8 +2,8 @@
 [
       {  
             "_comment": "Mode 1 = IO Borad , Mode 2 = Numeric Key",
-            "Mode": 1, 
-            "MachineName": "E17",
+            "Mode": 2, 
+            "MachineName": "E18",
             "Quantity_Cam":1,
             "Board_Name": "ASRL5::INSTR"      
       }

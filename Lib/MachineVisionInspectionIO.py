@@ -413,10 +413,10 @@ class App(tk.Tk):
         self.Result_Ok.configure(fg='Green')
         self.Result_Ok.place(x=5, y=50 ,width=375)
 
-        self.Result_NG = tk.Label(self, text="OK : "+str(self.OK_Data), borderwidth=3, relief="ridge", padx=5, pady=10,bg='black')
+        self.Result_NG = tk.Button(self, text="NG : "+str(self.OK_Data), borderwidth=3, relief="ridge", padx=5, pady=10,bg='black',command=self.ViewNG)
         self.Result_NG.configure(font=("Arial", 50,'bold'))
         self.Result_NG.configure(fg='Red')
-        self.Result_NG.place(x=5, y=180,width=375)
+        self.Result_NG.place(x=5, y=180,width=375,height=100)
 
         self.Label_cam = tk.Label(self, text="Cam1")
         self.frame = tk.Label(self,bg="black")
@@ -498,6 +498,121 @@ class App(tk.Tk):
 
         self.view = tk.Label(self,bg='black')
         self.view.place(x=950, y=180)
+
+    def ViewNG(self):
+        self.Image_NG = []
+        self.Next = 0
+        self.Previous = 0
+        self.Couter_Image = 0
+        self.Stand = False
+        self.Save_Previous = 0
+        self.Save_Next = 0
+        self.Keep = 0
+
+        self.index = 0
+        ViewNG = tk.Toplevel(self)
+        ViewNG.title("NG")
+        ViewNG.geometry("1920x1020+0+0")
+        ViewNG.overrideredirect(1)
+        ViewNG.configure(background='black')
+
+        PointNG_value = tk.StringVar()
+        PointNG = ttk.Combobox(ViewNG, width=8, height=80, textvariable=PointNG_value)
+        PointNG['state'] = 'readonly'
+        PointNG.configure(font=("Arial", 20))
+        PointNG.configure(justify="center", foreground="green")
+
+        Choose_PointNG = tk.Button(ViewNG, text="Choose", borderwidth=3, relief="ridge", padx=5, pady=10, bg='black',command=lambda : ShowImageNG())
+        Choose_PointNG.configure(font=("Arial", 20, 'bold'))
+        Choose_PointNG.configure(fg='green')
+        Choose_PointNG.place(x=170, y=10, width=120, height=50)
+
+        Previous = tk.Button(ViewNG, text="Previous", borderwidth=3, relief="ridge", padx=5, pady=10, bg='black', command=lambda: Previous())
+        Previous.configure(font=("Arial", 20, 'bold'))
+        Previous.configure(fg='green')
+        Previous.place(x=700, y=800, width=120, height=50)
+
+        Next = tk.Button(ViewNG, text="Next", borderwidth=3, relief="ridge", padx=5, pady=10, bg='black', command=lambda: Next())
+        Next.configure(font=("Arial", 20, 'bold'))
+        Next.configure(fg='green')
+        Next.place(x=1000, y=800, width=120, height=50)
+
+        PointCouter = []
+        for i in range(self.count):
+            PointCouter.append("Point"+str(i+1))
+        PointNG['values'] = PointCouter
+        PointNG.current(0)
+        PointNG.place(x=10, y=10,width=150,height=50)
+
+        def ReadImageNG():
+            Image_NG = []
+            Point = PointNG_value.get()
+            image_path_NG = 'Record/' + self.Part_API + "/NG/" + Point
+            for path in os.listdir(image_path_NG):
+                if os.path.isfile(os.path.join(image_path_NG, path)):
+                    if path.endswith('.jpg'):
+                        Image_NG.append(path)
+            return Image_NG,Point
+
+        def DestoryNG():
+            ViewNG.destroy()
+        btn_Close = tk.Button(ViewNG,text="Exit",command=DestoryNG, bg='black')
+        btn_Close.configure(font=("Arial", 18))
+        btn_Close.configure(justify="center", foreground="red")
+        btn_Close.place(x=1800, y=10,width=100)
+
+        def Next():
+            if self.Stand is True:
+                self.index = (self.index + 1) % len(self.Image_NG)
+                print(self.index)
+                Point = PointNG_value.get()
+                image_path_NG = "Record/" + self.Part_API + "/NG/" + Point + "/" + self.Image_NG[self.index]
+                imageNG = cv.imread(image_path_NG)
+                imageNG = cv.cvtColor(imageNG, cv.COLOR_BGR2RGB)
+                imageNG = Image.fromarray(imageNG)
+                photoNG = ImageTk.PhotoImage(imageNG.resize((900, 630)))
+                image_show_NG = tk.Label(ViewNG, image=photoNG)
+                image_show_NG.image = photoNG
+                image_show_NG.place(x=1000, y=100)
+
+        def Previous():
+            self.Stand = True
+            self.index = (self.index - 1) % len(self.Image_NG)
+            print(self.index)
+            Point = PointNG_value.get()
+            image_path_NG = "Record/" + self.Part_API + "/NG/" + Point + "/" + self.Image_NG[self.index]
+            imageNG = cv.imread(image_path_NG)
+            imageNG = cv.cvtColor(imageNG, cv.COLOR_BGR2RGB)
+            imageNG = Image.fromarray(imageNG)
+            photoNG = ImageTk.PhotoImage(imageNG.resize((900, 630)))
+            image_show_NG = tk.Label(ViewNG, image=photoNG)
+            image_show_NG.image = photoNG
+            image_show_NG.place(x=1000, y=100)
+
+        def ShowImageNG():
+            Point = PointNG_value.get()
+            image_path_Master = self.Part_API + '/Template/' + Point + '_Master.bmp'
+            image = cv.imread(image_path_Master)
+            image = cv.cvtColor(image, cv.COLOR_BGR2RGB)
+            image = Image.fromarray(image)
+            photo = ImageTk.PhotoImage(image.resize((900, 630)))
+            image_show = tk.Label(ViewNG, image=photo)
+            image_show.image = photo
+            image_show.place(x=10, y=100)
+
+            self.Image_NG, Point = ReadImageNG()
+            image_path_NG = "Record/" + self.Part_API + "/NG/" + Point + "/" + self.Image_NG[len(self.Image_NG) - 1]
+            imageNG = cv.imread(image_path_NG)
+            imageNG = cv.cvtColor(imageNG, cv.COLOR_BGR2RGB)
+            imageNG = Image.fromarray(imageNG)
+            photoNG = ImageTk.PhotoImage(imageNG.resize((900, 630)))
+            image_show_NG = tk.Label(ViewNG, image=photoNG)
+            image_show_NG.image = photoNG
+            image_show_NG.place(x=1000, y=100)
+
+
+
+
 
     def CallPart(self):
         self.API_json = Getpart()
@@ -705,13 +820,17 @@ class App(tk.Tk):
                             os.makedirs(Create)
                         else:
                             pass
+                        Master = '' + self.Part_API + '/Template'
+                        if not os.path.exists(Master):
+                            os.makedirs(Master)
+                        else:
+                            pass
                         refPt = []
                         cropping = False
 
                         def click_and_crop(event, x, y, flags, param):
                             global refPt, cropping
                             image = clone.copy()
-
                             if event == cv.EVENT_LBUTTONDOWN:
                                 refPt = [(x, y)]
                                 cropping = True
@@ -732,6 +851,7 @@ class App(tk.Tk):
                                                           cv.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 1)
                                     cv.imshow(Point, Showtext)
                                     img.save('' + Create + '/' + Point + '_Template.bmp')
+                                    cv.imwrite('' + Master + '/' + Point + '_Master.bmp', image)
                                     if Left and Top and Right and Bottom != 0:
                                         Save_Data.Master(Left, Top, Right, Bottom, Score_Outline, Score_Area, Cam, Point, Emp_ID, self.Part_API)
 
