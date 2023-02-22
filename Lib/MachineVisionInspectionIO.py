@@ -2,6 +2,7 @@ import json
 import logging
 import os
 import time
+import numpy as np
 import tkinter as tk
 import urllib.request
 import urllib.request
@@ -527,10 +528,16 @@ class App(tk.Tk):
         Choose_PointNG.configure(fg='green')
         Choose_PointNG.place(x=170, y=10, width=120, height=50)
 
+        NoImageNG = tk.Label(ViewNG, text="", borderwidth=3,  bg='black')
+        NoImageNG.configure(font=("Arial", 20, 'bold'))
+        NoImageNG.configure(fg='red')
+        NoImageNG.place(x=300, y=10)
+
+
         Previous = tk.Button(ViewNG, text="Previous", borderwidth=3, relief="ridge", padx=5, pady=10, bg='black', command=lambda: Previous())
         Previous.configure(font=("Arial", 20, 'bold'))
         Previous.configure(fg='green')
-        Previous.place(x=700, y=800, width=120, height=50)
+        Previous.place(x=800, y=800, width=120, height=50)
 
         Next = tk.Button(ViewNG, text="Next", borderwidth=3, relief="ridge", padx=5, pady=10, bg='black', command=lambda: Next())
         Next.configure(font=("Arial", 20, 'bold'))
@@ -548,10 +555,13 @@ class App(tk.Tk):
             Image_NG = []
             Point = PointNG_value.get()
             image_path_NG = 'Record/' + self.Part_API + "/NG/" + Point
-            for path in os.listdir(image_path_NG):
-                if os.path.isfile(os.path.join(image_path_NG, path)):
-                    if path.endswith('.jpg'):
-                        Image_NG.append(path)
+            try:
+                for path in os.listdir(image_path_NG):
+                    if os.path.isfile(os.path.join(image_path_NG, path)):
+                        if path.endswith('.jpg'):
+                            Image_NG.append(path)
+            except:
+                ViewNG.destroy()
             return Image_NG,Point
 
         def DestoryNG():
@@ -562,9 +572,27 @@ class App(tk.Tk):
         btn_Close.place(x=1800, y=10,width=100)
 
         def Next():
-            if self.Stand is True:
-                self.index = (self.index + 1) % len(self.Image_NG)
-                print(self.index)
+            try:
+                if self.Stand is True:
+                    self.index = (self.index + 1) % len(self.Image_NG)
+                    #print(self.index)
+                    Point = PointNG_value.get()
+                    image_path_NG = "Record/" + self.Part_API + "/NG/" + Point + "/" + self.Image_NG[self.index]
+                    imageNG = cv.imread(image_path_NG)
+                    imageNG = cv.cvtColor(imageNG, cv.COLOR_BGR2RGB)
+                    imageNG = Image.fromarray(imageNG)
+                    photoNG = ImageTk.PhotoImage(imageNG.resize((900, 630)))
+                    image_show_NG = tk.Label(ViewNG, image=photoNG)
+                    image_show_NG.image = photoNG
+                    image_show_NG.place(x=1000, y=100)
+            except:
+                pass
+
+        def Previous():
+            try:
+                self.Stand = True
+                self.index = (self.index - 1) % len(self.Image_NG)
+                #print(self.index)
                 Point = PointNG_value.get()
                 image_path_NG = "Record/" + self.Part_API + "/NG/" + Point + "/" + self.Image_NG[self.index]
                 imageNG = cv.imread(image_path_NG)
@@ -574,22 +602,11 @@ class App(tk.Tk):
                 image_show_NG = tk.Label(ViewNG, image=photoNG)
                 image_show_NG.image = photoNG
                 image_show_NG.place(x=1000, y=100)
-
-        def Previous():
-            self.Stand = True
-            self.index = (self.index - 1) % len(self.Image_NG)
-            print(self.index)
-            Point = PointNG_value.get()
-            image_path_NG = "Record/" + self.Part_API + "/NG/" + Point + "/" + self.Image_NG[self.index]
-            imageNG = cv.imread(image_path_NG)
-            imageNG = cv.cvtColor(imageNG, cv.COLOR_BGR2RGB)
-            imageNG = Image.fromarray(imageNG)
-            photoNG = ImageTk.PhotoImage(imageNG.resize((900, 630)))
-            image_show_NG = tk.Label(ViewNG, image=photoNG)
-            image_show_NG.image = photoNG
-            image_show_NG.place(x=1000, y=100)
+            except:
+                pass
 
         def ShowImageNG():
+            NoImageNG.configure(text="")
             Point = PointNG_value.get()
             image_path_Master = self.Part_API + '/Template/' + Point + '_Master.bmp'
             image = cv.imread(image_path_Master)
@@ -599,16 +616,26 @@ class App(tk.Tk):
             image_show = tk.Label(ViewNG, image=photo)
             image_show.image = photo
             image_show.place(x=10, y=100)
+            photoTest = np.zeros((350, 700, 3), dtype=np.uint8)
+            photoTest = Image.fromarray(photoTest)
+            photoTest = ImageTk.PhotoImage(photoTest.resize((900, 630)))
 
             self.Image_NG, Point = ReadImageNG()
-            image_path_NG = "Record/" + self.Part_API + "/NG/" + Point + "/" + self.Image_NG[len(self.Image_NG) - 1]
-            imageNG = cv.imread(image_path_NG)
-            imageNG = cv.cvtColor(imageNG, cv.COLOR_BGR2RGB)
-            imageNG = Image.fromarray(imageNG)
-            photoNG = ImageTk.PhotoImage(imageNG.resize((900, 630)))
-            image_show_NG = tk.Label(ViewNG, image=photoNG)
-            image_show_NG.image = photoNG
-            image_show_NG.place(x=1000, y=100)
+            try:
+                image_path_NG = "Record/" + self.Part_API + "/NG/" + Point + "/" + self.Image_NG[len(self.Image_NG) - 1]
+                imageNG = cv.imread(image_path_NG)
+                imageNG = cv.cvtColor(imageNG, cv.COLOR_BGR2RGB)
+                imageNG = Image.fromarray(imageNG)
+                photoNG = ImageTk.PhotoImage(imageNG.resize((900, 630)))
+                image_show_NG = tk.Label(ViewNG, image=photoNG)
+                image_show_NG.image = photoNG
+                image_show_NG.place(x=1000, y=100)
+            except:
+                image_show_NG = tk.Label(ViewNG, image=photoTest)
+                image_show_NG.image = photoTest
+                image_show_NG.place(x=1000, y=100)
+                NoImageNG.configure(text="No NG image "+Point)
+                #messagebox.showwarning("Warning", "No NG image on "+Point)
 
 
 
