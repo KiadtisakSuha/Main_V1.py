@@ -555,11 +555,12 @@ class App(tk.Tk):
         PointCouter = []
         try:
             for i in range(self.count):
-                PointCouter.append("Point"+str(i+1))
+                PointCouter.append("Point" + str(i + 1))
             PointNG['values'] = PointCouter
             PointNG.current(0)
-            PointNG.place(x=10, y=10,width=150,height=50)
-        except:pass
+            PointNG.place(x=10, y=10, width=150, height=50)
+        except:
+            pass
 
         def ReadImageNG():
             Image_NG = []
@@ -573,8 +574,6 @@ class App(tk.Tk):
             except:
                 ViewNG.destroy()
             return Image_NG,Point
-
-
 
         def Next():
             try:
