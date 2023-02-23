@@ -544,12 +544,22 @@ class App(tk.Tk):
         Next.configure(fg='green')
         Next.place(x=1000, y=800, width=120, height=50)
 
+        def DestoryNG():
+            ViewNG.destroy()
+
+        btn_Close = tk.Button(ViewNG, text="Exit", command=DestoryNG, bg='black')
+        btn_Close.configure(font=("Arial", 18))
+        btn_Close.configure(justify="center", foreground="red")
+        btn_Close.place(x=1800, y=10, width=100)
+
         PointCouter = []
-        for i in range(self.count):
-            PointCouter.append("Point"+str(i+1))
-        PointNG['values'] = PointCouter
-        PointNG.current(0)
-        PointNG.place(x=10, y=10,width=150,height=50)
+        try:
+            for i in range(self.count):
+                PointCouter.append("Point"+str(i+1))
+            PointNG['values'] = PointCouter
+            PointNG.current(0)
+            PointNG.place(x=10, y=10,width=150,height=50)
+        except:pass
 
         def ReadImageNG():
             Image_NG = []
@@ -564,12 +574,7 @@ class App(tk.Tk):
                 ViewNG.destroy()
             return Image_NG,Point
 
-        def DestoryNG():
-            ViewNG.destroy()
-        btn_Close = tk.Button(ViewNG,text="Exit",command=DestoryNG, bg='black')
-        btn_Close.configure(font=("Arial", 18))
-        btn_Close.configure(justify="center", foreground="red")
-        btn_Close.place(x=1800, y=10,width=100)
+
 
         def Next():
             try:
