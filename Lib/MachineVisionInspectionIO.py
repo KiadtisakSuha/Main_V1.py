@@ -31,38 +31,38 @@ frame0.set(cv.CAP_PROP_AUTOFOCUS, 0)"""
 
 if Quantity_Cam == 1:
     frame0 = cv.VideoCapture(0, cv.CAP_DSHOW)
-    frame0.set(cv.CAP_PROP_FRAME_WIDTH, 1980)
-    frame0.set(cv.CAP_PROP_FRAME_HEIGHT, 1080)
+    frame0.set(cv.CAP_PROP_FRAME_WIDTH, 1024)
+    frame0.set(cv.CAP_PROP_FRAME_HEIGHT, 768)
     frame0.set(cv.CAP_PROP_AUTO_EXPOSURE, 0)
     frame0.set(cv.CAP_PROP_AUTOFOCUS, 0)
 elif Quantity_Cam == 2:
     frame0 = cv.VideoCapture(0, cv.CAP_DSHOW)
-    frame0.set(cv.CAP_PROP_FRAME_WIDTH, 1980)
-    frame0.set(cv.CAP_PROP_FRAME_HEIGHT, 1080)
+    frame0.set(cv.CAP_PROP_FRAME_WIDTH, 1024)
+    frame0.set(cv.CAP_PROP_FRAME_HEIGHT, 768)
     frame0.set(cv.CAP_PROP_AUTO_EXPOSURE, 0)
     frame0.set(cv.CAP_PROP_AUTOFOCUS, 0)
     frame1 = cv.VideoCapture(1, cv.CAP_DSHOW)
-    frame1.set(cv.CAP_PROP_FRAME_WIDTH, 1980)
-    frame1.set(cv.CAP_PROP_FRAME_HEIGHT, 1080)
+    frame1.set(cv.CAP_PROP_FRAME_WIDTH, 1024)
+    frame1.set(cv.CAP_PROP_FRAME_HEIGHT, 786)
     frame1.set(cv.CAP_PROP_AUTO_EXPOSURE, 0)
     frame1.set(cv.CAP_PROP_AUTOFOCUS, 0)
 
 elif Quantity_Cam == 3:
     frame0 = cv.VideoCapture(0, cv.CAP_DSHOW)
-    frame0.set(cv.CAP_PROP_FRAME_WIDTH, 1980)
-    frame0.set(cv.CAP_PROP_FRAME_HEIGHT, 1080)
+    frame0.set(cv.CAP_PROP_FRAME_WIDTH, 1024)
+    frame0.set(cv.CAP_PROP_FRAME_HEIGHT, 786)
     frame0.set(cv.CAP_PROP_AUTO_EXPOSURE, 0)
     frame0.set(cv.CAP_PROP_AUTOFOCUS, 0)
 
     frame1 = cv.VideoCapture(1, cv.CAP_DSHOW)
-    frame1.set(cv.CAP_PROP_FRAME_WIDTH, 1980)
-    frame1.set(cv.CAP_PROP_FRAME_HEIGHT, 1080)
+    frame1.set(cv.CAP_PROP_FRAME_WIDTH, 1024)
+    frame1.set(cv.CAP_PROP_FRAME_HEIGHT, 786)
     frame1.set(cv.CAP_PROP_AUTO_EXPOSURE, 0)
     frame1.set(cv.CAP_PROP_AUTOFOCUS, 0)
 
     frame2 = cv.VideoCapture(2, cv.CAP_DSHOW)
-    frame2.set(cv.CAP_PROP_FRAME_WIDTH, 1980)
-    frame2.set(cv.CAP_PROP_FRAME_HEIGHT, 1080)
+    frame2.set(cv.CAP_PROP_FRAME_WIDTH, 1024)
+    frame2.set(cv.CAP_PROP_FRAME_HEIGHT, 768)
     frame2.set(cv.CAP_PROP_AUTO_EXPOSURE, 0)
     frame2.set(cv.CAP_PROP_AUTOFOCUS, 0)
 
@@ -1223,9 +1223,9 @@ class App(tk.Tk):
                     swapped = True
                     Score_Ture[i], Score_Ture[i + 1] = Score_Ture[i + 1], Score_Ture[i]
         for i in range(len(Score_Ture)):
-            if i < 2:
+            if i < 5:
                 Result_Score += Score_Ture[i]
-        Result_Score = int(Result_Score / 2)
+        Result_Score = int(Result_Score / 5)
         return Result_Score
 
     def Crop_find(self, image, Left, Top, Right, Bottom, top_left, bottom_right, scale):

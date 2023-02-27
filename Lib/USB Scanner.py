@@ -10,20 +10,46 @@ import numpy as np
 from PIL import Image, ImageTk
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
-#(279.0, 250.0) (254, 58) 15
+#((346.0000305175781, 367.5), (82.9999771118164, 168.0), 78.99999237060547)
 # load the image
-img = cv.imread('xxx.png',0)
-Template2 = cv.imread('Template2.png',0)
+img = cv.imread('Point 2.bmp',0)
+_Area = cv.imread('Master/_Area.bmp',0)
+_Position = cv.imread('Master/_Position.bmp',0)
+_Rotate = cv.imread('Master/_Rotate.bmp',0)
 
+def rotateAndScale(img, scaleFactor = 0.5, degreesCCW = 11.00000762939453):
+    (oldY,oldX) = img.shape #note: numpy uses (y,x) convention but most OpenCV functions use (x,y)
+    M = cv.getRotationMatrix2D(center=(oldX/2,oldY/2), angle=degreesCCW, scale=scaleFactor) #rotate about center of image.
 
+    #choose a new image size.
+    newX,newY = oldX*scaleFactor,oldY*scaleFactor
+    #include this if you want to prevent corners being cut off
+    r = np.deg2rad(degreesCCW)
+    newX,newY = (abs(np.sin(r)*newY) + abs(np.cos(r)*newX),abs(np.sin(r)*newX) + abs(np.cos(r)*newY))
 
-center = (279.0, 250.0)
-width = 254
-height = 58
-angle = 15
+    #the warpAffine function call, below, basically works like this:
+    # 1. apply the M transformation on each pixel of the original image
+    # 2. save everything that falls within the upper-left "dsize" portion of the resulting image.
+
+    #So I will find the translation that moves the result to the center of that region.
+    (tx,ty) = ((newX-oldX)/2,(newY-oldY)/2)
+    M[0,2] += tx #third column of matrix holds translation, which takes effect after rotation.
+    M[1,2] += ty
+
+    rotatedImg = cv.warpAffine(img, M, dsize=(int(newX),int(newY)))
+    return rotatedImg
+
+"""
+((345.5, 361.4999694824219), (49.00000762939453, 159.0), 77.0)
+center = (346.0000305175781, 367.5)
+width = 82.9999771118164
+height = 168.0
+angle = 78.99999237060547
 
 # compute the vertices of the rotated rectangle
+#rect = ((center[0], center[1]), (width, height), angle)
 rect = ((center[0], center[1]), (width, height), angle)
+
 box = cv.boxPoints(rect)
 
 box = np.int0(box)
@@ -45,6 +71,13 @@ roi = cv.bitwise_and(img, mask)
 
 # crop the ROI using the bounding box of the rotated rectangle
 roi = roi[y_min:y_max, x_min:x_max]
+#cv.imshow("roi",roi)
+#cv.waitKey(0)
+"""
+
+
+
+
 
 """fig = plt.figure()
 ax = fig.add_subplot(2, 1, 1)
@@ -82,17 +115,20 @@ def Process_Outline(image, Template):
             curMaxTemplate = c
             curMaxLoc = max_loc
         c = c + 1
-        try:
-            if curMaxTemplate == -1:
-                return (0, (0, 0), 0, 0, (0, 0))
-            else:
-                bottom_right = (top_left[0] + w, top_left[1] + h)
-                return (curMaxTemplate % 3, curMaxLoc, 1 - int(curMaxTemplate / 3) * 0.2, curMaxVal, bottom_right)
-        except:
-            return (0, (0, 0), 0, 0, (0, 0))
+        #print(top_left)
+        bottom_right = (top_left[0] + w, top_left[1] + h)
+        #bottom_right = 0
+        return (curMaxTemplate % 3, curMaxLoc, 1 - int(curMaxTemplate / 3) * 0.2, curMaxVal, bottom_right)
 
 
-print(Process_Outline(roi,Template2))
+rotate = rotateAndScale(_Position)
+#cv.imshow('rotate',_Position)
+#cv.imshow('_Area',_Area)
+cv.waitKey(0)
+#print(Process_Outline(rotate,_Rotate))
+#print(Process_Outline(_Position,_Area))
+
+
 #print(sum(roi))
 #print(sum(Template2))
 
@@ -137,7 +173,7 @@ def Process_Area(Master, Template):
     Result_Score = int(Result_Score / 5)
     return Result_Score
 
-print(Process_Area(Rule_Of_Thirds(roi),Rule_Of_Thirds(Template2)))
+#print(Process_Area(Rule_Of_Thirds(roi),Rule_Of_Thirds(Template2)))
 
 #cv.imshow("Template", roi)
 #cv.waitKey(0)
