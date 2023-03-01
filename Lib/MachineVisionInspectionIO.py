@@ -601,7 +601,7 @@ class App(tk.Tk):
             def ShowImageNG():
                 NoImageNG.configure(text="")
                 Point = PointNG_value.get()
-                image_path_Master = self.Part_API + '/Template/' + Point + '_Master.bmp'
+                image_path_Master = self.Part_API + '/Template/' + Point + '_Template.bmp'
                 image = cv.imread(image_path_Master)
                 image = cv.cvtColor(image, cv.COLOR_BGR2RGB)
                 image = Image.fromarray(image)
@@ -870,8 +870,8 @@ class App(tk.Tk):
                                     Showtext = cv.putText(image, "Save image " + Point + "", (10, 25),
                                                           cv.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 1)
                                     cv.imshow(Point, Showtext)
-                                    img.save('' + Create + '/' + Point + '_Template.bmp')
-                                    cv.imwrite('' + Master + '/' + Point + '_Master.bmp', image)
+                                    img.save('' + Create + '/' + Point + '_Master.bmp')
+                                    cv.imwrite('' + Master + '/' + Point + '_Template.bmp', image)
                                     if Left and Top and Right and Bottom != 0:
                                         Save_Data.Master(Left, Top, Right, Bottom, Score_Outline, Score_Area, Cam, Point, Emp_ID, self.Part_API)
 
@@ -1266,7 +1266,7 @@ class App(tk.Tk):
                 elif self.Point_Camera[x] == "Cam3":
                     image = r'Snap3.bmp'
                 self.ImageSave.append(cv.imread(image))
-                Template = r"" + self.Part_API + "\Master""\\""Point" + str(x + 1) + "_Template.bmp"
+                Template = r"" + self.Part_API + "\Master""\\""Point" + str(x + 1) + "_Master.bmp"
                 (template, top_left, scale, val, bottom_right) = self.Process_Outline(image, Template, self.Point_Left[x], self.Point_Top[x], self.Point_Right[x], self.Point_Bottom[x])
                 self.Left_Find.append(self.Point_Left[x] + top_left[0] - 30)
                 self.Top_Find.append(self.Point_Top[x] + top_left[1] - 30)
