@@ -9,64 +9,12 @@ import urllib.request
 from threading import Timer
 from tkinter import messagebox
 from tkinter import ttk
-
 import cv2 as cv
 import numpy as np
 import pyvisa
 from PIL import Image
 from PIL import ImageTk
 
-with open('Setting Paramiter.json', 'r') as json_file:
-    Setting_Paramiter = json.loads(json_file.read())
-Quantity_Cam = Setting_Paramiter[0]["Quantity_Cam"]
-Board_Name = Setting_Paramiter[0]["Board_Name"]
-
-Machine = Setting_Paramiter[0]["MachineName"]
-Mode = Setting_Paramiter[0]["Mode"]
-
-"""frame0.set(cv.CAP_PROP_FRAME_WIDTH, 1024)
-frame0.set(cv.CAP_PROP_FRAME_HEIGHT, 768)
-frame0.set(cv.CAP_PROP_AUTO_EXPOSURE, 0)
-frame0.set(cv.CAP_PROP_AUTOFOCUS, 0)"""
-
-if Quantity_Cam == 1:
-    frame0 = cv.VideoCapture(0, cv.CAP_DSHOW)
-    frame0.set(cv.CAP_PROP_FRAME_WIDTH, 1024)
-    frame0.set(cv.CAP_PROP_FRAME_HEIGHT, 768)
-    frame0.set(cv.CAP_PROP_AUTO_EXPOSURE, 0)
-    frame0.set(cv.CAP_PROP_AUTOFOCUS, 0)
-elif Quantity_Cam == 2:
-    frame0 = cv.VideoCapture(0, cv.CAP_DSHOW)
-    frame0.set(cv.CAP_PROP_FRAME_WIDTH, 1024)
-    frame0.set(cv.CAP_PROP_FRAME_HEIGHT, 768)
-    frame0.set(cv.CAP_PROP_AUTO_EXPOSURE, 0)
-    frame0.set(cv.CAP_PROP_AUTOFOCUS, 0)
-    frame1 = cv.VideoCapture(1, cv.CAP_DSHOW)
-    frame1.set(cv.CAP_PROP_FRAME_WIDTH, 1024)
-    frame1.set(cv.CAP_PROP_FRAME_HEIGHT, 786)
-    frame1.set(cv.CAP_PROP_AUTO_EXPOSURE, 0)
-    frame1.set(cv.CAP_PROP_AUTOFOCUS, 0)
-
-elif Quantity_Cam == 3:
-    frame0 = cv.VideoCapture(0, cv.CAP_DSHOW)
-    frame0.set(cv.CAP_PROP_FRAME_WIDTH, 1024)
-    frame0.set(cv.CAP_PROP_FRAME_HEIGHT, 786)
-    frame0.set(cv.CAP_PROP_AUTO_EXPOSURE, 0)
-    frame0.set(cv.CAP_PROP_AUTOFOCUS, 0)
-
-    frame1 = cv.VideoCapture(1, cv.CAP_DSHOW)
-    frame1.set(cv.CAP_PROP_FRAME_WIDTH, 1024)
-    frame1.set(cv.CAP_PROP_FRAME_HEIGHT, 786)
-    frame1.set(cv.CAP_PROP_AUTO_EXPOSURE, 0)
-    frame1.set(cv.CAP_PROP_AUTOFOCUS, 0)
-
-    frame2 = cv.VideoCapture(2, cv.CAP_DSHOW)
-    frame2.set(cv.CAP_PROP_FRAME_WIDTH, 1024)
-    frame2.set(cv.CAP_PROP_FRAME_HEIGHT, 768)
-    frame2.set(cv.CAP_PROP_AUTO_EXPOSURE, 0)
-    frame2.set(cv.CAP_PROP_AUTOFOCUS, 0)
-
-font = cv.FONT_HERSHEY_SIMPLEX
 
 """
 def Save_Result(Data):
@@ -112,6 +60,77 @@ class Getpart():
         return [self.PartNumber, self.BatchNumber, self.PartName, self.CustomerPartNumber, self.MachineName,
                 self.MoldId, self.Sever, self.Packing]
 
+
+with open('Setting Paramiter.json', 'r') as json_file:
+    Setting_Paramiter = json.loads(json_file.read())
+Quantity_Cam = Setting_Paramiter[0]["Quantity_Cam"]
+Board_Name = Setting_Paramiter[0]["Board_Name"]
+Machine = Setting_Paramiter[0]["MachineName"]
+Mode = Setting_Paramiter[0]["Mode"]
+
+"""frame0.set(cv.CAP_PROP_FRAME_WIDTH, 1024)
+frame0.set(cv.CAP_PROP_FRAME_HEIGHT, 768)
+frame0.set(cv.CAP_PROP_AUTO_EXPOSURE, 0)
+frame0.set(cv.CAP_PROP_AUTOFOCUS, 0)"""
+#E25
+PartNumber = Getpart().Get()[0]
+if PartNumber == "DEN0006SBK" or PartNumber == "TMT367KR00":
+    Quantity_Cam = 3
+    frame0 = cv.VideoCapture(0, cv.CAP_DSHOW)
+    frame0.set(cv.CAP_PROP_FRAME_WIDTH, 1024)
+    frame0.set(cv.CAP_PROP_FRAME_HEIGHT, 786)
+    frame0.set(cv.CAP_PROP_AUTO_EXPOSURE, 0)
+    frame0.set(cv.CAP_PROP_AUTOFOCUS, 0)
+
+    frame1 = cv.VideoCapture(1, cv.CAP_DSHOW)
+    frame1.set(cv.CAP_PROP_FRAME_WIDTH, 1024)
+    frame1.set(cv.CAP_PROP_FRAME_HEIGHT, 786)
+    frame1.set(cv.CAP_PROP_AUTO_EXPOSURE, 0)
+    frame1.set(cv.CAP_PROP_AUTOFOCUS, 0)
+
+    frame2 = cv.VideoCapture(2, cv.CAP_DSHOW)
+    frame2.set(cv.CAP_PROP_FRAME_WIDTH, 1024)
+    frame2.set(cv.CAP_PROP_FRAME_HEIGHT, 768)
+    frame2.set(cv.CAP_PROP_AUTO_EXPOSURE, 0)
+    frame2.set(cv.CAP_PROP_AUTOFOCUS, 0)
+else:
+    if Quantity_Cam == 1:
+        frame0 = cv.VideoCapture(0, cv.CAP_DSHOW)
+        frame0.set(cv.CAP_PROP_FRAME_WIDTH, 1024)
+        frame0.set(cv.CAP_PROP_FRAME_HEIGHT, 768)
+        frame0.set(cv.CAP_PROP_AUTO_EXPOSURE, 0)
+        frame0.set(cv.CAP_PROP_AUTOFOCUS, 0)
+    elif Quantity_Cam == 2:
+        frame0 = cv.VideoCapture(0, cv.CAP_DSHOW)
+        frame0.set(cv.CAP_PROP_FRAME_WIDTH, 1024)
+        frame0.set(cv.CAP_PROP_FRAME_HEIGHT, 768)
+        frame0.set(cv.CAP_PROP_AUTO_EXPOSURE, 0)
+        frame0.set(cv.CAP_PROP_AUTOFOCUS, 0)
+
+        frame1 = cv.VideoCapture(1, cv.CAP_DSHOW)
+        frame1.set(cv.CAP_PROP_FRAME_WIDTH, 1024)
+        frame1.set(cv.CAP_PROP_FRAME_HEIGHT, 786)
+        frame1.set(cv.CAP_PROP_AUTO_EXPOSURE, 0)
+        frame1.set(cv.CAP_PROP_AUTOFOCUS, 0)
+    elif Quantity_Cam == 3:
+        frame0 = cv.VideoCapture(0, cv.CAP_DSHOW)
+        frame0.set(cv.CAP_PROP_FRAME_WIDTH, 1024)
+        frame0.set(cv.CAP_PROP_FRAME_HEIGHT, 786)
+        frame0.set(cv.CAP_PROP_AUTO_EXPOSURE, 0)
+        frame0.set(cv.CAP_PROP_AUTOFOCUS, 0)
+
+        frame1 = cv.VideoCapture(1, cv.CAP_DSHOW)
+        frame1.set(cv.CAP_PROP_FRAME_WIDTH, 1024)
+        frame1.set(cv.CAP_PROP_FRAME_HEIGHT, 786)
+        frame1.set(cv.CAP_PROP_AUTO_EXPOSURE, 0)
+        frame1.set(cv.CAP_PROP_AUTOFOCUS, 0)
+
+        frame2 = cv.VideoCapture(2, cv.CAP_DSHOW)
+        frame2.set(cv.CAP_PROP_FRAME_WIDTH, 1024)
+        frame2.set(cv.CAP_PROP_FRAME_HEIGHT, 768)
+        frame2.set(cv.CAP_PROP_AUTO_EXPOSURE, 0)
+        frame2.set(cv.CAP_PROP_AUTOFOCUS, 0)
+font = cv.FONT_HERSHEY_SIMPLEX
 
 class GetEmp:
     @staticmethod
@@ -457,6 +476,10 @@ class App(tk.Tk):
             self.Board_show()
             self.BoardLoop = InfiniteTimer(0.1, self.Board_show)
             self.BoardLoop.start()
+            self.Reset_btn = tk.Button(self, text="Reset", command=self.Reset, bg='black')
+            self.Reset_btn.configure(font=("Arial", 18))
+            self.Reset_btn.configure(justify="center", foreground="green")
+            self.Reset_btn.place(x=1300, y=10)
         elif Mode == 2:
             self.CallKeyBorad()
 
@@ -484,6 +507,7 @@ class App(tk.Tk):
 
         self.ShowCount()
 
+
         self.btn_repart = tk.Button(self, text="Re-order", command=self.CallPart, bg='black')
         self.btn_repart.configure(font=("Arial", 18))
         self.btn_repart.configure(justify="center", foreground="green")
@@ -491,6 +515,12 @@ class App(tk.Tk):
 
         self.view = tk.Label(self, bg='black')
         self.view.place(x=950, y=180)
+
+
+
+    def Reset(self):
+        self.ClassBoard.inst.write("@1 R08")
+        self.ClassBoard.inst.clear()
 
     def ViewNG(self):
         self.Image_NG = []
@@ -1153,7 +1183,7 @@ class App(tk.Tk):
         Template = cv.imread(Template, 0)
         w, h = Template.shape[::-1]
         c = 0
-        TemplateThreshold = 0.7
+        TemplateThreshold = 0.4
         curMaxVal = 0
         curMaxTemplate = -1
         curMaxLoc = (0, 0)
