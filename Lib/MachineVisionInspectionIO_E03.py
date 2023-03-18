@@ -9,12 +9,38 @@ import urllib.request
 from threading import Timer
 from tkinter import messagebox
 from tkinter import ttk
+
 import cv2 as cv
 import numpy as np
 import pyvisa
 from PIL import Image
 from PIL import ImageTk
 
+with open('Setting Paramiter.json', 'r') as json_file:
+    Setting_Paramiter = json.loads(json_file.read())
+Quantity_Cam = Setting_Paramiter[0]["Quantity_Cam"]
+Board_Name = Setting_Paramiter[0]["Board_Name"]
+
+Machine = Setting_Paramiter[0]["MachineName"]
+Mode = Setting_Paramiter[0]["Mode"]
+
+"""frame0.set(cv.CAP_PROP_FRAME_WIDTH, 1024)
+frame0.set(cv.CAP_PROP_FRAME_HEIGHT, 768)
+frame0.set(cv.CAP_PROP_AUTO_EXPOSURE, 0)
+frame0.set(cv.CAP_PROP_AUTOFOCUS, 0)"""
+
+frame0 = cv.VideoCapture(0, cv.CAP_DSHOW)
+frame0.set(cv.CAP_PROP_FRAME_WIDTH, 1024)
+frame0.set(cv.CAP_PROP_FRAME_HEIGHT, 768)
+frame0.set(cv.CAP_PROP_AUTO_EXPOSURE, 0)
+frame0.set(cv.CAP_PROP_AUTOFOCUS, 0)
+frame1 = cv.VideoCapture(1, cv.CAP_DSHOW)
+frame1.set(cv.CAP_PROP_FRAME_WIDTH, 1024)
+frame1.set(cv.CAP_PROP_FRAME_HEIGHT, 786)
+frame1.set(cv.CAP_PROP_AUTO_EXPOSURE, 0)
+frame1.set(cv.CAP_PROP_AUTOFOCUS, 0)
+
+font = cv.FONT_HERSHEY_SIMPLEX
 
 """
 def Save_Result(Data):
@@ -60,77 +86,6 @@ class Getpart():
         return [self.PartNumber, self.BatchNumber, self.PartName, self.CustomerPartNumber, self.MachineName,
                 self.MoldId, self.Sever, self.Packing]
 
-
-with open('Setting Paramiter.json', 'r') as json_file:
-    Setting_Paramiter = json.loads(json_file.read())
-Quantity_Cam = Setting_Paramiter[0]["Quantity_Cam"]
-Board_Name = Setting_Paramiter[0]["Board_Name"]
-Machine = Setting_Paramiter[0]["MachineName"]
-Mode = Setting_Paramiter[0]["Mode"]
-
-"""frame0.set(cv.CAP_PROP_FRAME_WIDTH, 1024)
-frame0.set(cv.CAP_PROP_FRAME_HEIGHT, 768)
-frame0.set(cv.CAP_PROP_AUTO_EXPOSURE, 0)
-frame0.set(cv.CAP_PROP_AUTOFOCUS, 0)"""
-#E25
-PartNumber = Getpart().Get()[0]
-if PartNumber == "DEN0006SBK" or PartNumber == "TMT367KR00":
-    Quantity_Cam = 3
-    frame0 = cv.VideoCapture(0, cv.CAP_DSHOW)
-    frame0.set(cv.CAP_PROP_FRAME_WIDTH, 1024)
-    frame0.set(cv.CAP_PROP_FRAME_HEIGHT, 786)
-    frame0.set(cv.CAP_PROP_AUTO_EXPOSURE, 0)
-    frame0.set(cv.CAP_PROP_AUTOFOCUS, 0)
-
-    frame1 = cv.VideoCapture(1, cv.CAP_DSHOW)
-    frame1.set(cv.CAP_PROP_FRAME_WIDTH, 1024)
-    frame1.set(cv.CAP_PROP_FRAME_HEIGHT, 786)
-    frame1.set(cv.CAP_PROP_AUTO_EXPOSURE, 0)
-    frame1.set(cv.CAP_PROP_AUTOFOCUS, 0)
-
-    frame2 = cv.VideoCapture(2, cv.CAP_DSHOW)
-    frame2.set(cv.CAP_PROP_FRAME_WIDTH, 1024)
-    frame2.set(cv.CAP_PROP_FRAME_HEIGHT, 768)
-    frame2.set(cv.CAP_PROP_AUTO_EXPOSURE, 0)
-    frame2.set(cv.CAP_PROP_AUTOFOCUS, 0)
-else:
-    if Quantity_Cam == 1:
-        frame0 = cv.VideoCapture(0, cv.CAP_DSHOW)
-        frame0.set(cv.CAP_PROP_FRAME_WIDTH, 1024)
-        frame0.set(cv.CAP_PROP_FRAME_HEIGHT, 768)
-        frame0.set(cv.CAP_PROP_AUTO_EXPOSURE, 0)
-        frame0.set(cv.CAP_PROP_AUTOFOCUS, 0)
-    elif Quantity_Cam == 2:
-        frame0 = cv.VideoCapture(0, cv.CAP_DSHOW)
-        frame0.set(cv.CAP_PROP_FRAME_WIDTH, 1024)
-        frame0.set(cv.CAP_PROP_FRAME_HEIGHT, 768)
-        frame0.set(cv.CAP_PROP_AUTO_EXPOSURE, 0)
-        frame0.set(cv.CAP_PROP_AUTOFOCUS, 0)
-
-        frame1 = cv.VideoCapture(1, cv.CAP_DSHOW)
-        frame1.set(cv.CAP_PROP_FRAME_WIDTH, 1024)
-        frame1.set(cv.CAP_PROP_FRAME_HEIGHT, 786)
-        frame1.set(cv.CAP_PROP_AUTO_EXPOSURE, 0)
-        frame1.set(cv.CAP_PROP_AUTOFOCUS, 0)
-    elif Quantity_Cam == 3:
-        frame0 = cv.VideoCapture(0, cv.CAP_DSHOW)
-        frame0.set(cv.CAP_PROP_FRAME_WIDTH, 1024)
-        frame0.set(cv.CAP_PROP_FRAME_HEIGHT, 786)
-        frame0.set(cv.CAP_PROP_AUTO_EXPOSURE, 0)
-        frame0.set(cv.CAP_PROP_AUTOFOCUS, 0)
-
-        frame1 = cv.VideoCapture(1, cv.CAP_DSHOW)
-        frame1.set(cv.CAP_PROP_FRAME_WIDTH, 1024)
-        frame1.set(cv.CAP_PROP_FRAME_HEIGHT, 786)
-        frame1.set(cv.CAP_PROP_AUTO_EXPOSURE, 0)
-        frame1.set(cv.CAP_PROP_AUTOFOCUS, 0)
-
-        frame2 = cv.VideoCapture(2, cv.CAP_DSHOW)
-        frame2.set(cv.CAP_PROP_FRAME_WIDTH, 1024)
-        frame2.set(cv.CAP_PROP_FRAME_HEIGHT, 768)
-        frame2.set(cv.CAP_PROP_AUTO_EXPOSURE, 0)
-        frame2.set(cv.CAP_PROP_AUTOFOCUS, 0)
-font = cv.FONT_HERSHEY_SIMPLEX
 
 class GetEmp:
     @staticmethod
@@ -253,9 +208,9 @@ class Save_Data:
             else:
                 Point = ""
             if Result[s] == 1:
-                cv.imwrite('Record/' + Partnumber + '/OK/Point' + str(s + 1) + '/' + Time + '_P' + Point + str(s + 1) + '.jpg', Image[s])
+                cv.imwrite('Record/' + Partnumber + '/OK/Point' + str(s + 1) + '/' + Time + '_P' + Point + str(s + 1) + '.jpeg', Image[s])
             else:
-                cv.imwrite('Record/' + Partnumber + '/NG/Point' + str(s + 1) + '/' + Time + '_P' + Point + str(s + 1) + '.jpg', Image[s])
+                cv.imwrite('Record/' + Partnumber + '/NG/Point' + str(s + 1) + '/' + Time + '_P' + Point + str(s + 1) + '.jpeg', Image[s])
 
     @staticmethod
     def Save_Score(Partnumber, Batch, Machine, Couter, Score, Result):
@@ -281,7 +236,7 @@ class Save_Data:
         try:
             with open(Partnumber + '/' + Partnumber + '.json', 'r') as json_file:
                 item = json.loads(json_file.read())
-                for i in range(11):
+                for i in range(26):
                     str_ = str(i)
                     try:
                         if Point == "Point" + str_:
@@ -350,6 +305,8 @@ class App(tk.Tk):
         self.Run_Camera_2 = None
         self.Run_Camera_3 = None
         self.Close_Camera = False
+        self.Flag_Result = False
+        self.Flag_Reset = 0
         self.API_json.__int__()
         self.Part_API = self.API_json.Get()[0]
         self.Batch_API = self.API_json.Get()[1]
@@ -360,9 +317,12 @@ class App(tk.Tk):
         self.Sever_API = self.API_json.Get()[6]
         self.Packing_API = self.API_json.Get()[7]
         self.Batch_API_Get = self.Batch_API
-
+        req = urllib.request.Request('https://api.bkf.co.th/APIGateway_PCB/ManagePartSetupStatusConfirmVisionInspectionProductionOrder?batchNumber=' + self.Batch_API, method="POST")
+        with urllib.request.urlopen(req) as response:
+            status_code = response.getcode()
+        #print(status_code)
         self.Machine_Vision = tk.Label(self, text='Machine Vision Inspection ' + self.Machine_API, bg='black')
-        self.Machine_Version = tk.Label(self, text='v1.0.3', bg='black')
+        self.Machine_Version = tk.Label(self, text='v1.0.2', bg='black')
         if self.Sever_API == "Connected":
             self.Machine_Vision.configure(fg='Green')
             self.Machine_Version.configure(fg='Green')
@@ -435,8 +395,14 @@ class App(tk.Tk):
         self.Result_NG.place(x=5, y=180, width=375, height=100)
 
         self.Label_cam = tk.Label(self, text="Cam1")
-        self.frame = tk.Label(self, bg="black")
-        self.frame.place(x=395, y=650)
+
+        self.view_Camera1 = tk.Label(self, bg='black')
+        self.view_Camera1.place(x=10, y=300)
+        self.view_Camera2 = tk.Label(self, bg='black')
+        self.view_Camera2.place(x=950, y=300)
+
+        #self.frame = tk.Label(self, bg="black")
+        #self.frame.place(x=395, y=650)
 
         self.Process = tk.LabelFrame(self, text="Process", bg='black')
         self.Process.configure(font=("Arial", 10))
@@ -452,7 +418,7 @@ class App(tk.Tk):
         # self.btn_Start.place(x=1260, y=10, width=120)
         self.IMAGE()
         self.Call_IMAGE()
-        self.combobox_cam()
+        #self.combobox_cam()
         self.Camera()
         self.Printer()
         self.PrintText()
@@ -468,25 +434,30 @@ class App(tk.Tk):
 
         if Mode == 1:
             self.ClassBoard = Borad()
+            self.ClassBoard.inst.write("@1 R00")
             # Hex = self.ClassBoard.ReadBorad()[0]
             # print(Hex)
-
             self.SaveDataBoard = False
-            self.SaveDataBoard_IO = False
+            self.Flag00 = False
+            self.Flag01 = False
+            self.SaveDataBoard_03 = False
+            self.SaveDataBoard_03_Pass = False
+            self.Flag_Save = False
             self.Board_show()
             self.BoardLoop = InfiniteTimer(0.1, self.Board_show)
             self.BoardLoop.start()
-            self.Reset_btn = tk.Button(self, text="Reset", command=self.Reset, bg='black')
+            self.Reset_btn = tk.Button(self, text="Reset", bg='black')
             self.Reset_btn.configure(font=("Arial", 18))
             self.Reset_btn.configure(justify="center", foreground="green")
-            self.Reset_btn.place(x=1300, y=10)
+            self.Reset_btn.configure(command=self.Reset)
+            self.Reset_btn.place(x=1550, y=10)
         elif Mode == 2:
             self.CallKeyBorad()
 
-        self.btn_cam = tk.Button(self, text="Choose", command=lambda: [self.callback_cam(), self.ViewImage()], bg='black')
+        """self.btn_cam = tk.Button(self, text="Choose", command=lambda: [self.callback_cam(), self.ViewImage()], bg='black')
         self.btn_cam.configure(font=("Arial", 18))
         self.btn_cam.configure(justify="center", foreground="green")
-        self.btn_cam.place(x=1390, y=10)
+        self.btn_cam.place(x=1390, y=10)"""
 
         self.btn_add = tk.Button(self, text="Add Master", command=self.AddMaster, bg='black')
         self.btn_add.configure(font=("Arial", 18))
@@ -507,21 +478,21 @@ class App(tk.Tk):
 
         self.ShowCount()
 
-
         self.btn_repart = tk.Button(self, text="Re-order", command=self.CallPart, bg='black')
         self.btn_repart.configure(font=("Arial", 18))
         self.btn_repart.configure(justify="center", foreground="green")
         self.btn_repart.place(x=830, y=10)
 
-        self.view = tk.Label(self, bg='black')
-        self.view.place(x=950, y=180)
-
-
 
     def Reset(self):
-        self.ClassBoard.inst.write("@1 R08")
-        self.ClassBoard.inst.clear()
-
+        if self.Flag01 == True:
+            if self.Flag_Reset%2 == 0:
+                self.ClassBoard.inst.write("@1 R08")
+                #self.ClassBoard.inst.clear()
+            elif self.Flag_Reset%2 == 1:
+                self.ClassBoard.inst.write("@1 R00")
+                #self.ClassBoard.inst.clear()
+            self.Flag_Reset += 1
     def ViewNG(self):
         self.Image_NG = []
         self.Next = 0
@@ -590,8 +561,9 @@ class App(tk.Tk):
                         if os.path.isfile(os.path.join(image_path_NG, path)):
                             if path.endswith('.jpg'):
                                 Image_NG.append(path)
-                except:pass
-                    #ViewNG.destroy()
+                except:
+                    pass
+                # ViewNG.destroy()
                 return Image_NG, Point
 
             def Next():
@@ -690,6 +662,9 @@ class App(tk.Tk):
             self.CUSTOMER_NUMBERP.configure(text=self.Customer_API)
             self.BATCH_NUMBERP.configure(text=self.Batch_API)
             self.MOLD_NUMBERP.configure(text=self.Mode_API)
+            req = urllib.request.Request('https://api.bkf.co.th/APIGateway_PCB/ManagePartSetupStatusConfirmVisionInspectionProductionOrder?batchNumber=' + self.Batch_API, method="POST")
+            with urllib.request.urlopen(req) as response:
+                status_code = response.getcode()
             self.Call_IMAGE()
             self.ShowCount()
             self.PrintText()
@@ -825,7 +800,9 @@ class App(tk.Tk):
             Chose_Point = ttk.Combobox(self.SaveMaster, width=8, height=80, textvariable=Point_Data)
             Chose_Point.configure(font=("Arial", 20))
             Chose_Point.configure(justify="center", foreground="green")
-            Chose_Point['values'] = ('Point1', 'Point2', 'Point3', 'Point4', 'Point5', 'Point6', 'Point7', 'Point8', 'Point9', 'Point10')
+            Chose_Point['values'] = ('Point1', 'Point2', 'Point3', 'Point4', 'Point5', 'Point6', 'Point7', 'Point8', 'Point9', 'Point10',
+                                     'Point11', 'Point12', 'Point13', 'Point14', 'Point15', 'Point16', 'Point17', 'Point18', 'Point19', 'Point20',
+                                     'Point21', 'Point22', 'Point23', 'Point24', 'Point25')
             Chose_Point.current(0)
             Chose_Point.place(x=120, y=60)
 
@@ -951,7 +928,7 @@ class App(tk.Tk):
         except:
             pass
 
-    def combobox_cam(self):
+    """def combobox_cam(self):
         self.n = tk.StringVar()
         self.cam = ttk.Combobox(self, width=8, height=80, textvariable=self.n)
         self.cam['state'] = 'readonly'
@@ -969,7 +946,7 @@ class App(tk.Tk):
         elif Quantity_Cam == 5:
             self.cam['values'] = ('Cam1', 'Cam2', 'Cam3', 'Cam4', 'Cam5')
         self.cam.current(0)
-        self.cam.place(x=1500, y=10, height=47)
+        self.cam.place(x=1500, y=10, height=47)"""
 
     def callback_cam(self):
         self.Label_cam.configure(text=self.cam.get())
@@ -983,7 +960,7 @@ class App(tk.Tk):
 
         # Save_Result(1)
         self.btn_reset.focus_set()
-        self.Point_ = tk.LabelFrame(self, text="Point", borderwidth=3, relief="ridge", padx=5, pady=10, bg='black')
+        """self.Point_ = tk.LabelFrame(self, text="Point", borderwidth=3, relief="ridge", padx=5, pady=10, bg='black')
         self.Point_.configure(font=("Arial", 13))
         self.Point_.configure(fg='Green')
         self.Point_.place(x=5, y=300, height=700, width=60)
@@ -1001,7 +978,7 @@ class App(tk.Tk):
         self.Score_Area = tk.LabelFrame(self, text="Area", borderwidth=3, relief="ridge", padx=5, pady=10, bg='black')
         self.Score_Area.configure(font=("Arial", 13))
         self.Score_Area.configure(fg='Green')
-        self.Score_Area.place(x=270, y=300, height=700, width=110)
+        self.Score_Area.place(x=270, y=300, height=700, width=110)"""
         try:
             self.dir_path = r"" + self.Part_API + "\Master"
             self.count = 0
@@ -1031,7 +1008,7 @@ class App(tk.Tk):
                         self.Point_Bottom.append(self.Master[k]["Point" + str(k + 1)][0]["Bottom"])
                         self.Point_Score_Outline.append(self.Master[k]["Point" + str(k + 1)][0]["Score Outline"])
                         self.Point_Score_Area.append(self.Master[k]["Point" + str(k + 1)][0]["Score Area"])
-                        tk.Label(self.Point_, text=(k + 1), borderwidth=1, relief="groove", padx=5, pady=8, font=("Arial", 18), bg='black', fg='Green').place(x=5, y=70 * k)
+                        #tk.Label(self.Point_, text=(k + 1), borderwidth=1, relief="groove", padx=5, pady=8, font=("Arial", 18), bg='black', fg='Green').place(x=5, y=70 * k)
                         # tk.Label(self.Result_, text="N/A", borderwidth=3, relief="groove", padx=5, pady=10,font=("Arial", 18),fg='#A3A6AB').place(x=35, y=70*k)
                         # tk.Label(self.Score_Outline, text="", borderwidth=3, relief="groove", padx=55, pady=10,font=("Arial", 18)).place(x=2, y=70*k)
                         # tk.Label(self.Score_Area, text="", borderwidth=3, relief="groove", padx=55, pady=10,font=("Arial", 18)).place(x=2, y=70*k)
@@ -1042,38 +1019,20 @@ class App(tk.Tk):
 
     def Camera(self):
         try:
-            if Quantity_Cam == 1:
-                self.Run_Camera_1 = cv.cvtColor(frame0.read()[1], cv.COLOR_BGR2RGB)
-                img = Image.fromarray(self.Run_Camera_1)
-                resize_img = img.resize((540, 340))
-                imgtk = ImageTk.PhotoImage(image=resize_img)
-            elif Quantity_Cam == 2:
-                self.Run_Camera_1 = cv.cvtColor(frame0.read()[1], cv.COLOR_BGR2RGB)
-                self.Run_Camera_2 = cv.cvtColor(frame1.read()[1], cv.COLOR_BGR2RGB)
-                if self.Label_cam['text'] == "Cam1":
-                    img = Image.fromarray(self.Run_Camera_1)
-                    resize_img = img.resize((540, 340))
-                elif self.Label_cam['text'] == "Cam2":
-                    img = Image.fromarray(self.Run_Camera_2)
-                    resize_img = img.resize((540, 340))
-                imgtk = ImageTk.PhotoImage(image=resize_img)
-            elif Quantity_Cam == 3:
-                self.Run_Camera_1 = cv.cvtColor(frame0.read()[1], cv.COLOR_BGR2RGB)
-                self.Run_Camera_2 = cv.cvtColor(frame1.read()[1], cv.COLOR_BGR2RGB)
-                self.Run_Camera_3 = cv.cvtColor(frame2.read()[1], cv.COLOR_BGR2RGB)
-                if self.Label_cam['text'] == "Cam1":
-                    img = Image.fromarray(self.Run_Camera_1)
-                    resize_img = img.resize((540, 340))
-                elif self.Label_cam['text'] == "Cam2":
-                    img = Image.fromarray(self.Run_Camera_2)
-                    resize_img = img.resize((540, 340))
-                elif self.Label_cam['text'] == "Cam3":
-                    img = Image.fromarray(self.Run_Camera_3)
-                    resize_img = img.resize((540, 340))
-                imgtk = ImageTk.PhotoImage(image=resize_img)
+            self.Run_Camera_1 = cv.cvtColor(frame0.read()[1], cv.COLOR_BGR2RGB)
+            self.Run_Camera_2 = cv.cvtColor(frame1.read()[1], cv.COLOR_BGR2RGB)
+            im1 = Image.fromarray(self.Run_Camera_1)
+            im2 = Image.fromarray(self.Run_Camera_2)
             if self.Close_Camera == False:
-                self.frame.imgtk = imgtk
-                self.frame.configure(image=imgtk)
+                im1 = im1.resize((920, 620))
+                image1 = ImageTk.PhotoImage(image=im1)
+                self.view_Camera1.image1 = image1
+                self.view_Camera1.configure(image=image1)
+
+                im2 = im2.resize((920, 620))
+                image2 = ImageTk.PhotoImage(image=im2)
+                self.view_Camera2.image2 = image2
+                self.view_Camera2.configure(image=image2)
             self.after(60, self.Camera)
         except:
             messagebox.showerror('Python Error', 'Check Cameras')
@@ -1108,20 +1067,45 @@ class App(tk.Tk):
                 SaveMaster = True
             if Login == True and SaveMaster == True:
                 Hex = self.ClassBoard.ReadBorad()[0]
-
                 Bin = self.ClassBoard.ReadBorad()[2]
-
                 self.BoardP.configure(text=Hex)
-                if Bin == "110000001100000000110100001010":
+                #print(Hex,Bin)
+                # 110000001100010000110100001010 #01
+                # 110000001110010000110100001010 #09
+                # 110000010000100000110100001010 #0B
+                # 110000001101000000110100001010 #04
+                if Bin == "110000001100000000110100001010":#00
+                    self.Flag01 = False
                     self.SaveDataBoard = True
-                elif Bin == "110000001100010000110100001010" and self.SaveDataBoard == True:  # 01
-                    try:
+                    if self.Flag00 == False:
+                        self.ClassBoard.inst.write("@1 R00")
+                        self.Flag00 = True
+                elif Bin == "110000001100010000110100001010":#01
+                    self.Flag01 = True
+                    self.Flag00 = False
+                elif Bin == "110000001100110000110100001010" and self.SaveDataBoard == True:  #03
+                    self.Flag00 = False
+                    self.Flag01 = False
+                    self.SaveDataBoard = False
+                    self.ClassBoard.inst.write("@1 R03")
+                    time.sleep(0.5)
+                    self.ClassBoard.inst.write("")
+                    time.sleep(0.5)
+                    self.ClassBoard.inst.write("@1 I0")
+                    self.SaveDataBoard_03 = True
+                elif (Bin == "110000001110010000110100001010" or Bin == "110000010000100000110100001010") and self.Flag_Save == False:  # 09#0B
+                    self.Flag00 = False
+                    self.Flag01 = False
+                    if self.SaveDataBoard_03 == True:
+                        self.SaveDataBoard_03 = False
+                        self.ClassBoard.inst.write("@1 R03")
+                        time.sleep(1)
                         self.Close_Camera = True
                         self.ProcessP.configure(text="Process")
                         self.ProcessP.configure(fg='yellow')
                         Save_Data.Save_Imaga_Run(self.Run_Camera_1, self.Run_Camera_2, self.Run_Camera_3)
                         self.Main()
-                        self.ShowScore()
+                        #self.ShowScore()
                         self.ShowResult()
                         Save_Data.Save_Image(self.Part_API, self.count, self.ImageSave, self.Point_Left, self.Point_Top, self.Point_Right, self.Point_Bottom, self.Left_Find, self.Top_Find, self.Right_Find, self.Bottom_Find, self.Color,
                                              self.Score_Outline_Data, self.Point_Score_Outline, self.Score_Area_Data, self.Point_Score_Area, self.Result, 30)
@@ -1129,9 +1113,22 @@ class App(tk.Tk):
                         self.ProcessP.configure(text="Ready")
                         self.ProcessP.configure(fg="green")
                         self.SaveDataBoard = False
-                    except:
-                        messagebox.showerror('Program Error', 'Process')
-                # self.after(100,self.Board_show)
+                        self.Flag_Save = True
+                elif Bin == "110000001110010000110100001010" and self.Flag_Save == True:
+                    self.Flag00 = False
+                    self.Flag01 = False
+                    if self.Flag_Result == True:
+                        self.ClassBoard.inst.write("@1 R08")
+                        time.sleep(2)
+                        self.ClassBoard.inst.write("@1 R00")
+                    elif self.Flag_Result == False:
+                        self.ClassBoard.inst.write("@1 F02")
+                        time.sleep(2)
+                    self.ClassBoard.inst.clear()
+                    self.Flag_Save = False
+                else:
+                    self.Flag00 = False
+                    self.Flag01 = False
 
     elif Mode == 2:
         def CallKeyBorad(self):
@@ -1156,11 +1153,12 @@ class App(tk.Tk):
                     self.ProcessP.configure(fg='yellow')
                     Save_Data.Save_Imaga_Run(self.Run_Camera_1, self.Run_Camera_2, self.Run_Camera_3)
                     self.Main()
-                    self.ShowScore()
                     self.ShowResult()
+                    self.ViewImage()
+                    # self.ShowScore()
                     Save_Data.Save_Image(self.Part_API, self.count, self.ImageSave, self.Point_Left, self.Point_Top, self.Point_Right, self.Point_Bottom, self.Left_Find, self.Top_Find, self.Right_Find, self.Bottom_Find, self.Color,
                                          self.Score_Outline_Data, self.Point_Score_Outline, self.Score_Area_Data, self.Point_Score_Area, self.Result, 30)
-                    self.ViewImage()
+                    #self.ViewImage()
                     self.ProcessP.configure(text="Ready")
                     self.ProcessP.configure(fg="green")
 
@@ -1328,12 +1326,13 @@ class App(tk.Tk):
                     else:
                         self.padx_area.append(20)
                 self.place.append(x * 70)
+                #print(self.Result)
 
-    def ResultComfrim(self):
+    """def ResultComfrim(self):
         if self.Comfrim_Data >= 4:
             self.NG_Data = self.NG_Data + 1
             Save_Data.Save_Score(self.Part_API, self.Batch_API, self.Machine_API, self.count, self.Score_Area_Data, self.Result)
-            self.Result_NG.configure(text="NG : " + str(self.NG_Data))
+            self.Result_NG.configure(text="NG : " + str(self.NG_Data))"""
 
     def ShowResult(self):
         if self.count != 0:
@@ -1343,21 +1342,16 @@ class App(tk.Tk):
                         self.Couter_Printer()
                         self.PrintText()
                         self.OK_Data = self.OK_Data + 1
-                        self.Comfrim_Data = 0
                         Save_Data.Save_Score(self.Part_API, self.Batch_API, self.Machine_API, self.count, self.Score_Area_Data, self.Result)
                         self.Result_Ok.configure(text="OK : " + str(self.OK_Data))
-                        if Mode == 1 and self.SaveDataBoard_IO == False:
-                            self.ClassBoard.inst.write("@1 R00")
-                            self.SaveDataBoard_IO = True
-                            self.ClassBoard.inst.clear()
+                        self.Flag_Result = True
                 else:
-                    self.Comfrim_Data = self.Comfrim_Data + 1
-                    self.ResultComfrim()
-                    if Mode == 1 and self.SaveDataBoard_IO == True:
-                        self.ClassBoard.inst.write("@1 R40")
-                        self.SaveDataBoard_IO = False
-                        self.ClassBoard.inst.clear()
+                    self.NG_Data = self.NG_Data + 1
+                    Save_Data.Save_Score(self.Part_API, self.Batch_API, self.Machine_API, self.count, self.Score_Area_Data, self.Result)
+                    self.Result_NG.configure(text="NG : " + str(self.NG_Data))
+                    self.Flag_Result =False
                     break
+
 
     def ShowScore(self):
         if self.count != 0:
@@ -1372,66 +1366,36 @@ class App(tk.Tk):
     def ViewImage(self):
         if self.count != 0:
             try:
-                if Quantity_Cam == 1:
-                    image = cv.imread("Snap1.bmp")
-                    image = cv.cvtColor(image, cv.COLOR_BGR2RGB)
-                    for s in range(self.count):
-                        if self.cam.get() == "Cam1" and self.Point_Camera[s] == "Cam1":
-                            cv.rectangle(image, (self.Left_Find[s], self.Top_Find[s]), (self.Right_Find[s], self.Bottom_Find[s]), self.ColorView[s], 2)
-                            cv.rectangle(image, (self.Point_Left[s] - 30, self.Point_Top[s] - 30), (self.Point_Right[s] + 30, self.Point_Bottom[s] + 30), self.ColorView[s], 2)
-                            cv.putText(image, "Point" + str(s + 1), (self.Point_Left[s] - 30, self.Point_Top[s] - 30), cv.FONT_HERSHEY_SIMPLEX, 0.7, self.ColorView[s], 2)
-                    im = Image.fromarray(image)
-                    im = im.resize((960, 720))
-                    image = ImageTk.PhotoImage(image=im)
-                    self.view.image = image
-                    self.view.configure(image=image)
-                elif Quantity_Cam == 2:
                     image1 = cv.imread("Snap1.bmp")
                     image1 = cv.cvtColor(image1, cv.COLOR_BGR2RGB)
                     image2 = cv.imread("Snap2.bmp")
                     image2 = cv.cvtColor(image2, cv.COLOR_BGR2RGB)
                     for s in range(self.count):
-                        if self.cam.get() == "Cam1" and self.Point_Camera[s] == "Cam1":
-                            cv.rectangle(image1, (self.Left_Find[s], self.Top_Find[s]), (self.Right_Find[s], self.Bottom_Find[s]), self.ColorView[s], 2)
-                            cv.rectangle(image1, (self.Point_Left[s] - 30, self.Point_Top[s] - 30), (self.Point_Right[s] + 30, self.Point_Bottom[s] + 30), self.ColorView[s], 2)
-                            cv.putText(image1, "Point" + str(s + 1), (self.Point_Left[s] - 30, self.Point_Top[s] - 30), cv.FONT_HERSHEY_SIMPLEX, 0.7, self.ColorView[s], 2)
-                            im = Image.fromarray(image1)
-                        elif self.cam.get() == "Cam2" and self.Point_Camera[s] == "Cam2":
-                            cv.rectangle(image2, (self.Left_Find[s], self.Top_Find[s]), (self.Right_Find[s], self.Bottom_Find[s]), self.ColorView[s], 2)
-                            cv.rectangle(image2, (self.Point_Left[s] - 30, self.Point_Top[s] - 30), (self.Point_Right[s] + 30, self.Point_Bottom[s] + 30), self.ColorView[s], 2)
-                            cv.putText(image2, "Point" + str(s + 1), (self.Point_Left[s] - 30, self.Point_Top[s] - 30), cv.FONT_HERSHEY_SIMPLEX, 0.7, self.ColorView[s], 2)
-                            im = Image.fromarray(image2)
-                    im = im.resize((960, 720))
-                    image = ImageTk.PhotoImage(image=im)
-                    self.view.image = image
-                    self.view.configure(image=image)
-                elif Quantity_Cam == 3:
-                    image1 = cv.imread("Snap1.bmp")
-                    image1 = cv.cvtColor(image1, cv.COLOR_BGR2RGB)
-                    image2 = cv.imread("Snap2.bmp")
-                    image2 = cv.cvtColor(image2, cv.COLOR_BGR2RGB)
-                    image3 = cv.imread("Snap3.bmp")
-                    image3 = cv.cvtColor(image3, cv.COLOR_BGR2RGB)
-                    for s in range(self.count):
-                        if self.cam.get() == "Cam1" and self.Point_Camera[s] == "Cam1":
-                            cv.rectangle(image1, (self.Left_Find[s], self.Top_Find[s]), (self.Right_Find[s], self.Bottom_Find[s]), self.ColorView[s], 2)
-                            cv.rectangle(image1, (self.Point_Left[s] - 30, self.Point_Top[s] - 30), (self.Point_Right[s] + 30, self.Point_Bottom[s] + 30), self.ColorView[s], 2)
-                            cv.putText(image1, "Point" + str(s + 1), (self.Point_Left[s] - 30, self.Point_Top[s] - 30), cv.FONT_HERSHEY_SIMPLEX, 0.7, self.ColorView[s], 2)
-                            im = Image.fromarray(image1)
-                        elif self.cam.get() == "Cam2" and self.Point_Camera[s] == "Cam2":
-                            cv.rectangle(image2, (self.Left_Find[s], self.Top_Find[s]), (self.Right_Find[s], self.Bottom_Find[s]), self.ColorView[s], 2)
-                            cv.rectangle(image2, (self.Point_Left[s] - 30, self.Point_Top[s] - 30), (self.Point_Right[s] + 30, self.Point_Bottom[s] + 30), self.ColorView[s], 2)
-                            cv.putText(image2, "Point" + str(s + 1), (self.Point_Left[s] - 30, self.Point_Top[s] - 30), cv.FONT_HERSHEY_SIMPLEX, 0.7, self.ColorView[s], 2)
-                            im = Image.fromarray(image2)
-                        elif self.cam.get() == "Cam3" and self.Point_Camera[s] == "Cam3":
-                            cv.rectangle(image3, (self.Left_Find[s], self.Top_Find[s]), (self.Right_Find[s], self.Bottom_Find[s]), self.ColorView[s], 2)
-                            cv.rectangle(image3, (self.Point_Left[s] - 30, self.Point_Top[s] - 30), (self.Point_Right[s] + 30, self.Point_Bottom[s] + 30), self.ColorView[s], 2)
-                            cv.putText(image3, "Point" + str(s + 1), (self.Point_Left[s] - 30, self.Point_Top[s] - 30), cv.FONT_HERSHEY_SIMPLEX, 0.7, self.ColorView[s], 2)
-                            im = Image.fromarray(image3)
-                    im = im.resize((960, 720))
-                    image = ImageTk.PhotoImage(image=im)
-                    self.view.image = image
-                    self.view.configure(image=image)
+                        print(self.Point_Camera[s])
+                        if self.Point_Camera[s] == "Cam1":
+                            cv.rectangle(image1, (self.Left_Find[s], self.Top_Find[s]), (self.Right_Find[s], self.Bottom_Find[s]), self.ColorView[s], 1)
+                            #cv.rectangle(image1, (self.Point_Left[s] - 30, self.Point_Top[s] - 30), (self.Point_Right[s] + 30, self.Point_Bottom[s] + 30), self.ColorView[s], 1)
+                            cv.putText(image1, "P" + str(s + 1) + ", " + str(self.Score_Area_Data[s]), (self.Point_Left[s], self.Point_Top[s]), cv.FONT_HERSHEY_SIMPLEX, 0.6, self.ColorView[s], 1)
+                            im1 = Image.fromarray(image1)
+                        if self.Point_Camera[s] == "Cam2":
+                            cv.rectangle(image2, (self.Left_Find[s], self.Top_Find[s]), (self.Right_Find[s], self.Bottom_Find[s]), self.ColorView[s], 1)
+                            #cv.rectangle(image2, (self.Point_Left[s] - 30, self.Point_Top[s] - 30), (self.Point_Right[s] + 30, self.Point_Bottom[s] + 30), self.ColorView[s], 1)
+                            cv.putText(image2, "P" + str(s + 1) + ", " + str(self.Score_Area_Data[s]), (self.Point_Left[s], self.Point_Top[s]), cv.FONT_HERSHEY_SIMPLEX, 0.6, self.ColorView[s], 1)
+                            im2 = Image.fromarray(image2)
+                    try:
+                        im1 = im1.resize((920, 620))
+                        image1 = ImageTk.PhotoImage(image=im1)
+                        self.view_Camera1.image1 = image1
+                        self.view_Camera1.configure(image=image1)
+                    except:
+                        pass
+                    try:
+                        im2 = im2.resize((920, 620))
+                        image2 = ImageTk.PhotoImage(image=im2)
+                        self.view_Camera2.image2 = image2
+                        self.view_Camera2.configure(image=image2)
+                    except:
+                        pass
             except:
                 pass
 
