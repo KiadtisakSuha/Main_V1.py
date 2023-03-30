@@ -9,12 +9,12 @@ import urllib.request
 from threading import Timer
 from tkinter import messagebox
 from tkinter import ttk
+
 import cv2 as cv
 import numpy as np
 import pyvisa
 from PIL import Image
 from PIL import ImageTk
-
 
 """
 def Save_Result(Data):
@@ -72,7 +72,7 @@ Mode = Setting_Paramiter[0]["Mode"]
 frame0.set(cv.CAP_PROP_FRAME_HEIGHT, 768)
 frame0.set(cv.CAP_PROP_AUTO_EXPOSURE, 0)
 frame0.set(cv.CAP_PROP_AUTOFOCUS, 0)"""
-#E25
+# E25
 PartNumber = Getpart().Get()[0]
 if PartNumber == "DEN0006SBK" or PartNumber == "TMT367KR00":
     Quantity_Cam = 3
@@ -131,6 +131,7 @@ else:
         frame2.set(cv.CAP_PROP_AUTO_EXPOSURE, 0)
         frame2.set(cv.CAP_PROP_AUTOFOCUS, 0)
 font = cv.FONT_HERSHEY_SIMPLEX
+
 
 class GetEmp:
     @staticmethod
@@ -212,6 +213,25 @@ class InfiniteTimer():
         else:
             pass
 
+
+class Delete_Data:
+    @staticmethod
+    def Delete_Image():
+        if Quantity_Cam >= 1:
+            try:
+                os.remove("Snap1.bmp")
+            except FileNotFoundError:
+                pass
+            if Quantity_Cam >= 2:
+                try:
+                    os.remove("Snap2.bmp")
+                except FileNotFoundError:
+                    pass
+                if Quantity_Cam >= 3:
+                    try:
+                        os.remove("Snap3.bmp")
+                    except FileNotFoundError:
+                        pass
 
 class Save_Data:
     @staticmethod
@@ -507,7 +527,6 @@ class App(tk.Tk):
 
         self.ShowCount()
 
-
         self.btn_repart = tk.Button(self, text="Re-order", command=self.CallPart, bg='black')
         self.btn_repart.configure(font=("Arial", 18))
         self.btn_repart.configure(justify="center", foreground="green")
@@ -515,8 +534,6 @@ class App(tk.Tk):
 
         self.view = tk.Label(self, bg='black')
         self.view.place(x=950, y=180)
-
-
 
     def Reset(self):
         self.ClassBoard.inst.write("@1 R08")
@@ -590,8 +607,9 @@ class App(tk.Tk):
                         if os.path.isfile(os.path.join(image_path_NG, path)):
                             if path.endswith('.jpg'):
                                 Image_NG.append(path)
-                except:pass
-                    #ViewNG.destroy()
+                except:
+                    pass
+                # ViewNG.destroy()
                 return Image_NG, Point
 
             def Next():
@@ -1129,9 +1147,9 @@ class App(tk.Tk):
                         self.ProcessP.configure(text="Ready")
                         self.ProcessP.configure(fg="green")
                         self.SaveDataBoard = False
+                        Delete_Data.Delete_Image()
                     except:
                         messagebox.showerror('Program Error', 'Process')
-                # self.after(100,self.Board_show)
 
     elif Mode == 2:
         def CallKeyBorad(self):
@@ -1163,6 +1181,7 @@ class App(tk.Tk):
                     self.ViewImage()
                     self.ProcessP.configure(text="Ready")
                     self.ProcessP.configure(fg="green")
+                    Delete_Data.Delete_Image()
 
     def Strat(self):
         self.Close_Camera = True
@@ -1177,6 +1196,7 @@ class App(tk.Tk):
         self.ViewImage()
         self.ProcessP.configure(text="Ready")
         self.ProcessP.configure(fg="green")
+        Delete_Data.Delete_Image()
 
     def Process_Outline(self, image, Template, Left, Top, Right, Bottom):
         image = cv.imread(image, 0)
