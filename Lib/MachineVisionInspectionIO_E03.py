@@ -438,6 +438,7 @@ class App(tk.Tk):
             # Hex = self.ClassBoard.ReadBorad()[0]
             # print(Hex)
             self.SaveDataBoard = False
+            self.Flag_non = False
             self.Flag00 = False
             self.Flag01 = False
             self.SaveDataBoard_03 = False
@@ -1074,26 +1075,32 @@ class App(tk.Tk):
                 # 110000001110010000110100001010 #09
                 # 110000010000100000110100001010 #0B
                 # 110000001101000000110100001010 #04
-                if Bin == "110000001100000000110100001010":#00
+                if Bin == "110000001100000000110100001010":#00 กรณี OK
+                    self.Flag_non = False
                     self.Flag01 = False
                     self.SaveDataBoard = True
                     if self.Flag00 == False:
                         self.ClassBoard.inst.write("@1 R00")
                         self.Flag00 = True
-                elif Bin == "110000001100010000110100001010":#01
+                elif Bin == "110000001100010000110100001010":#01 กรณี NG
+                    self.SaveDataBoard = True
+                    self.Flag_non = False
                     self.Flag01 = True
                     self.Flag00 = False
                 elif Bin == "110000001100110000110100001010" and self.SaveDataBoard == True:  #03
+                    self.Flag_non = False
                     self.Flag00 = False
                     self.Flag01 = False
                     self.SaveDataBoard = False
                     self.ClassBoard.inst.write("@1 R03")
                     time.sleep(0.5)
                     self.ClassBoard.inst.write("")
+
                     time.sleep(0.5)
                     self.ClassBoard.inst.write("@1 I0")
                     self.SaveDataBoard_03 = True
                 elif (Bin == "110000001110010000110100001010" or Bin == "110000010000100000110100001010") and self.Flag_Save == False:  # 09#0B
+                    self.Flag_non = False
                     self.Flag00 = False
                     self.Flag01 = False
                     if self.SaveDataBoard_03 == True:
@@ -1115,18 +1122,22 @@ class App(tk.Tk):
                         self.SaveDataBoard = False
                         self.Flag_Save = True
                 elif Bin == "110000001110010000110100001010" and self.Flag_Save == True:
+                    self.Flag_non = False
                     self.Flag00 = False
                     self.Flag01 = False
                     if self.Flag_Result == True:
                         self.ClassBoard.inst.write("@1 R08")
                         time.sleep(2)
-                        self.ClassBoard.inst.write("@1 R00")
+                        self.ClassBoard.inst.write("@0 R00")
                     elif self.Flag_Result == False:
                         self.ClassBoard.inst.write("@1 F02")
                         time.sleep(2)
                     self.ClassBoard.inst.clear()
                     self.Flag_Save = False
                 else:
+                    """if self.Flag_non == False:
+                        self.ClassBoard.inst.write("@1 R00")
+                        self.Flag_non = True"""
                     self.Flag00 = False
                     self.Flag01 = False
 

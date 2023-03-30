@@ -233,6 +233,7 @@ class Delete_Data:
                     except FileNotFoundError:
                         pass
 
+
 class Save_Data:
     @staticmethod
     def Save_Imaga_Run(Camera1, Camera2, Camera3):
