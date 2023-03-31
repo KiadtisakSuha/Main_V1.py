@@ -214,24 +214,38 @@ class InfiniteTimer():
             pass
 
 
+flag_camera = False
+
+
 class Delete_Data:
     @staticmethod
     def Delete_Image():
+        global flag_camera
         if Quantity_Cam >= 1:
             try:
                 os.remove("Snap1.bmp")
             except FileNotFoundError:
-                pass
+                frame0.release()
+                flag_camera = True
             if Quantity_Cam >= 2:
                 try:
                     os.remove("Snap2.bmp")
                 except FileNotFoundError:
-                    pass
+                    frame0.release()
+                    frame1.release()
+                    flag_camera = True
                 if Quantity_Cam >= 3:
                     try:
                         os.remove("Snap3.bmp")
                     except FileNotFoundError:
-                        pass
+                        frame0.release()
+                        frame1.release()
+                        frame2.release()
+                        flag_camera = True
+        if flag_camera:
+            cv.destroyAllWindows()
+            app.destroy()
+            subprocess.call([r'TerminatedProcess.bat'])
 
 
 class Save_Data:
