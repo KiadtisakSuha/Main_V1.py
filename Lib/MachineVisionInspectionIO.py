@@ -397,7 +397,7 @@ class App(tk.Tk):
         self.Batch_API_Get = self.Batch_API
 
         self.Machine_Vision = tk.Label(self, text='Machine Vision Inspection ' + self.Machine_API, bg='black')
-        self.Machine_Version = tk.Label(self, text='v1.0.3', bg='black')
+        self.Machine_Version = tk.Label(self, text='v1.0.3', bg='black' )
         if self.Sever_API == "Connected":
             self.Machine_Vision.configure(fg='Green')
             self.Machine_Version.configure(fg='Green')
